@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: SNPlocs objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for SNPlocs-class {BSgenome}"><tr><td>SNPlocs-class {BSgenome}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>SNPlocs objects</h2>
+
+<h3>Description</h3>
+
+<p>The SNPlocs class is a container for storing known SNP locations (of class
+<em>snp</em>) for a given organism.
+</p>
+<p>SNPlocs objects are usually made in advance by a volunteer and made
+available to the Bioconductor community as <em>SNPlocs data packages</em>.
+See <code>?<a href="injectSNPs.html">available.SNPs</a></code> for how to get the list of
+<em>SNPlocs and <a href="XtraSNPlocs-class.html">XtraSNPlocs</a> data packages</em> curently available.
+</p>
+<p>The main focus of this man page is on how to extract SNPs from an
+SNPlocs object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+snpcount(x)
+
+snpsBySeqname(x, seqnames, ...)
+## S4 method for signature 'SNPlocs'
+snpsBySeqname(x, seqnames, drop.rs.prefix=FALSE, genome=NULL)
+
+snpsByOverlaps(x, ranges, ...)
+## S4 method for signature 'SNPlocs'
+snpsByOverlaps(x, ranges, drop.rs.prefix=FALSE, ..., genome=NULL)
+
+snpsById(x, ids, ...)
+## S4 method for signature 'SNPlocs'
+snpsById(x, ids, ifnotfound=c("error", "warning", "drop"), genome=NULL)
+
+inferRefAndAltAlleles(gpos, genome)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>A SNPlocs object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>seqnames</code></td>
+<td>
+
+<p>The names of the sequences for which to get SNPs. Must be a subset of
+<code>seqlevels(x)</code>. NAs and duplicates are not allowed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments, for use in specific methods.
+</p>
+<p>Arguments passed to the <code>snpsByOverlaps</code> method for SNPlocs
+objects thru <code>...</code> are used internally in the call to
+<code><a href="../../IRanges/html/subsetByOverlaps.html">subsetByOverlaps</a>()</code>.
+See <code>?IRanges::<a href="../../IRanges/html/subsetByOverlaps.html">subsetByOverlaps</a></code> in the <span class="pkg">IRanges</span>
+package and <code>?GenomicRanges::<a href="../../GenomicRanges/html/subsetByOverlaps.html">subsetByOverlaps</a></code>
+in the <span class="pkg">GenomicRanges</span> package for more information about the
+<code>subsetByOverlaps()</code> generic and its method for
+<a href="../../GenomicRanges/html/GenomicRanges.html">GenomicRanges</a> objects.
+</p>
+</td></tr>
+<tr valign="top"><td><code>drop.rs.prefix</code></td>
+<td>
+
+<p>Should the <code>rs</code> prefix be dropped from the returned RefSNP ids?
+(RefSNP ids are stored in the <code>RefSNP_id</code> metadata column of the
+returned object.)
+</p>
+</td></tr>
+<tr valign="top"><td><code>genome</code></td>
+<td>
+
+<p>For <code>snpsBySeqname</code>, <code>snpsByOverlaps</code>, and <code>snpsById</code>:
+</p>
+<p><code>NULL</code> (the default), or a <a href="BSgenome-class.html">BSgenome</a> object
+containing the sequences of the reference genome that corresponds
+to the SNP positions. See <code>inferRefAndAltAlleles</code> below for
+an alternative way to specify <code>genome</code>.
+</p>
+<p>If <code>genome</code> is supplied, then <code>inferRefAndAltAlleles</code> is
+called internally by <code>snpsBySeqname</code>, <code>snpsByOverlaps</code>,
+or <code>snpsById</code> to <em>infer</em> the reference allele (a.k.a.
+<em>ref</em> allele) and alternate allele(s) (a.k.a. <em>alt</em>
+allele(s)) for each SNP in the returned <a href="../../GenomicRanges/html/GPos.html">GPos</a>
+object. The inferred <em>ref</em> allele and <em>alt</em> allele(s) are
+returned in additional metadata columns <code>ref_allele</code> (character)
+and <code>alt_alleles</code> (CharacterList).
+</p>
+<p>For <code>inferRefAndAltAlleles</code>:
+</p>
+<p>A <a href="BSgenome-class.html">BSgenome</a> object containing the sequences of the
+reference genome that corresponds to the SNP positions in
+<code>gpos</code>. Alternatively <code>genome</code> can be a single
+string containing the name of the reference genome, in which
+case it must be specified in a way that is accepted by the
+<code><a href="available.genomes.html">getBSgenome</a></code> function (e.g. <code>"GRCh38"</code>)
+and the corresponding BSgenome data package needs to be already
+installed (see <code>?<a href="available.genomes.html">getBSgenome</a></code> for the details).
+</p>
+</td></tr>
+<tr valign="top"><td><code>ranges</code></td>
+<td>
+
+<p>One or more genomic regions of interest specified as a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> or <a href="../../GenomicRanges/html/GPos.html">GPos</a> object.
+A single region of interest can be specified as a character string of
+the form <code>"ch14:5201-5300"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ids</code></td>
+<td>
+
+<p>The RefSNP ids to look up (a.k.a. rs ids). Can be integer or character
+vector, with or without the <code>"rs"</code> prefix. NAs are not allowed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ifnotfound</code></td>
+<td>
+
+<p>What to do if SNP ids are not found.
+</p>
+</td></tr>
+<tr valign="top"><td><code>gpos</code></td>
+<td>
+
+<p>A <a href="../../GenomicRanges/html/GPos.html">GPos</a> object containing SNPs. It must have a
+metadata column <code>alleles_as_ambig</code> like obtained when using
+any of the SNP extractor <code>snpsBySeqname</code>, <code>snpsByOverlaps</code>,
+or <code>snpsById</code> on a SNPlocs object.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>When the reference genome is specified via the <code>genome</code> argument,
+SNP extractors <code>snpsBySeqname</code>, <code>snpsByOverlaps</code>, and
+<code>snpsById</code> call <code>inferRefAndAltAlleles</code> internally to
+<em>infer</em> the reference allele (a.k.a. <em>ref</em> allele) and
+alternate allele(s) (a.k.a. <em>alt</em> allele(s)) for each SNP.
+</p>
+<p>For each SNP the <em>ref</em> allele is inferred from the actual
+nucleotide found in the reference genome at the SNP position.
+The <em>alt</em> alleles are inferred from metadata column
+<code>alleles_as_ambig</code> and the <code>ref</code> allele. More precisely
+for each SNP the <em>alt</em> alleles are considered to be the alleles
+in <code>alleles_as_ambig</code> minus the <em>ref</em> allele.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>snpcount</code> returns a named integer vector containing the number
+of SNPs for each sequence in the reference genome.
+</p>
+<p><code>snpsBySeqname</code>, <code>snpsByOverlaps</code>, and <code>snpsById</code> return
+an <em>unstranded</em> <a href="../../GenomicRanges/html/GPos.html">GPos</a> object with one element
+(genomic position) per SNP and the following metadata columns:
+</p>
+
+<ul>
+<li> <p><code>RefSNP_id</code>: RefSNP ID (aka &quot;rs id&quot;). Character vector
+with no NAs and no duplicates.
+</p>
+</li>
+<li> <p><code>alleles_as_ambig</code>: A character vector with no NAs
+containing the alleles for each SNP represented by an IUPAC
+nucleotide ambiguity code.
+See <code>?<a href="../../Biostrings/html/IUPAC_CODE_MAP.html">IUPAC_CODE_MAP</a></code> in the
+<span class="pkg">Biostrings</span> package for more information.
+</p>
+</li></ul>
+
+<p>If the reference genome was specified (via the <code>genome</code> argument),
+the additional metadata columns are returned:
+</p>
+
+<ul>
+<li> <p><code>genome_compat</code>: A logical vector indicating whether the
+alleles in <code>alleles_as_ambig</code> are consistent with the
+reference genome.
+</p>
+</li>
+<li> <p><code>ref_allele</code>: A character vector containing the
+<em>inferred</em> reference allele for each SNP.
+</p>
+</li>
+<li> <p><code>alt_alleles</code>: A <a href="../../IRanges/html/CharacterList.html">CharacterList</a> object
+where each list element is a character vector containing the
+<em>inferred</em> alternate allele(s) for the corresponding SNP.
+</p>
+</li></ul>
+
+<p>Note that this <a href="../../GenomicRanges/html/GPos.html">GPos</a> object is <em>unstranded</em>
+i.e. all the SNPs in it have their strand set to <code>"*"</code>.
+Alleles are always reported with respect to the <em>positive</em> strand.
+</p>
+<p>If <code>ifnotfound="error"</code>, the object returned by <code>snpsById</code>
+is guaranteed to be <em>parallel</em> to <code>ids</code>, that is, the i-th
+element in the <a href="../../GenomicRanges/html/GPos.html">GPos</a> object corresponds to the
+i-th element in <code>ids</code>.
+</p>
+<p><code>inferRefAndAltAlleles</code> returns a <a href="../../S4Vectors/html/DataFrame.html">DataFrame</a> with
+one row per SNP in <code>gpos</code> and with columns <code>genome_compat</code>
+(logical), <code>ref_allele</code> (character), and <code>alt_alleles</code>
+(CharacterList).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>H. Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="injectSNPs.html">available.SNPs</a></code>
+</p>
+</li>
+<li> <p><a href="../../GenomicRanges/html/GPos.html">GPos</a> and <a href="../../GenomicRanges/html/GRanges.html">GRanges</a>
+objects in the <span class="pkg">GenomicRanges</span> package.
+</p>
+</li>
+<li> <p><a href="XtraSNPlocs-class.html">XtraSNPlocs</a> packages and objects for molecular variations
+of class other than <em>snp</em> e.g. of class <em>in-del</em>,
+<em>heterozygous</em>, <em>microsatellite</em>, etc...
+</p>
+</li>
+<li> <p><code>IRanges::<a href="../../IRanges/html/subsetByOverlaps.html">subsetByOverlaps</a></code> in the
+<span class="pkg">IRanges</span> package and
+<code>GenomicRanges::<a href="../../GenomicRanges/html/subsetByOverlaps.html">subsetByOverlaps</a></code>
+in the <span class="pkg">GenomicRanges</span> package for more information about the
+<code>subsetByOverlaps()</code> generic and its method for
+<a href="../../GenomicRanges/html/GenomicRanges.html">GenomicRanges</a> objects.
+</p>
+</li>
+<li> <p><code><a href="injectSNPs.html">injectSNPs</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../Biostrings/html/IUPAC_CODE_MAP.html">IUPAC_CODE_MAP</a></code> in the <span class="pkg">Biostrings</span>
+package.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+library(SNPlocs.Hsapiens.dbSNP144.GRCh38)
+snps &lt;- SNPlocs.Hsapiens.dbSNP144.GRCh38
+snpcount(snps)
+
+## ---------------------------------------------------------------------
+## snpsBySeqname()
+## ---------------------------------------------------------------------
+
+## Get all SNPs located on chromosome 22 or MT:
+snpsBySeqname(snps, c("22", "MT"))
+
+## ---------------------------------------------------------------------
+## snpsByOverlaps()
+## ---------------------------------------------------------------------
+
+## Get all SNPs overlapping some genomic region of interest:
+snpsByOverlaps(snps, "X:3e6-33e6")
+
+## With the regions of interest being all the known CDS for hg38
+## located on chromosome 22 or MT (except for the chromosome naming
+## convention, hg38 is the same as GRCh38):
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb &lt;- TxDb.Hsapiens.UCSC.hg38.knownGene
+my_cds &lt;- cds(txdb)
+seqlevels(my_cds, pruning.mode="coarse") &lt;- c("chr22", "chrM")
+seqlevelsStyle(my_cds)  # UCSC
+seqlevelsStyle(snps)    # NCBI
+seqlevelsStyle(my_cds) &lt;- seqlevelsStyle(snps)
+genome(my_cds) &lt;- genome(snps)
+my_snps &lt;- snpsByOverlaps(snps, my_cds)
+my_snps
+table(my_snps %within% my_cds)
+
+## ---------------------------------------------------------------------
+## snpsById()
+## ---------------------------------------------------------------------
+
+## Lookup some RefSNP ids:
+my_rsids &lt;- c("rs10458597", "rs12565286", "rs7553394")
+## Not run: 
+  snpsById(snps, my_rsids)  # error, rs7553394 not found
+
+## End(Not run)
+## The following example uses more than 2GB of memory, which is more
+## than what 32-bit Windows can handle:
+is_32bit_windows &lt;- .Platform$OS.type == "windows" &amp;&amp;
+                    .Platform$r_arch == "i386"
+if (!is_32bit_windows) {
+    snpsById(snps, my_rsids, ifnotfound="drop")
+}
+
+## ---------------------------------------------------------------------
+## Obtaining the ref allele and alt allele(s)
+## ---------------------------------------------------------------------
+
+## When the reference genome is specified (via the 'genome' argument),
+## SNP extractors snpsBySeqname(), snpsByOverlaps(), and snpsById()
+## call inferRefAndAltAlleles() internally to **infer** the ref allele
+## and alt allele(s) for each SNP.
+my_snps &lt;- snpsByOverlaps(snps, "X:3e6-8e6", genome="GRCh38")
+my_snps
+
+## Most SNPs have only 1 alternate allele:
+table(lengths(mcols(my_snps)$alt_alleles))
+
+## SNPs with 2 alternate alleles:
+my_snps[lengths(mcols(my_snps)$alt_alleles) == 2]
+
+## SNPs with 3 alternate alleles:
+my_snps[lengths(mcols(my_snps)$alt_alleles) == 3]
+
+## Note that a small percentage of SNPs in dbSNP have alleles that
+## are inconsistent with the reference genome (don't ask me why):
+table(mcols(my_snps)$genome_compat)
+
+## For the inconsistent SNPs, all the alleles reported by dbSNP
+## are considered alternate alleles i.e. for each inconsistent SNP
+## metadata columns "alleles_as_ambig" and "alt_alleles" represent
+## the same set of nucleotides (the latter being just an expanded
+## representation of the IUPAC ambiguity letter in the former):
+my_snps[!mcols(my_snps)$genome_compat]
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>BSgenome</em> version 1.58.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

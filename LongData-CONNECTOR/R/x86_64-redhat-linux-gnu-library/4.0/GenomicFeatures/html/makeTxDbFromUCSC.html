@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Make a TxDb object from annotations available at the UCSC...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for makeTxDbFromUCSC {GenomicFeatures}"><tr><td>makeTxDbFromUCSC {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Make a TxDb object from annotations available at the
+UCSC Genome Browser
+</h2>
+
+<h3>Description</h3>
+
+<p>The <code>makeTxDbFromUCSC</code> function allows the user to make a
+<a href="TxDb-class.html">TxDb</a> object from transcript annotations available at the
+UCSC Genome Browser.
+</p>
+<p>Note that it uses the <span class="pkg">RMariaDB</span> package internally so make sure
+that this package is installed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+makeTxDbFromUCSC(genome="hg19", tablename="knownGene",
+        transcript_ids=NULL,
+        circ_seqs=NULL,
+        url="http://genome.ucsc.edu/cgi-bin/",
+        goldenPath.url=getOption("UCSC.goldenPath.url"),
+        taxonomyId=NA,
+        miRBaseBuild=NA)
+
+supportedUCSCtables(genome="hg19", url="http://genome.ucsc.edu/cgi-bin/")
+
+browseUCSCtrack(genome="hg19", tablename="knownGene",
+                url="http://genome.ucsc.edu/cgi-bin/")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>genome</code></td>
+<td>
+
+<p>The name of a UCSC genome assembly e.g. <code>"hg19"</code> or <code>"panTro6"</code>.
+You can use <code>rtracklayer::<a href="../../rtracklayer/html/ucscGenomes.html">ucscGenomes</a>()[ , "db"]</code>
+to obtain the current list of valid UCSC genome assemblies.
+</p>
+</td></tr>
+<tr valign="top"><td><code>tablename</code></td>
+<td>
+
+<p>The name of the UCSC table containing the transcript genomic locations
+to retrieve. Use the <code>supportedUCSCtables</code> utility function to get
+the list of tables known to work with <code>makeTxDbFromUCSC</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>transcript_ids</code></td>
+<td>
+
+<p>Optionally, only retrieve transcript locations for the specified
+set of transcript ids. If this is used, then the meta information
+displayed for the resulting <a href="TxDb-class.html">TxDb</a> object will say
+'Full dataset: no'. Otherwise it will say 'Full dataset: yes'.
+</p>
+</td></tr>
+<tr valign="top"><td><code>circ_seqs</code></td>
+<td>
+
+<p>Like <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> objects,
+<a href="../../SummarizedExperiment/html/SummarizedExperiment.html">SummarizedExperiment</a> objects,
+and many other objects in Bioconductor, the <a href="TxDb-class.html">TxDb</a> object
+returned by <code>makeTxDbFromUCSC</code> contains a
+<a href="../../GenomeInfoDb/html/seqinfo.html">seqinfo</a> component that can be
+accessed with <code><a href="../../GenomeInfoDb/html/seqinfo.html">seqinfo</a>()</code>.
+This component contains various sequence-level information
+like the sequence names, lengths, and circularity flag for the
+genome assembly of the <a href="TxDb-class.html">TxDb</a> object.
+</p>
+<p>As far as we know the information of which sequences are circular
+is not available in the UCSC Genome Browser. However, for the
+most commonly used UCSC genome assemblies <code>makeTxDbFromUCSC</code>
+will get this information from a knowledge database stored in the
+<span class="pkg">GenomeInfoDb</span> package (see <code>?<a href="../../GenomeInfoDb/html/getChromInfoFromUCSC.html">registered_UCSC_genomes</a></code>).
+</p>
+<p>For less commonly used UCSC genome assemblies, <code>makeTxDbFromUCSC</code>
+will make a guess based on the chromosome names (e.g. chrM or 2micron
+will be assumed to be circular). Even though this works most of the
+time, it is not guaranteed to work <em>all the time</em>. So in this
+case a warning is issued. If you think the guess is incorrect then
+you can supply your own list of circular sequences (as a character
+vector) via the <code>circ_seqs</code> argument.
+</p>
+</td></tr>
+<tr valign="top"><td><code>url,goldenPath.url</code></td>
+<td>
+
+<p>Use to specify the location of an alternate UCSC Genome Browser.
+</p>
+</td></tr>
+<tr valign="top"><td><code>taxonomyId</code></td>
+<td>
+
+<p>By default this value is NA and the organism inferred will be used
+to look up the correct value for this. But you can use this argument
+to supply your own valid taxId here.
+</p>
+</td></tr>
+<tr valign="top"><td><code>miRBaseBuild</code></td>
+<td>
+
+<p>Specify the string for the appropriate build information from
+<span class="pkg">mirbase.db</span> to use for microRNAs.  This can be learned by
+calling <code>supportedMiRBaseBuildValues</code>. By default, this value
+will be set to <code>NA</code>, which will inactivate the <code>microRNAs</code>
+accessor.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>makeTxDbFromUCSC</code> is a convenience function that feeds
+data from the UCSC source to the lower level <code><a href="makeTxDb.html">makeTxDb</a></code>
+function.
+See <code>?<a href="makeTxDbFromEnsembl.html">makeTxDbFromEnsembl</a></code> for a similar function that
+feeds data from an Ensembl database.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For <code>makeTxDbFromUCSC</code>: A <a href="TxDb-class.html">TxDb</a> object.
+</p>
+<p>For <code>supportedUCSCtables</code>: A data frame with 3 columns
+(<code>tablename</code>, <code>track</code>, and <code>subtrack</code>) and 1 row
+per table known to work with <code>makeTxDbFromUCSC</code>.
+IMPORTANT NOTE: In the returned data frame, the set of tables associated
+with a track with subtracks might contain tables that don't exist for the
+specified genome.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>M. Carlson and H. Pagès
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="makeTxDbFromEnsembl.html">makeTxDbFromEnsembl</a></code> and
+<code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code> for making a <a href="TxDb-class.html">TxDb</a>
+object from other online resources.
+</p>
+</li>
+<li> <p><code><a href="makeTxDbFromGRanges.html">makeTxDbFromGRanges</a></code> and <code><a href="makeTxDbFromGFF.html">makeTxDbFromGFF</a></code>
+for making a <a href="TxDb-class.html">TxDb</a> object from a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a>
+object, or from a GFF or GTF file.
+</p>
+</li>
+<li> <p><code><a href="../../rtracklayer/html/ucscGenomes.html">ucscGenomes</a></code> in the <span class="pkg">rtracklayer</span>
+package.
+</p>
+</li>
+<li><p> The <code><a href="makeTxDbPackage.html">supportedMiRBaseBuildValues</a></code> function for
+listing all the possible values for the <code>miRBaseBuild</code>
+argument.
+</p>
+</li>
+<li><p> The <a href="TxDb-class.html">TxDb</a> class.
+</p>
+</li>
+<li> <p><code><a href="makeTxDb.html">makeTxDb</a></code> for the low-level function used by the
+<code>makeTxDbFrom*</code> functions to make the <a href="TxDb-class.html">TxDb</a> object
+returned to the user.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## ---------------------------------------------------------------------
+## A. BASIC USAGE
+## ---------------------------------------------------------------------
+
+## Use ucscGenomes() from the rtracklayer package to display the list of
+## genomes available at UCSC:
+library(rtracklayer)
+ucscGenomes()[ , "db"]
+
+## Display the list of tables known to work with makeTxDbFromUCSC():
+supportedUCSCtables("hg38")
+supportedUCSCtables("hg19")
+
+## Open the UCSC track page for a given organism/table:
+browseUCSCtrack("hg38", tablename="knownGene")
+browseUCSCtrack("hg19", tablename="knownGene")
+
+browseUCSCtrack("hg38", tablename="ncbiRefSeqSelect")
+browseUCSCtrack("hg19", tablename="ncbiRefSeqSelect")
+
+browseUCSCtrack("hg19", tablename="pseudoYale60")
+
+browseUCSCtrack("sacCer3", tablename="ensGene")
+
+## Retrieve a full transcript dataset for Yeast from UCSC:
+txdb1 &lt;- makeTxDbFromUCSC("sacCer3", tablename="ensGene")
+txdb1
+
+## Retrieve an incomplete transcript dataset for Mouse from UCSC (only
+## transcripts linked to Entrez Gene ID 22290):
+transcript_ids &lt;- c(
+    "uc009uzf.1",
+    "uc009uzg.1",
+    "uc009uzh.1",
+    "uc009uzi.1",
+    "uc009uzj.1"
+)
+
+txdb2 &lt;- makeTxDbFromUCSC("mm10", tablename="knownGene",
+                          transcript_ids=transcript_ids)
+txdb2
+
+## ---------------------------------------------------------------------
+## B. IMPORTANT NOTE ABOUT supportedUCSCtables()
+## ---------------------------------------------------------------------
+
+## In the data frame returned by supportedUCSCtables(), the set of
+## tables associated with a track with subtracks might contain tables
+## that don't exist for the specified genome:
+supportedUCSCtables("mm10")
+browseUCSCtrack("mm10", tablename="ncbiRefSeqSelect")  # no such table
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

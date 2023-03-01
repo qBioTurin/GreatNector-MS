@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Seqinfo objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for Seqinfo-class {GenomeInfoDb}"><tr><td>Seqinfo-class {GenomeInfoDb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Seqinfo objects</h2>
+
+<h3>Description</h3>
+
+<p>A Seqinfo object is a table-like object that contains basic information
+about a set of genomic sequences. The table has 1 row per sequence and
+1 column per sequence attribute.  Currently the only attributes are the
+length, circularity flag, and genome provenance (e.g. hg19) of the
+sequence, but more attributes might be added in the future as the need
+arises.
+</p>
+
+
+<h3>Details</h3>
+
+<p>Typically Seqinfo objects are not used directly but are part of
+higher level objects. Those higher level objects will generally
+provide a <code>seqinfo</code> accessor for getting/setting their
+Seqinfo component.
+</p>
+
+
+<h3>Constructor</h3>
+
+
+<dl>
+<dt></dt><dd>
+<p><code>Seqinfo(seqnames, seqlengths=NA, isCircular=NA, genome=NA)</code>:
+Create a Seqinfo object and populate it with the supplied data.
+</p>
+<p>One special form of calling the <code>Seqinfo()</code> constructor is
+to specify only the <code>genome</code> argument and set it to the name
+of an NCBI assembly (e.g. <code>Seqinfo(genome="GRCh38.p12")</code>)
+or UCSC genome (e.g. <code>Seqinfo(genome="hg38")</code>), in which
+case the sequence information is fetched from NCBI or UCSC.
+See Examples section below for some examples.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Accessor methods</h3>
+
+<p>In the code snippets below, <code>x</code> is a Seqinfo object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>length(x)</code>:
+Return the number of sequences in <code>x</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqnames(x)</code>, <code>seqnames(x) &lt;- value</code>:
+Get/set the names of the sequences in <code>x</code>.
+Those names must be non-NA, non-empty and unique.
+They are also called the <em>sequence levels</em> or the <em>keys</em>
+of the Seqinfo object.
+</p>
+<p>Note that, in general, the end user should not try to alter the
+sequence levels with <code>seqnames(x) &lt;- value</code>. The recommended way
+to do this is with <code>seqlevels(x) &lt;- value</code> as described below.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>names(x)</code>, <code>names(x) &lt;- value</code>:
+Same as <code>seqnames(x)</code> and <code>seqnames(x) &lt;- value</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlevels(x)</code>:
+Same as <code>seqnames(x)</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlevels(x) &lt;- value</code>:
+Can be used to rename, drop, add and/or reorder the sequence levels.
+<code>value</code> must be either a named or unnamed character vector.
+When <code>value</code> has names, the names only serve the purpose of
+mapping the new sequence levels to the old ones.
+Otherwise (i.e. when <code>value</code> is unnamed) this mapping is
+implicitly inferred from the following rules:
+</p>
+<p>(1) If the number of new and old levels are the same, and if the
+positional mapping between the new and old levels shows that
+some or all of the levels are being renamed, and if the levels
+that are being renamed are renamed with levels that didn't exist
+before (i.e. are not present in the old levels), then
+<code>seqlevels(x) &lt;- value</code> will just rename the sequence levels.
+Note that in that case the result is the same as with
+<code>seqnames(x) &lt;- value</code> but it's still recommended to use
+<code>seqlevels(x) &lt;- value</code> as it is safer.
+</p>
+<p>(2) Otherwise (i.e. if the conditions for (1) are not satisfied)
+<code>seqlevels(x) &lt;- value</code> will consider that the sequence
+levels are not being renamed and will just perform
+<code>x &lt;- x[value]</code>.
+</p>
+<p>See below for some examples.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlengths(x)</code>, <code>seqlengths(x) &lt;- value</code>:
+Get/set the length for each sequence in <code>x</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>isCircular(x)</code>, <code>isCircular(x) &lt;- value</code>:
+Get/set the circularity flag for each sequence in <code>x</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>genome(x)</code>, <code>genome(x) &lt;- value</code>:
+Get/set the genome identifier or assembly name for each sequence
+in <code>x</code>.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Subsetting</h3>
+
+<p>In the code snippets below, <code>x</code> is a Seqinfo object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>x[i]</code>:
+A Seqinfo object can be subsetted only by name i.e. <code>i</code>
+must be a character vector.
+This is a convenient way to drop/add/reorder the rows (aka the
+sequence levels) of a Seqinfo object.
+</p>
+<p>See below for some examples.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Coercion</h3>
+
+<p>In the code snippets below, <code>x</code> is a Seqinfo object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>as.data.frame(x)</code>:
+Turns <code>x</code> into a data frame.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Combining Seqinfo objects</h3>
+
+<p>There are no <code>c</code> or <code>rbind</code> method for Seqinfo objects.
+Both would be expected to just append the rows in <code>y</code> to the rows
+in <code>x</code> resulting in an object of length <code>length(x) + length(y)</code>.
+But that would tend to break the constraint that the seqnames of a Seqinfo
+object must be unique keys.
+</p>
+<p>So instead, a <code>merge</code> method is provided.
+</p>
+<p>In the code snippet below, <code>x</code> and <code>y</code> are Seqinfo objects.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>merge(x, y)</code>:
+Merge <code>x</code> and <code>y</code> into a single Seqinfo object where the
+keys (aka the seqnames) are <code>union(seqnames(x), seqnames(y))</code>.
+If a row in <code>y</code> has the same key as a row in <code>x</code>, and if
+the 2 rows contain compatible information (NA values are compatible
+with anything), then they are merged into a single row in the result.
+If they cannot be merged (because they contain different seqlengths,
+and/or circularity flags, and/or genome identifiers), then an error
+is raised.
+In addition to check for incompatible sequence information,
+<code>merge(x, y)</code> also compares <code>seqnames(x)</code> with
+<code>seqnames(y)</code> and issues a warning if each of them has names not
+in the other. The purpose of these checks is to try to detect situations
+where the user might be combining or comparing objects based on
+different reference genomes.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>intersect(x, y)</code>: Finds the intersection between
+two <code>Seqinfo</code> objects by merging them and subsetting for the
+intersection of their sequence names. This makes it easy to avoid
+warnings about the objects not being subsets of each other during
+overlap operations.
+</p>
+</dd>
+</dl>
+
+<p>A convenience wrapper, <code>checkCompatibleSeqinfo()</code>, is provided
+for checking whether 2 objects have compatible seqinfo components
+or not. <code>checkCompatibleSeqinfo(x, y)</code> is equivalent to
+<code>merge(seqinfo(x), seqinfo(y))</code> so will work on any objects
+<code>x</code> and <code>y</code> that support <code><a href="seqinfo.html">seqinfo</a>()</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>H. Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="seqinfo.html">seqinfo</a></code>
+</p>
+</li>
+<li><p> The <code><a href="getChromInfoFromNCBI.html">getChromInfoFromNCBI</a></code> and
+<code><a href="getChromInfoFromUCSC.html">getChromInfoFromUCSC</a></code> utility functions
+that are used behind the scene to generate a Seqinfo
+object for a given assembly/genome (see examples below).
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## ---------------------------------------------------------------------
+## A. MAKING A Seqinfo OBJECT FOR A GIVEN NCBI ASSEMBLY OR UCSC GENOME
+## ---------------------------------------------------------------------
+
+## One special form of calling the 'Seqinfo()' constructor is to specify
+## only the 'genome' argument and set it to the name of an NCBI assembly
+## or UCSC genome, in which case the sequence information is fetched
+## from NCBI or UCSC ('getChromInfoFromNCBI()' or 'getChromInfoFromUCSC()'
+## are used behind the scene for this so internet access is required).
+
+if (interactive()) {
+  ## NCBI assemblies (see '?registered_NCBI_assemblies' for the list of
+  ## NCBI assemblies that are currently supported):
+  Seqinfo(genome="GRCh38")
+  Seqinfo(genome="GRCh38.p12")
+  Seqinfo(genome="Amel_HAv3.1")
+  Seqinfo(genome="WBcel235")
+  Seqinfo(genome="TAIR10.1")
+
+  ## UCSC genomes (see '?registered_UCSC_genomes' for the list of UCSC
+  ## genomes that are currently supported):
+  Seqinfo(genome="hg38")
+  Seqinfo(genome="mm10")
+  Seqinfo(genome="rn6")
+  Seqinfo(genome="bosTau9")
+  Seqinfo(genome="canFam3")
+  Seqinfo(genome="musFur1")
+  Seqinfo(genome="galGal6")
+  Seqinfo(genome="dm6")
+  Seqinfo(genome="ce11")
+  Seqinfo(genome="sacCer3")
+}
+
+## ---------------------------------------------------------------------
+## B. BASIC MANIPULATION OF A Seqinfo OBJECT
+## ---------------------------------------------------------------------
+
+## Note that all the arguments (except 'genome') must have the
+## same length. 'genome' can be of length 1, whatever the lengths
+## of the other arguments are.
+x &lt;- Seqinfo(seqnames=c("chr1", "chr2", "chr3", "chrM"),
+             seqlengths=c(100, 200, NA, 15),
+             isCircular=c(NA, FALSE, FALSE, TRUE),
+             genome="toy")
+x
+
+## Accessors:
+length(x)
+seqnames(x)
+names(x)
+seqlevels(x)
+seqlengths(x)
+isCircular(x)
+genome(x)
+
+## Get a compact summary:
+summary(x)
+
+## Subset by names:
+x[c("chrY", "chr3", "chr1")]
+
+## Rename, drop, add and/or reorder the sequence levels:
+xx &lt;- x
+seqlevels(xx) &lt;- sub("chr", "ch", seqlevels(xx))  # rename
+xx
+seqlevels(xx) &lt;- rev(seqlevels(xx))  # reorder
+xx
+seqlevels(xx) &lt;- c("ch1", "ch2", "chY")  # drop/add/reorder
+xx
+seqlevels(xx) &lt;- c(chY="Y", ch1="1", "22")  # rename/reorder/drop/add
+xx
+
+## ---------------------------------------------------------------------
+## C. MERGING 2 Seqinfo OBJECTS
+## ---------------------------------------------------------------------
+
+y &lt;- Seqinfo(seqnames=c("chr3", "chr4", "chrM"),
+             seqlengths=c(300, NA, 15))
+y
+
+## This issues a warning:
+merge(x, y)  # rows for chr3 and chrM are merged
+
+## To get rid of the above warning, either use suppressWarnings() or
+## set the genome on 'y':
+suppressWarnings(merge(x, y))
+genome(y) &lt;- genome(x)
+merge(x, y)
+
+## Note that, strictly speaking, merging 2 Seqinfo objects is not
+## a commutative operation, i.e., in general 'z1 &lt;- merge(x, y)'
+## is not identical to 'z2 &lt;- merge(y, x)'. However 'z1' and 'z2'
+## are guaranteed to contain the same information (i.e. the same
+## rows, but typically not in the same order):
+merge(y, x)
+
+## This contradicts what 'x' says about circularity of chr3 and chrM:
+isCircular(y)[c("chr3", "chrM")] &lt;- c(TRUE, FALSE)
+y
+if (interactive()) {
+  merge(x, y)  # raises an error
+}
+
+## Sanity checks:
+stopifnot(identical(x, merge(x, Seqinfo())))
+stopifnot(identical(x, merge(Seqinfo(), x)))
+stopifnot(identical(x, merge(x, x)))
+
+## ---------------------------------------------------------------------
+## D. checkCompatibleSeqinfo()
+## ---------------------------------------------------------------------
+
+library(GenomicRanges)
+gr1 &lt;- GRanges("chr3:15-25", seqinfo=x)
+gr2 &lt;- GRanges("chr3:105-115", seqinfo=y)
+if (interactive()) {
+  checkCompatibleSeqinfo(gr1, gr2)  # raises an error
+}
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomeInfoDb</em> version 1.26.7 <a href="00Index.html">Index</a>]</div>
+</body></html>

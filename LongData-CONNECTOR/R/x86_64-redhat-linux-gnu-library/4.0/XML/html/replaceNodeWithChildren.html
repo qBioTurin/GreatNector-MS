@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Replace an XML node with it child nodes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for replaceNodeWithChildren {XML}"><tr><td>replaceNodeWithChildren {XML}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Replace an XML node with it child nodes</h2>
+
+<h3>Description</h3>
+
+<p>This function can be used to flatten parts of an XML tree.
+This takes a node and removes itself from the tree, but places
+its kids in it place.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+replaceNodeWithChildren(node)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>node</code></td>
+<td>
+<p>an <code>XMLInternalNode</code> object</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code>NULL</code>. The purpose of this function is to modify the internal document.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Duncan Temple Lang
+</p>
+
+
+<h3>References</h3>
+
+<p>libxml2 documentation.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+doc = xmlParse('&lt;doc&gt;
+                 &lt;page&gt;
+                  &lt;p&gt;A&lt;/p&gt;
+                  &lt;p&gt;B&lt;/p&gt;
+                  &lt;p&gt;C&lt;/p&gt;
+                 &lt;/page&gt;
+                 &lt;page&gt;
+                  &lt;p&gt;D&lt;/p&gt;
+                  &lt;p&gt;E&lt;/p&gt;
+                  &lt;p&gt;F&lt;/p&gt;
+                 &lt;/page&gt;
+                &lt;/doc&gt;')
+
+pages = getNodeSet(doc, "//page")
+invisible(lapply(pages, replaceNodeWithChildren))
+doc
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>XML</em> version 3.99-0.9 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Summarize variants by sample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for summarizeVariants {VariantAnnotation}"><tr><td>summarizeVariants {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Summarize variants by sample</h2>
+
+<h3>Description</h3>
+
+<p>Variants in a VCF file are overlapped with an annotation 
+region and summarized by sample. Genotype information in
+the VCF is used to determine which samples express 
+each variant.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'TxDb,VCF,CodingVariants'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'TxDb,VCF,FiveUTRVariants'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'TxDb,VCF,ThreeUTRVariants'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'TxDb,VCF,SpliceSiteVariants'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'TxDb,VCF,IntronVariants'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'TxDb,VCF,PromoterVariants'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'GRangesList,VCF,VariantType'
+summarizeVariants(query, subject, mode, ...)
+## S4 method for signature 'GRangesList,VCF,function'
+summarizeVariants(query, subject, mode, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>query</code></td>
+<td>
+<p>A <a href="../../GenomicFeatures/html/TxDb.html">TxDb</a> or <code>GRangesList</code>
+object that serves as the annotation. GFF files can be converted to
+<a href="../../GenomicFeatures/html/TxDb.html">TxDb</a> objects with 
+<code>makeTxDbFromGFF()</code> in the <code>GenomicFeatures</code> package.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subject</code></td>
+<td>
+<p>A <a href="VCF-class.html">VCF</a> object containing the variants.
+</p>
+</td></tr>
+<tr valign="top"><td><code>mode</code></td>
+<td>
+<p><code>mode</code> can be a <code>VariantType</code> class or the
+name of a function. 
+</p>
+<p>When <code>mode</code> is a <code>VariantType</code> class, counting is done with
+<code>locateVariants</code> and counts are summarized transcript-by-sample. 
+Supported <code>VariantType</code> classes include 
+<code>CodingVariants</code>, <code>IntronVariants</code>, <code>FiveUTRVariants</code>, 
+<code>ThreeUTRVariants</code>, <code>SpliceSiteVariants</code> or <code>PromoterVariants</code>. 
+<code>AllVariants()</code> and <code>IntergenicVariants</code> are not supported. See 
+?<code>locateVariants</code> for more detail on the variant classes.
+</p>
+<p><code>mode</code> can also be the name of any counting function that outputs
+a <code>Hits</code> object. Variants will be summarized by the length of the
+<code>GRangesList</code> annotation (i.e., 'length-of-GRangesList'-by-sample).
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additional arguments passed to methods such as
+</p>
+
+<dl>
+<dt>ignore.strand</dt><dd><p>A <code>logical</code> indicating if strand should be
+igored when performing overlaps.
+</p>
+</dd>
+</dl>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>summarizeVariants</code> uses the genotype information in a VCF
+file to determine which samples are positive for each variant.
+Variants are overlapped with the annotation and the counts
+are summarized annotation-by-sample. If the annotation is a 
+<code>GRangesList</code> of transcripts, the count matrix will 
+be transcripts-by-sample. If the <code>GRangesList</code> is genes,
+the count matrix will be gene-by-sample.
+</p>
+
+<ul>
+<li><p>Counting with locateVariants() :
+</p>
+<p>Variant counts are always summarized transcript-by-sample.
+When <code>query</code> is a <code>GRangesList</code>, it must be compatible 
+with the <code>VariantType</code>-class given as the <code>mode</code> argument. 
+The list below specifies the appropriate <code>GRangesList</code> for each
+<code>mode</code>.
+</p>
+
+<dl>
+<dt>CodingVariants :</dt><dd><p>coding (CDS) by transcript</p>
+</dd>
+<dt>IntronVariants :</dt><dd><p>introns by transcript</p>
+</dd>
+<dt>FiveUTRVariants :</dt><dd><p>five prime UTR by transcript</p>
+</dd>
+<dt>ThreeUTRVariants :</dt><dd><p>three prime UTR by transcript</p>
+</dd>
+<dt>SpliceSiteVariants :</dt><dd><p>introns by transcript</p>
+</dd>
+<dt>PromoterVariants :</dt><dd><p>list of transcripts</p>
+</dd>
+</dl>
+
+<p>When <code>query</code> is a <code>TxDb</code>, the appropriate 
+region-by-transcript <code>GRangesList</code> listed above is extracted 
+internally and used as the annotation. 
+</p>
+
+</li>
+<li><p>Counting with a user-supplied function :
+</p>
+<p><code>subject</code> must be a <code>GRangesList</code> and <code>mode</code> must
+be the name of a function. The count function must take 'query'
+and 'subject' arguments and return a <code>Hits</code> object. Counts are 
+summarized by the outer list elements of the <code>GRangesList</code>.
+
+</p>
+</li></ul>
+
+
+
+<h3>Value</h3>
+
+<p>A <code>RangedSummarizedExperiment</code> object with count summaries in the 
+<code>assays</code> slot. The <code>rowRanges</code> contains the annotation
+used for counting. Information in <code>colData</code> and <code>metadata</code> 
+are taken from the VCF file.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Valerie Obenchain</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="readVcf-methods.html">readVcf</a></code>,
+<code><a href="predictCoding-methods.html">predictCoding</a></code>,
+<code><a href="locateVariants-methods.html">locateVariants</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+  txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene 
+
+  ## Read variants from VCF.
+  fl &lt;- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+  vcf &lt;- readVcf(fl, "hg19")
+  ## Rename seqlevels to match TxDb; confirm the match.
+  seqlevels(vcf) &lt;- paste0("chr", seqlevels(vcf)) 
+  intersect(seqlevels(vcf), seqlevels(txdb))
+
+  ## ----------------------------------------
+  ## Counting with locateVariants()
+  ## ----------------------------------------
+  ## TxDb as the 'query'
+  coding1 &lt;- summarizeVariants(txdb, vcf, CodingVariants())
+  colSums(assays(coding1)$counts)
+
+  ## GRangesList as the 'query'
+  cdsbytx &lt;- cdsBy(txdb, "tx")
+  coding2 &lt;- summarizeVariants(cdsbytx, vcf, CodingVariants()) 
+
+  stopifnot(identical(assays(coding1)$counts, assays(coding2)$counts))
+
+  ## Promoter region variants summarized by transcript
+  tx &lt;- transcripts(txdb)
+  txlst &lt;- splitAsList(tx, seq_len(length(tx)))
+  promoter &lt;- summarizeVariants(txlst, vcf, 
+                                PromoterVariants(upstream=100, downstream=10))
+  colSums(assays(promoter)$counts)
+
+  ## ----------------------------------------
+  ## Counting with findOverlaps() 
+  ## ----------------------------------------
+
+  ## Summarize all variants by transcript
+  allvariants &lt;- summarizeVariants(txlst, vcf, findOverlaps)
+  colSums(assays(allvariants)$counts)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Get transcript sequences</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for getTranscriptSeqs {VariantAnnotation}"><tr><td>getTranscriptSeqs {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Get transcript sequences</h2>
+
+<h3>Description</h3>
+
+<p>This function is defunct. Use GenomicFeatures::extractTranscriptSeqs()
+instead.
+</p>
+<p>Extract transcript sequences from a <a href="../../BSgenome/html/BSgenome.html">BSgenome</a> object or 
+an <a href="../../Rsamtools/html/FaFile.html">FaFile</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  ## S4 method for signature 'GRangesList,BSgenome'
+getTranscriptSeqs(query, subject, ...)
+  ## S4 method for signature 'GRangesList,FaFile'
+getTranscriptSeqs(query, subject, ...)
+  ## S4 method for signature 'GRanges,FaFile'
+getTranscriptSeqs(query, subject, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>query</code></td>
+<td>
+<p>A <a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> object containing
+exons or cds grouped by transcript.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subject</code></td>
+<td>
+<p>A <a href="../../BSgenome/html/BSgenome.html">BSgenome</a> object or a <a href="../../Rsamtools/html/FaFile.html">FaFile</a> from which
+the sequences will be taken.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additional arguments
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>getTranscriptSeqs</code> is a wrapper for the
+<code>extractTranscriptSeqs</code> and <code>getSeq</code> functions. The 
+purpose is to allow sequence extraction from either a
+<a href="../../BSgenome/html/BSgenome.html">BSgenome</a> or <a href="../../Rsamtools/html/FaFile.html">FaFile</a>. Transcript
+sequences are extracted based on the boundaries of the feature
+provided in the <code>query</code> (i.e., either exons or cds regions).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <a href="../../Biostrings/html/DNAStringSet.html">DNAStringSet</a> instance containing the sequences for all transcripts
+specified in <code>query</code>. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Valerie Obenchain</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="predictCoding-methods.html">predictCoding</a>
+<a href="../../GenomicFeatures/html/extractTranscriptSeqs.html">extractTranscriptSeqs</a>
+<a href="../../Biostrings/html/getSeq.html">getSeq</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## See ?extractTranscriptSeqs in the GenomicFeatures package.
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

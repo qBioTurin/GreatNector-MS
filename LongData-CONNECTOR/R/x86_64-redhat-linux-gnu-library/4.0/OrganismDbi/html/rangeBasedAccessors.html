@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract genomic features from an object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for rangeBasedAccessors {OrganismDbi}"><tr><td>rangeBasedAccessors {OrganismDbi}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Extract genomic features from an object
+</h2>
+
+<h3>Description</h3>
+
+<p>Generic functions to extract genomic features from an object.
+This page documents the methods for <a href="OrganismDb.html">OrganismDb</a> objects only.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'MultiDb'
+transcripts(x, columns=c("TXID", "TXNAME"), filter=NULL)
+
+## S4 method for signature 'MultiDb'
+exons(x, columns="EXONID", filter=NULL)
+
+## S4 method for signature 'MultiDb'
+cds(x, columns="CDSID", filter=NULL)
+
+## S4 method for signature 'MultiDb'
+genes(x, columns="GENEID", filter=NULL)
+
+## S4 method for signature 'MultiDb'
+transcriptsBy(x, by, columns, use.names=FALSE,
+                                     outerMcols=FALSE)
+
+## S4 method for signature 'MultiDb'
+exonsBy(x, by, columns, use.names=FALSE, outerMcols=FALSE)
+
+## S4 method for signature 'MultiDb'
+cdsBy(x, by, columns, use.names=FALSE, outerMcols=FALSE)
+
+## S4 method for signature 'MultiDb'
+getTxDbIfAvailable(x, ...)
+
+
+
+## S4 method for signature 'MultiDb'
+asBED(x)
+## S4 method for signature 'MultiDb'
+asGFF(x)
+
+## S4 method for signature 'MultiDb'
+disjointExons(x, aggregateGenes=FALSE, 
+              includeTranscripts=TRUE, ...) 
+## S4 method for signature 'MultiDb'
+microRNAs(x)
+## S4 method for signature 'MultiDb'
+tRNAs(x)
+## S4 method for signature 'MultiDb'
+promoters(x, upstream=2000, downstream=200, use.names=TRUE, ...)
+
+## S4 method for signature 'GenomicRanges,MultiDb'
+distance(x, y, ignore.strand=FALSE,
+    ..., id, type=c("gene", "tx", "exon", "cds"))
+
+## S4 method for signature 'BSgenome'
+extractTranscriptSeqs(x, transcripts, strand = "+")
+
+## S4 method for signature 'MultiDb'
+extractUpstreamSeqs(x, genes, width=1000, exclude.seqlevels=NULL)
+
+## S4 method for signature 'MultiDb'
+intronsByTranscript(x, use.names=FALSE)
+## S4 method for signature 'MultiDb'
+fiveUTRsByTranscript(x, use.names=FALSE)
+## S4 method for signature 'MultiDb'
+threeUTRsByTranscript(x, use.names=FALSE)
+
+## S4 method for signature 'MultiDb'
+isActiveSeq(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+ 
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>A <a href="OrganismDb.html">MultiDb</a> object. Except for the extractTranscriptSeqs
+method.  In that case it's a <a href="../../BSgenome/html/BSgenome-class.html">BSgenome</a> object and the
+second argument is an <a href="OrganismDb.html">MultiDb</a> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Arguments to be passed to or from methods.
+</p>
+</td></tr>
+<tr valign="top"><td><code>by</code></td>
+<td>
+
+<p>One of <code>"gene"</code>, <code>"exon"</code>, <code>"cds"</code> or <code>"tx"</code>.
+Determines the grouping.
+</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+
+<p>The columns or kinds of metadata that can be retrieved from the
+database.  All possible columns are returned by using the <code>columns</code>
+method.
+</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+
+<p>Either <code>NULL</code> or a named list of vectors to be used to
+restrict the output. Valid names for this list are:
+<code>"gene_id"</code>,
+<code>"tx_id"</code>, <code>"tx_name"</code>,
+<code>"tx_chrom"</code>, <code>"tx_strand"</code>,
+<code>"exon_id"</code>, <code>"exon_name"</code>,
+<code>"exon_chrom"</code>, <code>"exon_strand"</code>,
+<code>"cds_id"</code>, <code>"cds_name"</code>,
+<code>"cds_chrom"</code>, <code>"cds_strand"</code> and <code>"exon_rank"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>use.names</code></td>
+<td>
+<p>Controls how to set the names of the returned
+<a href="../../GenomicRanges/html/GRangesList-class.html">GRangesList</a> object.
+These functions return all the features of a given type (e.g.
+all the exons) grouped by another feature type (e.g. grouped by
+transcript) in a <a href="../../GenomicRanges/html/GRangesList-class.html">GRangesList</a> object.
+By default (i.e. if <code>use.names</code> is <code>FALSE</code>), the
+names of this <a href="../../GenomicRanges/html/GRangesList-class.html">GRangesList</a> object
+(aka the group names) are the internal ids of the features
+used for grouping (aka the grouping features), which are
+guaranteed to be unique.
+If <code>use.names</code> is <code>TRUE</code>, then the names of the
+grouping features are used instead of their internal ids.
+For example, when grouping by transcript (<code>by="tx"</code>),
+the default group names are the transcript internal ids
+(<code>"tx_id"</code>). But, if <code>use.names=TRUE</code>, the group
+names are the transcript names (<code>"tx_name"</code>).
+Note that, unlike the feature ids, the feature names are not
+guaranteed to be unique or even defined (they could be all
+<code>NA</code>s). A warning is issued when this happens.
+See <code>?<a href="../../GenomicFeatures/html/id2name.html">id2name</a></code> for more information about
+feature internal ids and feature external names and how
+to map the formers to the latters.
+</p>
+<p>Finally, <code>use.names=TRUE</code> cannot be used when grouping
+by gene <code>by="gene"</code>. This is because, unlike for the
+other features, the gene ids are external ids (e.g. Entrez
+Gene or Ensembl ids) so the db doesn't have a <code>"gene_name"</code>
+column for storing alternate gene names.
+</p>
+</td></tr>
+<tr valign="top"><td><code>upstream</code></td>
+<td>
+
+<p>For <code>promoters</code> : An <code>integer(1)</code> value indicating the
+number of bases upstream from the transcription start site. For
+additional details see <code>?`promoters,GRanges-method`</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>downstream</code></td>
+<td>
+
+<p>For <code>promoters</code> : An <code>integer(1)</code> value indicating the 
+number of bases downstream from the transcription start site. For 
+additional details see <code>?`promoters,GRanges-method`</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>aggregateGenes</code></td>
+<td>
+
+<p>For <code>disjointExons</code> : A <code>logical</code>. When <code>FALSE</code>
+(default) exon fragments that overlap multiple genes are dropped.
+When <code>TRUE</code>, all fragments are kept and the <code>gene_id</code>
+metadata column includes all gene ids that overlap the exon fragment.
+</p>
+</td></tr>
+<tr valign="top"><td><code>includeTranscripts</code></td>
+<td>
+
+<p>For <code>disjointExons</code> : A <code>logical</code>. When <code>TRUE</code>
+(default) a <code>tx_name</code> metadata column is included that 
+lists all transcript names that overlap the exon fragment. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>y</code></td>
+<td>
+<p>For <code>distance</code>, a <a href="OrganismDb.html">MultiDb</a> instance. The
+<code>id</code> is used to extract ranges from the <a href="OrganismDb.html">MultiDb</a>
+which are then used to compute the distance from <code>x</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>id</code></td>
+<td>
+<p>A <code>character</code> vector the same length as <code>x</code>.
+The <code>id</code> must be identifiers in the <a href="OrganismDb.html">MultiDb</a> object.
+<code>type</code> indicates what type of identifier <code>id</code> is. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+<p>A <code>character(1)</code> describing the <code>id</code>. 
+Must be one of &lsquo;gene&rsquo;, &lsquo;tx&rsquo;, &lsquo;exon&rsquo; or
+&lsquo;cds&rsquo;.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ignore.strand</code></td>
+<td>
+
+<p>A <code>logical</code> indicating if the strand of the ranges
+should be ignored. When <code>TRUE</code>, strand is set to <code>'+'</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>outerMcols</code></td>
+<td>
+
+<p>A <code>logical</code> indicating if the the 'outer' mcols (metadata
+columns) should be populated for some range based accesors which
+return a GRangesList object.  By default this is FALSE, but if TRUE
+then the outer list object will also have it's metadata columns
+(mcols) populated as well as the mcols for the 'inner' GRanges
+objects.
+</p>
+</td></tr>
+<tr valign="top"><td><code>transcripts</code></td>
+<td>
+
+<p>An object representing the exon ranges of each transcript to extract.
+It must be a <a href="../../GenomicRanges/html/GRangesList-class.html">GRangesList</a> or <a href="OrganismDb.html">MultiDb</a>
+object while the <code>x</code> is a <a href="../../BSgenome/html/BSgenome-class.html">BSgenome</a> object.
+Internally, it's turned into a <a href="../../GenomicRanges/html/GRangesList-class.html">GRangesList</a>
+object with <code><a href="../../GenomicFeatures/html/transcriptsBy.html">exonsBy</a>(transcripts, by="tx", use.names=TRUE)</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>strand</code></td>
+<td>
+
+<p>Only supported when <code>x</code> is a <a href="../../Biostrings/html/DNAString-class.html">DNAString</a> object.
+</p>
+<p>Can be an atomic vector, a factor, or an <a href="../../S4Vectors/html/Rle-class.html">Rle</a> object,
+in which case it indicates the strand of each transcript (i.e. all the
+exons in a transcript are considered to be on the same strand).
+More precisely: it's turned into a factor (or factor-<a href="../../S4Vectors/html/Rle-class.html">Rle</a>)
+that has the &quot;standard strand levels&quot; (this is done by calling the
+<code><a href="../../BiocGenerics/html/strand.html">strand</a></code> function on it). Then it's recycled
+to the length of <a href="../../IRanges/html/IntegerRangesList-class.html">IntegerRangesList</a> object
+<code>transcripts</code> if needed. In the resulting object, the i-th element
+is interpreted as the strand of all the exons in the i-th transcript.
+</p>
+<p><code>strand</code> can also be a list-like object, in which case it indicates
+the strand of each exon, individually. Thus it must have the same
+<em>shape</em> as <a href="../../IRanges/html/IntegerRangesList-class.html">IntegerRangesList</a> object <code>transcripts</code>
+(i.e. same length plus <code>strand[[i]]</code> must have the same length
+as <code>transcripts[[i]]</code> for all <code>i</code>).
+</p>
+<p><code>strand</code> can only contain <code>"+"</code> and/or <code>"-"</code> values.
+<code>"*"</code> is not allowed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>genes</code></td>
+<td>
+
+<p>An object containing the locations (i.e. chromosome name, start, end, and
+strand) of the genes or transcripts with respect to the reference genome.
+Only <a href="../../GenomicRanges/html/GRanges-class.html">GenomicRanges</a> and <a href="OrganismDb.html">MultiDb</a> objects
+are supported at the moment. If the latter, the gene locations are obtained
+by calling the <code><a href="../../GenomicFeatures/html/transcripts.html">genes</a></code> function on the <a href="OrganismDb.html">MultiDb</a>
+object internally.
+</p>
+</td></tr>
+<tr valign="top"><td><code>width</code></td>
+<td>
+
+<p>How many bases to extract upstream of each TSS (transcription start site).
+</p>
+</td></tr>
+<tr valign="top"><td><code>exclude.seqlevels</code></td>
+<td>
+
+<p>A character vector containing the chromosome names (a.k.a. sequence levels)
+to exclude when the genes are obtained from a <a href="OrganismDb.html">MultiDb</a> object.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>These are the range based functions for extracting transcript information
+from a <a href="OrganismDb.html">MultiDb</a> object. 
+</p>
+
+
+<h3>Value</h3>
+
+<p> a GRanges or GRangesList object </p>
+
+
+<h3>Author(s)</h3>
+
+<p>M. Carlson
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><a href="OrganismDb.html">MultiDb-class</a> for how to use the
+simple &quot;select&quot; interface to extract information from a
+<code>MultiDb</code> object.
+</p>
+</li>
+<li> <p><a href="../../GenomicFeatures/html/transcripts.html">transcripts</a> for the original
+<code>transcripts</code> method and related methods.
+</p>
+</li>
+<li> <p><a href="../../GenomicFeatures/html/transcriptsBy.html">transcriptsBy</a> for the original
+<code>transcriptsBy</code> method and related methods.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## extracting all transcripts from Homo.sapiens with some extra metadata
+library(Homo.sapiens)
+cols = c("TXNAME","SYMBOL")
+res &lt;- transcripts(Homo.sapiens, columns=cols)
+
+## extracting all transcripts from Homo.sapiens, grouped by gene and
+## with extra metadata
+res &lt;- transcriptsBy(Homo.sapiens, by="gene", columns=cols)
+
+## list possible values for columns argument:
+columns(Homo.sapiens)
+
+## Get the TxDb from an MultiDb object (if it's available)
+getTxDbIfAvailable(Homo.sapiens)
+
+## Other functions listed above should work in way similar to their TxDb
+## counterparts.  So for example:
+promoters(Homo.sapiens)
+## Should give the same value as:
+promoters(getTxDbIfAvailable(Homo.sapiens))
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>OrganismDbi</em> version 1.32.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

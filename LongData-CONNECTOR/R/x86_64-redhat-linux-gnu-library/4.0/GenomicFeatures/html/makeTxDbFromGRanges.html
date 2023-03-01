@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Make a TxDb object from a GRanges object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for makeTxDbFromGRanges {GenomicFeatures}"><tr><td>makeTxDbFromGRanges {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Make a TxDb object from a GRanges object</h2>
+
+<h3>Description</h3>
+
+<p>The <code>makeTxDbFromGRanges</code> function allows the user
+to extract gene, transcript, exon, and CDS information from a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object structured as GFF3 or GTF,
+and to return that information in a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+makeTxDbFromGRanges(gr, drop.stop.codons=FALSE, metadata=NULL, taxonomyId=NA)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>gr</code></td>
+<td>
+
+<p>A <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object structured as GFF3 or GTF,
+typically obtained with <code>rtracklayer::<a href="../../rtracklayer/html/import.html">import</a>()</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>drop.stop.codons</code></td>
+<td>
+
+<p><code>TRUE</code> or <code>FALSE</code>. If <code>TRUE</code>, then features of type
+<code>stop_codon</code> are ignored. Otherwise (the default) the stop codons
+are considered to be part of the CDS and merged to them.
+</p>
+</td></tr>
+<tr valign="top"><td><code>metadata</code></td>
+<td>
+
+<p>A 2-column data frame containing meta information to be included in the
+<a href="TxDb-class.html">TxDb</a> object. This data frame is just passed to
+<code><a href="makeTxDb.html">makeTxDb</a></code>, which <code>makeTxDbFromGRanges</code> calls at the
+end to make the <a href="TxDb-class.html">TxDb</a> object from the information extracted from
+<code>gr</code>. See <code>?<a href="makeTxDb.html">makeTxDb</a></code> for more information about the
+format of <code>metadata</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>taxonomyId</code></td>
+<td>
+<p>By default this value is NA which will result in
+an NA field since there is no reliable way to infer this from a
+GRanges object.  But you can use this argument to supply your own
+valid taxId here and if you do, then the Organism can be filled in
+as well</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A <a href="TxDb-class.html">TxDb</a> object.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hervé Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="makeTxDbFromUCSC.html">makeTxDbFromUCSC</a></code>, <code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code>,
+and <code><a href="makeTxDbFromEnsembl.html">makeTxDbFromEnsembl</a></code>, for making a <a href="TxDb-class.html">TxDb</a>
+object from online resources.
+</p>
+</li>
+<li> <p><code><a href="makeTxDbFromGFF.html">makeTxDbFromGFF</a></code> for making a <a href="TxDb-class.html">TxDb</a> object
+from a GFF or GTF file.
+</p>
+</li>
+<li><p> The <code><a href="../../rtracklayer/html/import.html">import</a></code> function in the
+<span class="pkg">rtracklayer</span> package.
+</p>
+</li>
+<li><p> The <code>asGFF</code> method for <a href="TxDb-class.html">TxDb</a> objects
+(<a href="as-format-methods.html">asGFF,TxDb-method</a>) for the reverse of
+<code>makeTxDbFromGRanges</code>, that is, for turning a <a href="TxDb-class.html">TxDb</a>
+object into a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object structured as
+GFF.
+</p>
+</li>
+<li><p> The <a href="TxDb-class.html">TxDb</a> class.
+</p>
+</li>
+<li> <p><code><a href="makeTxDb.html">makeTxDb</a></code> for the low-level function used by the
+<code>makeTxDbFrom*</code> functions to make the <a href="TxDb-class.html">TxDb</a> object
+returned to the user.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+library(rtracklayer)  # for the import() function
+
+## ---------------------------------------------------------------------
+## WITH A GRanges OBJECT STRUCTURED AS GFF3
+## ---------------------------------------------------------------------
+GFF3_files &lt;- system.file("extdata", "GFF3_files",
+                          package="GenomicFeatures")
+
+path &lt;- file.path(GFF3_files, "a.gff3")
+gr &lt;- import(path)
+txdb &lt;- makeTxDbFromGRanges(gr)
+txdb
+
+## Reverse operation:
+gr2 &lt;- asGFF(txdb)
+
+## Sanity check (asGFF() does not propagate the CDS phase at the moment):
+target &lt;- as.list(txdb)
+target$splicings$cds_phase &lt;- NULL
+stopifnot(identical(target, as.list(makeTxDbFromGRanges(gr2))))
+
+## ---------------------------------------------------------------------
+## WITH A GRanges OBJECT STRUCTURED AS GTF
+## ---------------------------------------------------------------------
+GTF_files &lt;- system.file("extdata", "GTF_files", package="GenomicFeatures")
+
+## test1.gtf was grabbed from http://mblab.wustl.edu/GTF22.html (5 exon
+## gene with 3 translated exons):
+path &lt;- file.path(GTF_files, "test1.gtf")
+gr &lt;- import(path)
+txdb &lt;- makeTxDbFromGRanges(gr)
+txdb
+
+path &lt;- file.path(GTF_files, "Aedes_aegypti.partial.gtf")
+gr &lt;- import(path)
+txdb &lt;- makeTxDbFromGRanges(gr)
+txdb
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Predict amino acid coding changes for variants</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for predictCoding {VariantAnnotation}"><tr><td>predictCoding {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Predict amino acid coding changes for variants</h2>
+
+<h3>Description</h3>
+
+<p>Predict amino acid coding changes for variants a coding regions
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'CollapsedVCF,TxDb,ANY,missing'
+predictCoding(query, subject, seqSource, varAllele, ..., ignore.strand=FALSE)
+## S4 method for signature 'ExpandedVCF,TxDb,ANY,missing'
+predictCoding(query, subject, seqSource, varAllele, ..., ignore.strand=FALSE)
+## S4 method for signature 'IntegerRanges,TxDb,ANY,DNAStringSet'
+predictCoding(query, subject, seqSource, varAllele, ..., ignore.strand=FALSE)
+## S4 method for signature 'GRanges,TxDb,ANY,DNAStringSet'
+predictCoding(query, subject, seqSource, varAllele, ..., ignore.strand=FALSE)
+## S4 method for signature 'VRanges,TxDb,ANY,missing'
+predictCoding(query, subject, seqSource, varAllele, ..., ignore.strand=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>query</code></td>
+<td>
+<p>A <a href="VCF-class.html">VCF</a>, <a href="../../IRanges/html/IntegerRanges-class.html">IntegerRanges</a>, <a href="../../GenomicRanges/html/GRanges-class.html">GRanges</a> or
+<code>VRanges</code> instance containing the variants to be annotated. If
+<code>query</code> is a <a href="../../IRanges/html/IntegerRanges.html">IntegerRanges</a> or <code>VRanges</code> it is
+coerced to a <a href="../../GenomicRanges/html/GRanges-class.html">GRanges</a>.  If a <a href="VCF-class.html">VCF</a> is provided the
+<code>GRanges</code> returned by the <code>rowRanges()</code> accessor will be used.
+All metadata columns are ignored.
+</p>
+<p>When <code>query</code> is not a <code>VCF</code> object a <code>varAllele</code> must be
+provided. The <code>varAllele</code> must be a <code>DNAStringSet</code> the same length
+as the <code>query</code>. If there are multiple alternate alleles per variant the
+<code>query</code> must be expanded to one row per each alternate allele.  See
+examples.
+</p>
+<p>NOTE: Variants are expected to conform to the VCF specs as described
+on the 1000 Genomes page (see references). Indels must include
+the reference allele; zero-width ranges are not valid and return no matches.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subject</code></td>
+<td>
+<p>A <a href="../../GenomicFeatures/html/TxDb.html">TxDb</a> object that serves 
+as the annotation. GFF files can be converted to 
+<a href="../../GenomicFeatures/html/TxDb.html">TxDb</a> objects with 
+<code>makeTxDbFromGFF()</code> in the <code>GenomicFeatures</code> package.
+</p>
+</td></tr> 
+<tr valign="top"><td><code>seqSource</code></td>
+<td>
+<p>A <code><a href="../../BSgenome/html/BSgenome.html">BSgenome</a></code> instance or an <a href="../../Rsamtools/html/FaFile-class.html">FaFile</a>
+to be used for sequence extraction.
+</p>
+</td></tr>
+<tr valign="top"><td><code>varAllele</code></td>
+<td>
+<p>A <a href="../../Biostrings/html/DNAStringSet.html">DNAStringSet</a> containing the variant
+(alternate) alleles. The length of <code>varAllele</code> must equal the length
+of <code>query</code>. Missing values are represented by a zero width empty 
+element. Ranges with missing <code>varAllele</code> values are ignored; those with 
+an &lsquo;N&rsquo; character are not translated.
+</p>
+<p>When the <code>query</code> is a <code>VCF</code> object the <code>varAllele</code> argument 
+will be missing. This value is taken internally from the <code>VCF</code> with
+<code>alt(&lt;VCF&gt;)</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additional arguments passed to methods. Arguments
+<code>genetic.code</code> and <code>if.fuzzy.codon</code> are supported for the
+<code>translate</code> function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ignore.strand</code></td>
+<td>
+<p>A <code>logical</code> indicating if strand should be ignored
+when performing overlaps.
+</p>
+<p>When <code>ignore.strand == TRUE</code> the <code>query</code> strand is set to
+'*' and can overlap with any strand of the <code>subject</code>. The
+return <code>GRanges</code> reflects the strand of the <code>subject</code> hit,
+however, the positions and alleles reported are computed as if 
+both were from the '+' strand.
+</p>
+<p><code>ignore.strand == FALSE</code> requires the <code>query</code> and <code>subject</code>
+to have compatible strand. Again the return <code>GRanges</code> reports
+the strand of the <code>subject</code> hit but in this case positions and
+alleles are computed according to the strand of the <code>subject</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function returns the amino acid coding for variants that fall 
+completely &lsquo;within&rsquo; a coding region. The reference sequences are 
+taken from a fasta file or <a href="../../BSgenome/html/BSgenome.html">BSgenome</a>. The width of 
+the reference is determined from the start position and width of the 
+range in the <code>query</code>. For guidance on how to represent an insertion, 
+deletion or substitution see the 1000 Genomes VCF format (references). 
+</p>
+<p>Variant alleles are taken from the <code>varAllele</code> when supplied.
+When the <code>query</code> is a <code>VCF</code> object the <code>varAllele</code> will
+be missing. This value is taken internally from the <code>VCF</code> with
+<code>alt(&lt;VCF&gt;)</code>. The variant allele is substituted 
+into the reference sequences and transcribed. Transcription only 
+occurs if the substitution, insertion or deletion results in a new sequence 
+length divisible by 3.
+</p>
+<p>When the <code>query</code> is an unstranded (*) <code>GRanges</code> <code>predictCoding</code> 
+will attempt to find overlaps on both the positive and negative strands of the
+<code>subject</code>. When the subject hit is on the negative strand the return 
+<code>varAllele</code> is reverse complemented. The strand of the returned 
+<code>GRanges</code> represents the strand of the subject hit.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> with a row for each variant-transcript 
+match. The result includes only variants that fell within coding regions.
+The strand of the output <code>GRanges</code> represents the strand of the 
+<code>subject</code> hit.
+</p>
+<p>At a minimum, the metadata columns (accessible with <code>mcols</code>) include,
+</p>
+
+<dl>
+<dt><code>varAllele</code></dt><dd>
+<p>Variant allele. This value is reverse complemented for an unstranded 
+<code>query</code> that overlaps a <code>subject</code> on the negative strand.
+</p>
+</dd>
+<dt><code>QUERYID</code></dt><dd>
+<p>Map back to the row in the original query
+</p>
+</dd>
+<dt><code>TXID</code></dt><dd>
+<p>Internal transcript id from the annotation
+</p>
+</dd>
+<dt><code>CDSID</code></dt><dd>
+<p>Internal coding region id from the annotation
+</p>
+</dd>
+<dt><code>GENEID</code></dt><dd>
+<p>Internal gene id from the annotation
+</p>
+</dd>
+<dt><code>CDSLOC</code></dt><dd>
+<p>Variant location in coding region-based coordinates. This position is 
+relative to the start of the coding (cds) region defined in the 
+<code>subject</code> annotation.
+</p>
+</dd>
+<dt><code>PROTEINLOC</code></dt><dd>
+<p>Variant codon triplet location in coding region-based coordinates.
+This position is relative to the start of the coding (cds) region
+defined in the <code>subject</code> annotation. 
+</p>
+</dd>
+<dt><code>CONSEQUENCE</code></dt><dd>
+<p>Possible values are &lsquo;synonymous&rsquo;, &lsquo;nonsynonymous&rsquo;, &lsquo;frameshift&rsquo;, 
+&lsquo;nonsense&rsquo; and &lsquo;not translated&rsquo;. Variant sequences are translated only 
+when the codon sequence is a multiple of 3. The value will be &lsquo;frameshift&rsquo; 
+when a sequence is of incompatible length. &lsquo;not translated&rsquo; is used
+when <code>varAllele</code> is missing or there is an &lsquo;N&rsquo; in the 
+sequence. &lsquo;nonsense&rsquo; is used for premature stop codons.
+</p>
+</dd>
+<dt><code>REFCODON</code></dt><dd>
+<p>The reference codon sequence. This range is typically greater
+than the width of the range in the <code>GRanges</code> because it includes 
+all codons involved in the sequence modification. If the reference 
+sequence is of width 2 but the alternate allele is of width 4 then at 
+least two codons must be included in the <code>REFSEQ</code>.
+</p>
+</dd>
+<dt><code>VARCODON</code></dt><dd>
+<p>This sequence is the result of inserting, deleting or replacing the 
+position(s) in the reference sequence alternate allele. If the result 
+of this substitution is not a multiple of 3 it will not be translated.
+</p>
+</dd>
+<dt><code>REFAA</code></dt><dd>
+<p>The reference amino acid column contains the translated <code>REFSEQ</code>.
+When translation is not possible this value is missing.
+</p>
+</dd>
+<dt><code>VARAA</code></dt><dd>
+<p>The variant amino acid column contains the translated <code>VARSEQ</code>. When
+translation is not possible this value is missing.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Michael Lawrence and Valerie Obenchain</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://www.1000genomes.org/wiki/analysis/variant-call-format/">http://www.1000genomes.org/wiki/analysis/variant-call-format/</a>
+<a href="http://vcftools.sourceforge.net/specs.html">http://vcftools.sourceforge.net/specs.html</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="readVcf-methods.html">readVcf</a>,
+<a href="locateVariants-methods.html">locateVariants</a>,
+<a href="defunct.html">refLocsToLocalLocs</a>
+<a href="getTranscriptSeqs-methods.html">getTranscriptSeqs</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  library(BSgenome.Hsapiens.UCSC.hg19)
+  library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+  txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene 
+
+  ## ----------------------------
+  ## VCF object as query 
+  ## ----------------------------
+  ## Read variants from a VCF file 
+  fl &lt;- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+  vcf &lt;- readVcf(fl, "hg19")
+
+  ## Rename seqlevels in the VCF object to match those in the TxDb.
+  vcf &lt;- renameSeqlevels(vcf, "chr22")
+  ## Confirm common seqlevels
+  intersect(seqlevels(vcf), seqlevels(txdb))
+ 
+  ## When 'query' is a VCF object the varAllele argument is missing.
+  coding1 &lt;- predictCoding(vcf, txdb, Hsapiens)
+  head(coding1, 3)
+
+  ## Exon-centric or cDNA locations:
+  exonsbytx &lt;- exonsBy(txdb, "tx")
+
+  cDNA &lt;- mapToTranscripts(coding1, exonsbytx)
+  mcols(cDNA)$TXID &lt;- names(exonsbytx)[mcols(cDNA)$transcriptsHits]
+  cDNA &lt;- cDNA[mcols(cDNA)$TXID == mcols(coding1)$TXID[mcols(cDNA)$xHits]]
+
+  ## Make sure cDNA is parallel to coding1
+  stopifnot(identical(mcols(cDNA)$xHits, seq_along(coding1)))
+
+  coding1$cDNA &lt;- ranges(cDNA)
+
+  ## ----------------------------
+  ## GRanges object as query 
+  ## ----------------------------
+  ## A GRanges can also be used as the 'query'. The seqlevels in the VCF
+  ## were adjusted in previous example so the GRanges extracted with
+  ## has the correct seqlevels.
+  rd &lt;- rowRanges(vcf)
+ 
+  ## The GRanges must be expanded to have one row per alternate allele. 
+  ## Variants 1, 2 and 10 have two alternate alleles.
+  altallele &lt;- alt(vcf)
+  eltROWS &lt;- elementNROWS(altallele)
+  rd_exp &lt;- rep(rd, eltROWS)
+ 
+  ## Call predictCoding() with the expanded GRanges and the unlisted
+  ## alternate allele as the 'varAllele'.
+  coding2 &lt;- predictCoding(rd_exp, txdb, Hsapiens, unlist(altallele)) 
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

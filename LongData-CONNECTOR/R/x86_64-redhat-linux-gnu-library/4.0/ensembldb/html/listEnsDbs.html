@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: List EnsDb databases in a MariaDB/MySQL server</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for listEnsDbs {ensembldb}"><tr><td>listEnsDbs {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>List EnsDb databases in a MariaDB/MySQL server</h2>
+
+<h3>Description</h3>
+
+<p>The <code>listEnsDbs</code> function lists EnsDb databases in a
+MariaDB/MySQL server.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+listEnsDbs(dbcon, host, port, user, pass)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>dbcon</code></td>
+<td>
+<p>A <code>DBIConnection</code> object providing access to a
+MariaDB/MySQL database. Either <code>dbcon</code> or all of the other
+arguments have to be specified.</p>
+</td></tr>
+<tr valign="top"><td><code>host</code></td>
+<td>
+<p>Character specifying the host on which the MySQL server is
+running.</p>
+</td></tr>
+<tr valign="top"><td><code>port</code></td>
+<td>
+<p>The port of the MariaDB/MySQL server (usually <code>3306</code>).</p>
+</td></tr>
+<tr valign="top"><td><code>user</code></td>
+<td>
+<p>The username for the MariaDB/MySQL server.</p>
+</td></tr>
+<tr valign="top"><td><code>pass</code></td>
+<td>
+<p>The password for the MariaDB/MySQL server.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The use of this function requires the <code>RMariaDB</code> package
+to be installed. In addition user credentials to access a MySQL server
+(with already installed EnsDb databases), or with write access are required.
+For the latter EnsDb databases can be added with the <code><a href="useMySQL-EnsDb-method.html">useMySQL</a></code>
+method. EnsDb databases in a MariaDB/MySQL server follow the same naming
+conventions than EnsDb packages, with the exception that the name is all
+lower case and that each <code>"."</code> is replaced by <code>"_"</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code>data.frame</code> listing the database names, organism name
+and Ensembl version of the EnsDb databases found on the server.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="useMySQL-EnsDb-method.html">useMySQL</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+library(RMariaDB)
+dbcon &lt;- dbConnect(MariaDB(), host = "localhost", user = my_user, pass = my_pass)
+listEnsDbs(dbcon)
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

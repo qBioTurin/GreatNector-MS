@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Class &quot;BSParams&quot;</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for BSParams-class {BSgenome}"><tr><td>BSParams-class {BSgenome}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Class &quot;BSParams&quot;</h2>
+
+<h3>Description</h3>
+
+<p>A parameter class for representing all parameters needed for running
+the <code>bsapply</code> method.
+</p>
+
+
+<h3>Objects from the Class</h3>
+
+<p>Objects can be created by calls of the form <code>new("BSParams", ...)</code>.
+</p>
+
+
+<h3>Slots</h3>
+
+
+<dl>
+<dt><code>X</code>:</dt><dd>
+<p>a BSgenome object that contains chromosomes that you wish to apply
+FUN on
+</p>
+</dd>
+<dt><code>FUN</code>:</dt><dd>
+<p>the function to apply to each chromosome in the BSgenome object 'X'
+</p>
+</dd>
+<dt><code>exclude</code>:</dt><dd>
+<p>this is a character vector with strings that will be treated as
+<em>regular expressions</em> to filter out chromosomes whose names
+match these strings.
+</p>
+</dd>
+<dt><code>simplify</code>:</dt><dd>
+<p>TRUE/FALSE value to indicate whether or not the function should try
+to simplify the output for you.
+</p>
+</dd>
+<dt><code>maskList</code>:</dt><dd>
+<p>A named logical vector of maskStates preferred when used with a
+BSGenome object.  When using the bsapply function, the masks will
+be set to the states in this vector.
+</p>
+</dd>    
+<dt><code>motifList</code>:</dt><dd>
+<p>A character vector which should contain motifs that the user
+wishes to mask from the sequence.
+</p>
+</dd>
+<dt><code>userMask</code>:</dt><dd>
+<p>A <a href="../../IRanges/html/IntegerRangesList-class.html">IntegerRangesList</a> object, where each element masks the
+corresponding chromosome in <code>X</code>. This allows the user to
+conveniently apply masks besides those included in <code>X</code>.
+</p>
+</dd>
+<dt><code>invertUserMask</code>:</dt><dd>
+<p>A <code>logical</code> indicating whether to invert each mask in
+<code>userMask</code>.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>bsapply(p)</code></dt><dd><p>Performs the function FUN using the
+parameters contained within <code>BSParams</code>.</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Carlson</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="bsapply.html">bsapply</a></code>
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>BSgenome</em> version 1.58.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

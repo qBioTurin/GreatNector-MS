@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Identification of genomic variant types.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for isSNV {VariantAnnotation}"><tr><td>isSNV {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Identification of genomic variant types.
+</h2>
+
+<h3>Description</h3>
+
+<p>Functions for identifying variant types such as SNVs, insertions, 
+deletions, transitions, and structural rearrangements. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'VRanges'
+isSNV(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isSNV(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isSNV(x, ..., singleAltOnly = TRUE)
+
+## S4 method for signature 'VRanges'
+isInsertion(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isInsertion(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isInsertion(x, ..., singleAltOnly = TRUE)
+
+## S4 method for signature 'VRanges'
+isDeletion(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isDeletion(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isDeletion(x, ..., singleAltOnly = TRUE)
+
+## S4 method for signature 'VRanges'
+isIndel(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isIndel(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isIndel(x, ..., singleAltOnly = TRUE)
+
+## S4 method for signature 'VRanges'
+isDelins(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isDelins(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isDelins(x, ..., singleAltOnly = TRUE)
+
+## S4 method for signature 'VRanges'
+isTransition(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isTransition(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isTransition(x, ..., singleAltOnly = TRUE)
+
+## S4 method for signature 'VRanges'
+isSubstitution(x, ...)
+## S4 method for signature 'ExpandedVCF'
+isSubstitution(x, ...)
+## S4 method for signature 'CollapsedVCF'
+isSubstitution(x, ..., singleAltOnly = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>A <a href="VCF-class.html">VCF</a> or <a href="VRanges-class.html">VRanges</a> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>singleAltOnly</code></td>
+<td>
+<p>A <code>logical</code> only applicable when <code>x</code>
+is a <a href="VCF-class.html">CollapsedVCF</a> class.
+</p>
+<p>When <code>TRUE</code> (default) only variants with a single alternate 
+allele are evaluated; all multi-alt variants evaluate to <code>FALSE</code>. 
+When <code>singleAltOnly=FALSE</code> all ref / alt pairs for 
+each variant are evaluated. If any ref / alt pairs meet the 
+test criteria a value of TRUE is returned for the variant; this
+may result in a value of TRUE for a variant with a mixture of
+alternate alleles, some that pass the criteria and some that do not.
+To retain single ref / alt pairs that pass the critera use
+<code>expand</code> on the <code>CollapsedVCF</code> and then apply the test.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Arguments passed to other methods.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>All functions return a logical vector the length of <code>x</code>.
+Variants in gvcf files with NON_REF alt alleles return TRUE;
+structural variants return FALSE.
+</p>
+
+<ul>
+<li><p>isSNV: 
+Reference and alternate alleles are both a single nucleotide long.
+
+</p>
+</li>
+<li><p>isInsertion: 
+Reference allele is a single nucleotide and the alternate allele 
+is greater (longer) than a single nucleotide and the first
+nucleotide of the alternate allele matches the reference. 
+
+</p>
+</li>
+<li><p>isDeletion: 
+Alternate allele is a single nucleotide and the reference allele 
+is greater (longer) than a single nucleotide and the first
+nucleotide of the reference allele matches the alternate. 
+
+</p>
+</li>
+<li><p>isIndel: 
+The variant is either a deletion or insertion as determined
+by <code>isDeletion</code> and <code>isInsertion</code>.
+
+</p>
+</li>
+<li><p>isDelins: 
+The variant is a deletion followed by an insertion, either of them
+involving two or more nucleotides.
+
+</p>
+</li>
+<li><p>isSubstition: 
+Reference and alternate alleles are the same length (1 or
+more nucleotides long).
+
+</p>
+</li>
+<li><p>isTransition: 
+Reference and alternate alleles are both a single nucleotide long.
+The reference-alternate pair interchange is of either two-ring 
+purines (A &lt;-&gt; G) or one-ring pyrimidines (C &lt;-&gt; T).
+
+</p>
+</li></ul>
+
+
+
+<h3>Value</h3>
+
+<p>A <code>logical</code> vector the same length as <code>x</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Michael Lawrence, Valerie Obenchain and Robert Castelo</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  fl &lt;- system.file("extdata", "ex2.vcf", package="VariantAnnotation")
+  ## ---------------------------------------------------------------------
+  ## VCF objects 
+  ## ---------------------------------------------------------------------
+  vcf &lt;- readVcf(fl, "hg19")
+  DataFrame(ref(vcf), alt(vcf))
+
+  ## This vcf has transitions in row 2 and 3. When 'singleAltOnly=TRUE' 
+  ## only the row 2 variant is identified:
+  isTransition(vcf)
+
+  ## Both row 2 and 3 are identified when 'singleAltOnly=FALSE':
+  isTransition(vcf, singleAltOnly=FALSE)
+
+  ## Expand the CollapsedVCF to ExpandedVCF
+  evcf &lt;- expand(vcf)
+ 
+  ## All ref / alt pairs are now expanded and there is no need to 
+  ## use 'singleAltOnly'. The return length is now 7 instead of 5:
+  transition &lt;- isTransition(evcf)
+  transition
+  DataFrame(ref(evcf)[transition], alt(evcf)[transition])
+ 
+  ## ---------------------------------------------------------------------
+  ## VRanges objects 
+  ## ---------------------------------------------------------------------
+  ## A VRanges object holds data from a VCF class in a completely
+  ## 'flat' fashion. INFO and FORMAT variables for all subjects are
+  ## 'repped' out such that each row is a unique combination of data.
+  vr &lt;- as(vcf, "VRanges")
+  isSNV(vr, singleAltOnly=FALSE)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

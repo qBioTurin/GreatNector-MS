@@ -1,0 +1,686 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Retrieve annotation data from an Ensembl based package</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for exonsBy {ensembldb}"><tr><td>exonsBy {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Retrieve annotation data from an Ensembl based package</h2>
+
+<h3>Description</h3>
+
+<p>Retrieve gene/transcript/exons annotations stored in an Ensembl based
+database package generated with the <code><a href="makeEnsemblDbPackage.html">makeEnsembldbPackage</a></code>
+function. Parameter <code>filter</code> enables to define filters to
+retrieve only specific data. Alternatively, a global filter might be
+added to the <code>EnsDb</code> object using the <code><a href="global-filters.html">addFilter</a></code>
+method.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+## S4 method for signature 'EnsDb'
+exons(x, columns = listColumns(x,"exon"),
+        filter = AnnotationFilterList(), order.by,
+        order.type = "asc", return.type = "GRanges")
+
+## S4 method for signature 'EnsDb'
+exonsBy(x, by = c("tx", "gene"),
+        columns = listColumns(x, "exon"), filter =
+        AnnotationFilterList(), use.names = FALSE)
+
+## S4 method for signature 'EnsDb'
+intronsByTranscript(x, ..., use.names = FALSE)
+
+## S4 method for signature 'EnsDb'
+exonsByOverlaps(x, ranges, maxgap = -1L, minoverlap = 0L,
+        type = c("any", "start", "end"), columns = listColumns(x, "exon"),
+        filter = AnnotationFilterList())
+
+## S4 method for signature 'EnsDb'
+transcripts(x, columns = listColumns(x, "tx"),
+        filter = AnnotationFilterList(), order.by, order.type = "asc",
+        return.type = "GRanges")
+
+## S4 method for signature 'EnsDb'
+transcriptsBy(x, by = c("gene", "exon"),
+        columns = listColumns(x, "tx"), filter = AnnotationFilterList())
+
+## S4 method for signature 'EnsDb'
+transcriptsByOverlaps(x, ranges, maxgap = -1L,
+        minoverlap = 0L, type = c("any", "start", "end"),
+        columns = listColumns(x, "tx"), filter = AnnotationFilterList())
+
+## S4 method for signature 'EnsDb'
+promoters(x, upstream = 2000, downstream = 200,
+        use.names = TRUE, ...)
+
+## S4 method for signature 'EnsDb'
+genes(x, columns = c(listColumns(x, "gene"), "entrezid"),
+        filter = AnnotationFilterList(), order.by, order.type = "asc",
+        return.type = "GRanges")
+
+## S4 method for signature 'EnsDb'
+disjointExons(x, aggregateGenes = FALSE,
+        includeTranscripts = TRUE, filter = AnnotationFilterList(), ...)
+
+## S4 method for signature 'EnsDb'
+cdsBy(x, by = c("tx", "gene"), columns = NULL,
+        filter = AnnotationFilterList(), use.names = FALSE)
+
+## S4 method for signature 'EnsDb'
+fiveUTRsByTranscript(x, columns = NULL,
+        filter = AnnotationFilterList())
+
+## S4 method for signature 'EnsDb'
+threeUTRsByTranscript(x, columns = NULL,
+        filter = AnnotationFilterList())
+
+## S4 method for signature 'GRangesList'
+toSAF(x, ...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<p>(In alphabetic order)
+</p>
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>For <code>promoters</code>: additional arguments to be passed to the
+<code>transcripts</code> method. For <code>intronsByTranscript</code>:
+additional arguments such as <code>filter</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>aggregateGenes</code></td>
+<td>
+
+<p>For <code>disjointExons</code>: When <code>FALSE</code> (default) exon fragments
+that overlap multiple genes are dropped. When <code>TRUE</code>, all
+fragments are kept and the <code>gene_id</code> metadata column includes
+all gene IDs that overlap the exon fragment.
+</p>
+</td></tr>
+<tr valign="top"><td><code>by</code></td>
+<td>
+
+<p>For <code>exonsBy</code>: wheter exons sould be fetched by genes
+or by transcripts; as in the corresponding function of the
+<code>GenomicFeatures</code> package.
+For <code>transcriptsBy</code>: whether
+transcripts should be fetched by genes or by exons; fetching
+transcripts by cds as supported by the
+<code><a href="../../GenomicFeatures/html/transcriptsBy.html">transcriptsBy</a></code> method in the
+<code>GenomicFeatures</code> package is currently not implemented.
+For <code>cdsBy</code>: whether cds should be fetched by transcript of by
+gene.
+</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+
+<p>Columns to be retrieved from the database tables.
+</p>
+<p>Default values for <code>genes</code>  are all columns from the <code>gene</code>
+database table, for <code>exons</code> and <code>exonsBy</code> the column names of
+the <code>exon</code> database table table and for <code>transcript</code> and
+<code>transcriptBy</code> the columns of the <code>tx</code> data base table
+(see details below for more information).
+</p>
+<p>Note that any of the column names of the database tables can be
+submitted to any of the methods (use <code><a href="EnsDb-class.html">listTables</a></code> or
+<code><a href="EnsDb-class.html">listColumns</a></code> methods for a complete list of allowed
+column names).
+</p>
+<p>For <code>cdsBy</code>: this argument is only supported for for
+<code>by="tx"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>downstream</code></td>
+<td>
+
+<p>For method <code>promoters</code>: the number of nucleotides downstream of
+the transcription start site that should be included in the promoter region.
+</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+
+<p>A filter describing which results to retrieve from the database. Can
+be a single object extending
+<code><a href="../../AnnotationFilter/html/AnnotationFilter.html">AnnotationFilter</a></code>, an
+<code><a href="../../AnnotationFilter/html/AnnotationFilterList.html">AnnotationFilterList</a></code> object
+combining several such objects or a <code>formula</code> representing a
+filter expression (see examples below or
+<code><a href="../../AnnotationFilter/html/AnnotationFilter.html">AnnotationFilter</a></code> for more
+details). Use the <code><a href="../../AnnotationFilter/html/AnnotationFilter.html">supportedFilters</a></code> method to get an
+overview of supported filter classes and related fields.
+</p>
+</td></tr>
+<tr valign="top"><td><code>includeTranscripts</code></td>
+<td>
+
+<p>For <code>disjointExons</code>: When <code>TRUE</code> (default) a
+<code>tx_name</code> metadata column is included that lists all transcript
+IDs that overlap the exon fragment. Note: this is different to the
+<code><a href="../../GenomicFeatures/html/disjointExons.html">disjointExons</a></code> function in the
+<code>GenomicFeatures</code> package, that lists the transcript names, not
+IDs.
+</p>
+</td></tr>
+<tr valign="top"><td><code>maxgap</code></td>
+<td>
+
+<p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: see
+<code>exonsByOverlaps</code> in <code>GenomicFeatures</code> for more
+information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>minoverlap</code></td>
+<td>
+
+<p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: see
+<code>exonsByOverlaps</code> in <code>GenomicFeatures</code> for more
+information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>order.by</code></td>
+<td>
+
+<p>Character vector specifying the column(s) by which the result should
+be ordered. This can be either in the form of
+<code>"gene_id, seq_name"</code> or <code>c("gene_id", "seq_name")</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>order.type</code></td>
+<td>
+
+<p>If the results should be ordered ascending
+(<code>asc</code>, default) or descending (<code>desc</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>ranges</code></td>
+<td>
+
+<p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: a
+<code>GRanges</code> object specifying the genomic regions.
+</p>
+</td></tr>
+<tr valign="top"><td><code>return.type</code></td>
+<td>
+
+<p>Type of the returned object. Can be either
+<code>"data.frame"</code>, <code>"DataFrame"</code> or <code>"GRanges"</code>. In the
+latter case the return object will be a <code>GRanges</code> object with
+the GRanges specifying the chromosomal start and end coordinates of
+the feature (gene, transcript or exon, depending whether <code>genes</code>,
+<code>transcripts</code> or <code>exons</code> was called). All additional
+columns are added as metadata columns to the GRanges object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+
+<p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: see
+<code>exonsByOverlaps</code> in <code>GenomicFeatures</code> for more
+information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>upstream</code></td>
+<td>
+
+<p>For method <code>promoters</code>: the number of nucleotides upstream of
+the transcription start site that should be included in the promoter region.
+</p>
+</td></tr>
+<tr valign="top"><td><code>use.names</code></td>
+<td>
+
+<p>For <code>cdsBy</code> and <code>exonsBy</code>: only for <code>by="gene"</code>: use
+the names of the genes instead of their IDs as names of the resulting
+<code>GRangesList</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>For <code>toSAF</code> a <code>GRangesList</code> object.
+For all other methods an <code>EnsDb</code> instance.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>A detailed description of all database tables and the associated
+attributes/column names is also given in the vignette of this package.
+An overview of the columns is given below:
+</p>
+
+<dl>
+<dt>gene_id</dt><dd><p>the Ensembl gene ID of the gene.</p>
+</dd>
+<dt>gene_name</dt><dd><p>the name of the gene (in most cases its official symbol).</p>
+</dd>
+<dt>entrezid</dt><dd><p>the NCBI Entrezgene ID of the gene. Note that this
+column contains a <code>list</code> of Entrezgene identifiers to
+accommodate the potential 1:n mapping between Ensembl genes and
+Entrezgene IDs.</p>
+</dd>
+<dt>gene_biotype</dt><dd><p>the biotype of the gene.</p>
+</dd>
+<dt>gene_seq_start</dt><dd><p>the start coordinate of the gene on the
+sequence (usually a chromosome).</p>
+</dd>
+<dt>gene_seq_end</dt><dd><p>the end coordinate of the gene.</p>
+</dd>
+<dt>seq_name</dt><dd><p>the name of the sequence the gene is encoded
+(usually a chromosome).</p>
+</dd>
+<dt>seq_strand</dt><dd><p>the strand on which the gene is encoded</p>
+</dd>
+<dt>seq_coord_system</dt><dd><p>the coordinate system of the sequence.</p>
+</dd>
+<dt>tx_id</dt><dd><p>the Ensembl transcript ID.</p>
+</dd>
+<dt>tx_biotype</dt><dd><p>the biotype of the transcript.</p>
+</dd>
+<dt>tx_seq_start</dt><dd><p>the chromosomal start coordinate of the transcript.</p>
+</dd>
+<dt>tx_seq_end</dt><dd><p>the chromosomal end coordinate of the transcript.</p>
+</dd>
+<dt>tx_cds_seq_start</dt><dd><p>the start coordinate of the coding region of
+the transcript (NULL for non-coding transcripts).</p>
+</dd>
+<dt>tx_cds_seq_end</dt><dd><p>the end coordinate of the coding region.</p>
+</dd>
+<dt>gc_content</dt><dd><p>the G and C nucleotide content of the transcript's
+sequence expressed as a percentage (i.e. between 0 and 100).</p>
+</dd>
+<dt>exon_id</dt><dd><p>the ID of the exon. In Ensembl, each exon specified
+by a unique chromosomal start and end position has its own
+ID. Thus, the same exon might be part of several transcripts.</p>
+</dd>
+<dt>exon_seq_start</dt><dd><p>the chromosomal start coordinate of the exon.</p>
+</dd>
+<dt>exon_seq_end</dt><dd><p>the chromosomal end coordinate of the exon.</p>
+</dd>
+<dt>exon_idx</dt><dd><p>the index of the exon in the transcript model. As
+noted above, an exon can be part of several transcripts and thus
+its position inside these transcript might differ.</p>
+</dd>
+</dl>
+
+<p>Many <code>EnsDb</code> databases provide also protein related
+annotations. See <code><a href="ProteinFunctionality.html">listProteinColumns</a></code> for more information.
+</p>
+
+
+<h3>Value</h3>
+
+<p>For <code>exons</code>, <code>transcripts</code> and <code>genes</code>,
+a <code>data.frame</code>, <code>DataFrame</code>
+or a <code>GRanges</code>, depending on the value of the
+<code>return.type</code> parameter. The result is ordered as specified by
+the parameter <code>order.by</code> or, if not provided, by <code>seq_name</code>
+and chromosomal start coordinate, but NOT by any ordering of values in
+eventually submitted filter objects.
+</p>
+<p>For <code>exonsBy</code>, <code>transcriptsBy</code>:
+a <code>GRangesList</code>, depending on the value of the
+<code>return.type</code> parameter. The results are ordered by the value of the
+<code>by</code> parameter.
+</p>
+<p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: a
+<code>GRanges</code> with the exons or transcripts overlapping the specified
+regions.
+</p>
+<p>For <code>toSAF</code>: a <code>data.frame</code> with column names
+<code>"GeneID"</code> (the group name from the <code>GRangesList</code>, i.e. the
+ID by which the <code>GRanges</code> are split), <code>"Chr"</code> (the seqnames
+from the <code>GRanges</code>), <code>"Start"</code> (the start coordinate),
+<code>"End"</code> (the end coordinate) and <code>"Strand"</code> (the strand).
+</p>
+<p>For <code>disjointExons</code>: a <code>GRanges</code> of non-overlapping exon
+parts.
+</p>
+<p>For <code>cdsBy</code>: a <code>GRangesList</code> with <code>GRanges</code> per either
+transcript or exon specifying the start and end coordinates of the
+coding region of the transcript or gene.
+</p>
+<p>For <code>fiveUTRsByTranscript</code>: a <code>GRangesList</code> with
+<code>GRanges</code> for each protein coding transcript representing the
+start and end coordinates of full or partial exons that constitute the
+5' untranslated region of the transcript.
+</p>
+<p>For <code>threeUTRsByTranscript</code>: a <code>GRangesList</code> with
+<code>GRanges</code> for each protein coding transcript representing the
+start and end coordinates of full or partial exons that constitute the
+3' untranslated region of the transcript.
+</p>
+
+
+<h3>Methods and Functions</h3>
+
+
+<dl>
+<dt>exons</dt><dd>
+<p>Retrieve exon information from the database. Additional
+columns from transcripts or genes associated with the exons can be specified
+and are added to the respective exon annotation.
+</p>
+</dd>
+<dt>exonsBy</dt><dd>
+<p>Retrieve exons grouped by transcript or by gene. This
+function returns a <code>GRangesList</code> as does the analogous function
+in the <code>GenomicFeatures</code> package. Using the <code>columns</code>
+parameter it is possible to determine which additional values should
+be retrieved from the database. These will be included in the
+<code>GRanges</code> object for the exons as metadata columns.
+The exons in the inner <code>GRanges</code> are ordered by the exon
+index within the transcript (if <code>by="tx"</code>), or increasingly by the
+chromosomal start position of the exon or decreasingly by the chromosomal end
+position of the exon depending whether the gene is encoded on the
++ or - strand (for <code>by="gene"</code>).
+The <code>GRanges</code> in the <code>GRangesList</code> will be ordered by
+the name of the gene or transcript.
+</p>
+</dd>
+<dt>intronsByTranscript</dt><dd>
+<p>Retrieve introns by transcripts. Filters can also be passed to the
+function. For more information see the <code>intronsByTranscript</code>
+method in the <code>GenomicFeatures</code> package.
+</p>
+</dd>
+<dt>exonsByOverlaps</dt><dd>
+<p>Retrieve exons overlapping specified genomic ranges. For
+more information see the
+<code>exonsByOverlaps</code> method in the
+<code>GenomicFeatures</code> package. The functionality is to some
+extent similar and redundant to the <code>exons</code> method in
+combination with <code><a href="../../AnnotationFilter/html/AnnotationFilter.html">GRangesFilter</a></code> filter.
+</p>
+</dd>
+<dt>transcripts</dt><dd>
+<p>Retrieve transcript information from the database. Additional
+columns from genes or exons associated with the transcripts can be specified
+and are added to the respective transcript annotation.
+</p>
+</dd>
+<dt>transcriptsBy</dt><dd>
+<p>Retrieve transcripts grouped by gene or exon. This
+function returns a <code>GRangesList</code> as does the analogous function
+in the <code>GenomicFeatures</code> package. Using the <code>columns</code>
+parameter it is possible to determine which additional values should
+be retrieved from the database. These will be included in the
+<code>GRanges</code> object for the transcripts as metadata columns.
+The transcripts in the inner <code>GRanges</code> are ordered  increasingly by the
+chromosomal start position of the transcript for genes encoded on
+the + strand and in a decreasing manner by the chromosomal end
+position of the transcript for genes encoded on the - strand.
+The <code>GRanges</code> in the <code>GRangesList</code> will be ordered by
+the name of the gene or exon.
+</p>
+</dd>
+<dt>transcriptsByOverlaps</dt><dd>
+<p>Retrieve transcripts overlapping specified genomic ranges. For
+more information see
+<code><a href="../../GenomicFeatures/html/transcriptsByOverlaps.html">transcriptsByOverlaps</a></code> method in the
+<code>GenomicFeatures</code> package. The functionality is to some
+extent similar and redundant to the <code>transcripts</code> method in
+combination with <code><a href="../../AnnotationFilter/html/AnnotationFilter.html">GRangesFilter</a></code> filter.
+</p>
+</dd>
+<dt>promoters</dt><dd>
+<p>Retrieve promoter information from the database. Additional
+columns from genes or exons associated with the promoters can be specified
+and are added to the respective promoter annotation.
+</p>
+</dd>
+<dt>genes</dt><dd>
+<p>Retrieve gene information from the database. Additional columns
+from transcripts or exons associated with the genes can be
+specified and are added to the respective gene annotation. Note
+that column <code>"entrezid"</code> is a <code>list</code> of Entrezgene
+identifiers to accomodate the potential 1:n mapping between
+Ensembl genes and Entrezgene IDs.
+</p>
+</dd>
+<dt>disjointExons</dt><dd>
+<p>This method is identical to
+<code><a href="../../GenomicFeatures/html/disjointExons.html">disjointExons</a></code> defined in the
+<code>GenomicFeatures</code> package. It creates a <code>GRanges</code> of
+non-overlapping exon parts with metadata columns of <code>gene_id</code>
+and <code>exonic_part</code>. Exon parts that overlap more than one gene
+can be dropped with <code>aggregateGenes=FALSE</code>.
+</p>
+</dd>
+<dt>cdsBy</dt><dd>
+<p>Returns the coding region grouped either by transcript or by
+gene. Each element in the <code>GRangesList</code> represents the cds
+for one transcript or gene, with the individual ranges
+corresponding to the coding part of its exons.
+For <code>by="tx"</code> additional annotation columns can be added to
+the individual <code>GRanges</code> (in addition to the default columns
+<code>exon_id</code> and <code>exon_rank</code>).
+Note that the <code>GRangesList</code> is sorted by its names.
+</p>
+</dd>
+<dt>fiveUTRsByTranscript</dt><dd>
+<p>Returns the 5' untranslated region for protein coding
+transcripts.
+</p>
+</dd>
+<dt>threeUTRsByTranscript</dt><dd>
+<p>Returns the 3' untranslated region for protein coding
+transcripts.
+</p>
+</dd>
+<dt>toSAF</dt><dd>
+<p>Reformats a <code>GRangesList</code> object into a
+<code>data.frame</code> corresponding to a standard SAF (Simplified
+Annotation Format) file (i.e. with column names <code>"GeneID"</code>,
+<code>"Chr"</code>, <code>"Start"</code>, <code>"End"</code> and
+<code>"Strand"</code>). Note: this method makes only sense on a
+<code>GRangesList</code> that groups features (exons, transcripts) by gene.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Note</h3>
+
+<p>Ensembl defines genes not only on standard chromosomes, but also on
+patched chromosomes and chromosome variants. Thus it might be
+advisable to restrict the queries to just those chromosomes of
+interest (e.g. by specifying a <code>SeqNameFilter(c(1:22, "X", "Y"))</code>).
+In addition, also so called LRG genes (Locus Reference Genomic) are defined in
+Ensembl. Their gene id starts with LRG instead of ENS for Ensembl
+genes, thus, a filter can be applied to specifically select those
+genes or exclude those genes (see examples below).
+</p>
+<p>Depending on the value of the global option
+<code>"ucscChromosomeNames"</code> (use
+<code>getOption(ucscChromosomeNames, FALSE)</code> to get its value or
+<code>option(ucscChromosomeNames=TRUE)</code> to change its value)
+the sequence/chromosome names of the returned <code>GRanges</code> objects
+or provided in the returned <code>data.frame</code> or <code>DataFrame</code>
+correspond to Ensembl chromosome names (if value is <code>FALSE</code>) or
+UCSC chromosome names (if <code>TRUE</code>). This ensures a better
+integration with the <code>Gviz</code> package, in which this option is set
+by default to <code>TRUE</code>.
+</p>
+
+
+<h3>Note</h3>
+
+<p>While it is possible to request values from a column <code>"tx_name"</code>
+(with the <code>columns</code> argument), no such column is present in the
+database. The returned values correspond to the ID of the transcripts.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer, Tim Triche
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../AnnotationFilter/html/AnnotationFilter.html">supportedFilters</a></code> to get an overview of supported filters.
+<code><a href="makeEnsemblDbPackage.html">makeEnsembldbPackage</a></code>,
+<code><a href="EnsDb-class.html">listColumns</a></code>, <code><a href="EnsDb-lengths.html">lengthOf</a></code>
+</p>
+<p><code><a href="global-filters.html">addFilter</a></code> for globally adding filters to an <code>EnsDb</code>
+object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(EnsDb.Hsapiens.v86)
+edb &lt;- EnsDb.Hsapiens.v86
+
+######   genes
+##
+## Get all genes encoded on chromosome Y
+AllY &lt;- genes(edb, filter = SeqNameFilter("Y"))
+AllY
+
+## Return the result as a DataFrame; also, we use a filter expression here
+## to define which features to extract from the database.
+AllY.granges &lt;- genes(edb,
+                      filter = ~ seq_name == "Y",
+                      return.type="DataFrame")
+AllY.granges
+
+## Include all transcripts of the gene and their chromosomal
+## coordinates, sort by chrom start of transcripts and return as
+## GRanges.
+AllY.granges.tx &lt;- genes(edb,
+                         filter = SeqNameFilter("Y"),
+                         columns = c("gene_id", "seq_name",
+                                     "seq_strand", "tx_id", "tx_biotype",
+                                     "tx_seq_start", "tx_seq_end"),
+                         order.by = "tx_seq_start")
+AllY.granges.tx
+
+
+
+######   transcripts
+##
+## Get all transcripts of a gene
+Tx &lt;- transcripts(edb,
+                  filter = GeneIdFilter("ENSG00000184895"),
+                  order.by = "tx_seq_start")
+Tx
+
+## Get all transcripts of two genes along with some information on the
+## gene and transcript
+Tx &lt;- transcripts(edb,
+                  filter = GeneIdFilter(c("ENSG00000184895",
+                                          "ENSG00000092377")),
+                  columns = c("gene_id", "gene_seq_start", "gene_seq_end",
+                              "gene_biotype", "tx_biotype"))
+Tx
+
+######   promoters
+##
+## Get the bona-fide promoters (2k up- to 200nt downstream of TSS)
+promoters(edb, filter = GeneIdFilter(c("ENSG00000184895",
+                                       "ENSG00000092377")))
+
+######   exons
+##
+## Get all exons of protein coding transcript for the gene ENSG00000184895
+Exon &lt;- exons(edb,
+              filter = ~ gene_id == "ENSG00000184895" &amp;
+                  tx_biotype == "protein_coding",
+              columns = c("gene_id", "gene_seq_start", "gene_seq_end",
+                          "tx_biotype", "gene_biotype"))
+Exon
+
+
+
+#####    exonsBy
+##
+## Get all exons for transcripts encoded on chromosomes X and Y.
+ETx &lt;- exonsBy(edb, by = "tx",
+               filter = SeqNameFilter(c("X", "Y")))
+ETx
+## Get all exons for genes encoded on chromosome 1 to 22, X and Y and
+## include additional annotation columns in the result
+EGenes &lt;- exonsBy(edb, by = "gene",
+                  filter = SeqNameFilter(c("X", "Y")),
+                  columns = c("gene_biotype", "gene_name"))
+EGenes
+
+## Note that this might also contain "LRG" genes.
+length(grep(names(EGenes), pattern="LRG"))
+
+## to fetch just Ensemblgenes, use an GeneIdFilter with value
+## "ENS%" and condition "like"
+eg &lt;- exonsBy(edb, by = "gene",
+              filter = AnnotationFilterList(SeqNameFilter(c("X", "Y")),
+                                            GeneIdFilter("ENS", "startsWith")),
+              columns = c("gene_biotype", "gene_name"))
+eg
+length(grep(names(eg), pattern="LRG"))
+
+#####    transcriptsBy
+##
+TGenes &lt;- transcriptsBy(edb, by = "gene",
+                        filter = SeqNameFilter(c("X", "Y")))
+TGenes
+
+## convert this to a SAF formatted data.frame that can be used by the
+## featureCounts function from the Rsubreader package.
+head(toSAF(TGenes))
+
+
+#####   transcriptsByOverlaps
+##
+ir &lt;- IRanges(start = c(2654890, 2709520, 28111770),
+              end = c(2654900, 2709550, 28111790))
+gr &lt;- GRanges(rep("Y", length(ir)), ir)
+
+## Retrieve all transcripts overlapping any of the regions.
+txs &lt;- transcriptsByOverlaps(edb, gr)
+txs
+
+## Alternatively, use a GRangesFilter
+grf &lt;- GRangesFilter(gr, type = "any")
+txs &lt;- transcripts(edb, filter = grf)
+txs
+
+
+####    cdsBy
+## Get the coding region for all transcripts on chromosome Y.
+## Specifying also additional annotation columns (in addition to the default
+## exon_id and exon_rank).
+cds &lt;- cdsBy(edb, by = "tx", filter = SeqNameFilter("Y"),
+             columns = c("tx_biotype", "gene_name"))
+
+####    the 5' untranslated regions:
+fUTRs &lt;- fiveUTRsByTranscript(edb, filter = SeqNameFilter("Y"))
+
+####    the 3' untranslated regions with additional column gene_name.
+tUTRs &lt;- threeUTRsByTranscript(edb, filter = SeqNameFilter("Y"),
+                               columns = "gene_name")
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

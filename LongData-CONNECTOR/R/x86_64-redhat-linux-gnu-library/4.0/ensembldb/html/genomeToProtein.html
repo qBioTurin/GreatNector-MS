@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Map genomic coordinates to protein coordinates</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for genomeToProtein {ensembldb}"><tr><td>genomeToProtein {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Map genomic coordinates to protein coordinates</h2>
+
+<h3>Description</h3>
+
+<p>Map positions along the genome to positions within the protein sequence if
+a protein is encoded at the location. The provided coordinates have to be
+completely within the genomic position of an exon of a protein coding
+transcript (see <code><a href="genomeToTranscript.html">genomeToTranscript()</a></code> for details). Also, the provided
+positions have to be within the genomic region encoding the CDS of a
+transcript (excluding its stop codon; soo <code><a href="transcriptToProtein.html">transcriptToProtein()</a></code> for
+details).
+</p>
+<p>For genomic positions for which the mapping failed an <code>IRanges</code> with
+negative coordinates (i.e. a start position of -1) is returned.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+genomeToProtein(x, db)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p><code>GRanges</code> with the genomic coordinates that should be mapped to
+within-protein coordinates.</p>
+</td></tr>
+<tr valign="top"><td><code>db</code></td>
+<td>
+<p><code>EnsDb</code> object.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>genomeToProtein</code> combines calls to <code><a href="genomeToTranscript.html">genomeToTranscript()</a></code> and
+<code><a href="transcriptToProtein.html">transcriptToProtein()</a></code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>IRangesList</code> with each element representing the mapping of one of the
+<code>GRanges</code> in <code>x</code> (i.e. the length of the <code>IRangesList</code> is <code>length(x)</code>).
+Each element in <code>IRanges</code> provides the coordinates within the protein
+sequence, names being the (Ensembl) IDs of the protein. The ID of the
+transcript encoding the protein, the ID of the exon within which the
+genomic coordinates are located and its rank in the transcript are provided
+in metadata columns <code>"tx_id"</code>, <code>"exon_id"</code> and <code>"exon_rank"</code>. Metadata
+columns <code>"cds_ok"</code> indicates whether the length of the CDS matches the
+length of the encoded protein. Coordinates for which <code>cds_ok = FALSE</code> should
+be taken with caution, as they might not be correct. Metadata columns
+<code>"seq_start"</code>, <code>"seq_end"</code>, <code>"seq_name"</code> and <code>"seq_strand"</code> provide the
+provided genomic coordinates.
+</p>
+<p>For genomic coordinates that can not be mapped to within-protein sequences
+an <code>IRanges</code> with a start coordinate of -1 is returned.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other coordinate mapping functions: 
+<code><a href="cdsToTranscript.html">cdsToTranscript</a>()</code>,
+<code><a href="genomeToTranscript.html">genomeToTranscript</a>()</code>,
+<code><a href="proteinToGenome.html">proteinToGenome</a>()</code>,
+<code><a href="proteinToTranscript.html">proteinToTranscript</a>()</code>,
+<code><a href="transcriptToCds.html">transcriptToCds</a>()</code>,
+<code><a href="transcriptToGenome.html">transcriptToGenome</a>()</code>,
+<code><a href="transcriptToProtein.html">transcriptToProtein</a>()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(EnsDb.Hsapiens.v86)
+## Restrict all further queries to chromosome x to speed up the examples
+edbx &lt;- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
+
+## In the example below we define 4 genomic regions:
+## 630898: corresponds to the first nt of the CDS of ENST00000381578
+## 644636: last nt of the CDS of ENST00000381578
+## 644633: last nt before the stop codon in ENST00000381578
+## 634829: position within an intron.
+gnm &lt;- GRanges("X", IRanges(start = c(630898, 644636, 644633, 634829),
+    width = c(5, 1, 1, 3)))
+res &lt;- genomeToProtein(gnm, edbx)
+
+## The result is an IRangesList with the same length as gnm
+length(res)
+length(gnm)
+
+## The first element represents the mapping for the first GRanges:
+## the coordinate is mapped to the first amino acid of the protein(s).
+## The genomic coordinates can be mapped to several transcripts (and hence
+## proteins).
+res[[1]]
+
+## The stop codon is not translated, thus the mapping for the second
+## GRanges fails
+res[[2]]
+
+## The 3rd GRanges is mapped to the last amino acid.
+res[[3]]
+
+## Mapping of intronic positions fail
+res[[4]]
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

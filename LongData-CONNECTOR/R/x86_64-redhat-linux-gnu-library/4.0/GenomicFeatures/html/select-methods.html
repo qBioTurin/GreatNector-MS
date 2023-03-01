@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Using the &quot;select&quot; interface on TxDb objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for select-methods {GenomicFeatures}"><tr><td>select-methods {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Using the &quot;select&quot; interface on TxDb objects</h2>
+
+<h3>Description</h3>
+
+<p><code>select</code>, <code>columns</code> and <code>keys</code> can be used together to
+extract data from a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+
+
+<h3>Details</h3>
+
+<p>In the code snippets below, <code>x</code> is a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>keytypes(x)</code>:
+allows the user to discover which keytypes can be passed in to
+<code>select</code> or <code>keys</code> and the <code>keytype</code> argument.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>keys(x, keytype, pattern, column, fuzzy)</code>: Return keys for
+the database contained in the <a href="TxDb-class.html">TxDb</a> object .
+</p>
+<p>The <code>keytype</code> argument specifies the kind of keys that will
+be returned. By default <code>keys</code> will return the &quot;GENEID&quot; keys
+for the database.
+</p>
+<p>If <code>keys</code> is used with <code>pattern</code>, it will pattern match
+on the <code>keytype</code>.
+</p>
+<p>But if the <code>column</code> argument is also provided along with the
+<code>pattern</code> argument, then <code>pattern</code> will be matched
+against the values in <code>column</code> instead.
+</p>
+<p>And if <code>keys</code> is called with <code>column</code> and no
+<code>pattern</code> argument, then it will return all keys that have
+corresponding values in the <code>column</code> argument.
+</p>
+<p>Thus, the behavior of <code>keys</code> all depends on how many arguments are
+specified.
+</p>
+<p>Use of the <code>fuzzy</code> argument will toggle fuzzy matching to
+TRUE or FALSE.  If <code>pattern</code> is not used, fuzzy is ignored.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>columns(x)</code>:
+Show which kinds of data can be returned for the
+<a href="TxDb-class.html">TxDb</a> object.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>select(x, keys, columns, keytype)</code>:
+When all the appropriate arguments are specified <code>select</code>
+will retrieve the matching data as a data.frame based on
+parameters for selected <code>keys</code> and <code>columns</code> and
+<code>keytype</code> arguments.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Carlson</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><a href="../../AnnotationDbi/html/AnnotationDb-class.html">AnnotationDb-class</a> for more descriptsion
+of methods <code>select</code>,<code>keytypes</code>,<code>keys</code> and <code>columns</code>.
+</p>
+</li>
+<li> <p><code><a href="transcripts.html">transcripts</a></code>, <code><a href="transcriptsBy.html">transcriptsBy</a></code>,
+and <code><a href="transcriptsByOverlaps.html">transcriptsByOverlaps</a></code>, for other ways to
+extract genomic features from a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+</li>
+<li><p> The <a href="TxDb-class.html">TxDb</a> class.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+txdb_file &lt;- system.file("extdata", "Biomart_Ensembl_sample.sqlite",
+                         package="GenomicFeatures")
+txdb &lt;- loadDb(txdb_file)
+txdb
+
+## find key types
+keytypes(txdb)
+
+## list IDs that can be used to filter
+head(keys(txdb, "GENEID"))
+head(keys(txdb, "TXID"))
+head(keys(txdb, "TXNAME"))
+
+## list columns that can be returned by select
+columns(txdb)
+
+## call select
+res &lt;- select(txdb, head(keys(txdb, "GENEID")),
+              columns=c("GENEID","TXNAME"),
+              keytype="GENEID")
+head(res)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

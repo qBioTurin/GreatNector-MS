@@ -1,0 +1,488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Read VCF files</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for readVcf {VariantAnnotation}"><tr><td>readVcf {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Read VCF files</h2>
+
+<h3>Description</h3>
+
+<p>Read Variant Call Format (VCF) files</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+  ## S4 method for signature 'TabixFile,ScanVcfParam'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'TabixFile,IntegerRangesList'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'TabixFile,GRanges'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'TabixFile,GRangesList'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'TabixFile,missing'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'character,ANY'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'character,missing'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+  ## S4 method for signature 'character,missing'
+readVcf(file, genome, param, 
+      ..., row.names=TRUE)
+
+## Lightweight functions to read a single variable
+readInfo(file, x, param=ScanVcfParam(), ..., row.names=TRUE)
+readGeno(file, x, param=ScanVcfParam(), ..., row.names=TRUE)
+readGT(file, nucleotides=FALSE, param=ScanVcfParam(), ..., row.names=TRUE)
+
+## Import wrapper
+## S4 method for signature 'VcfFile,ANY,ANY'
+import(con, format, text, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>file</code></td>
+<td>
+<p>A <code><a href="VcfFile-class.html">VcfFile</a></code> (synonymous with
+<code><a href="../../Rsamtools/html/TabixFile-class.html">TabixFile</a></code>) instance or character() name of the VCF
+file to be processed. When ranges are specified in <code>param</code>,
+<code>file</code> must be a <code><a href="VcfFile-class.html">VcfFile</a></code>.
+</p>
+<p>Use of the <code><a href="VcfFile-class.html">VcfFile</a></code> methods are encouraged as they are
+more efficient than the character() methods. See ?<code>VcfFile</code>,
+and ?<code>indexVcf</code> for help creating a <code><a href="VcfFile-class.html">VcfFile</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>genome</code></td>
+<td>
+<p>A <code>character</code> or <code>Seqinfo</code> object.
+</p>
+
+<ul>
+<li><p><code>character</code>: Genome identifier as a single string or named 
+character vector. Names of the character vector correspond to 
+chromosome names in the file. This identifier replaces the genome 
+information in the VCF <code>Seqinfo</code> (i.e., <code>seqinfo(vcf)</code>).
+When not provided, <code>genome</code> is taken from the VCF file header.
+
+</p>
+</li>
+<li><p><code>Seqinfo</code>: When <code>genome</code> is provided as a <code>Seqinfo</code>
+it is propagated to the VCF output. If seqinfo information can be 
+obtained from the file, 
+(i.e., seqinfo(scanVcfHeader(fl)) is not empty), the output
+<code>Seqinfo</code> is a product of merging the two.
+</p>
+<p>If a param (i.e., ScanVcfParam) is used in the call to <code>readVcf</code>, 
+the seqlevels  of the param ranges must be present in <code>genome</code>.
+
+</p>
+</li></ul>
+
+</td></tr>
+<tr valign="top"><td><code>param</code></td>
+<td>
+<p>An instance of <code><a href="ScanVcfParam-class.html">ScanVcfParam</a></code>, <code>GRanges</code>,
+<code>GRangesList</code> or <code>IntegerRangesList</code>. VCF files can be 
+subset on genomic coordinates (ranges) or elements in the VCF fields. Both 
+genomic coordinates and VCF elements can be specified in a 
+<code><a href="ScanVcfParam-class.html">ScanVcfParam</a></code>. See ?<code>ScanVcfParam</code> for details.
+</p>
+</td></tr>
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p><code>character</code> name of single <code>info</code> or <code>geno</code> field to 
+import. Applicable to <code>readInfo</code> and <code>readGeno</code> only.
+</p>
+</td></tr>
+<tr valign="top"><td><code>row.names</code></td>
+<td>
+<p>A <code>logical</code> specifying if rownames should be returned. 
+In the case of <code>readVcf</code>, rownames appear on the <code>GRanges</code>
+returned by the <code>rowRanges</code> accessor.
+</p>
+</td></tr>
+<tr valign="top"><td><code>nucleotides</code></td>
+<td>
+<p>A <code>logical</code> indicating if genotypes should be returned
+as nucleotides instead of the numeric representation.
+Applicable to <code>readGT</code> only.
+</p>
+</td></tr>
+<tr valign="top"><td><code>con</code></td>
+<td>
+<p>The <code>VcfFile</code> object to import.</p>
+</td></tr>
+<tr valign="top"><td><code>format, text</code></td>
+<td>
+<p>Ignored.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additional arguments, passed to methods. For
+<code>import</code>, the arguments are passed to <code>readVcf</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<dl>
+<dt>Data Import: </dt><dd>
+
+<dl>
+<dt>VCF object: </dt><dd>
+<p><code>readVcf</code> imports records from bzip compressed or uncompressed 
+VCF files. Data are parsed into a <code><a href="VCF-class.html">VCF</a></code> object 
+using the file header information if available. To import a subset 
+of ranges the VCF must have an index file. An index file can be 
+created with <code>bzip</code> and <code>indexVcf</code> functions.
+</p>
+<p>The <code>readInfo</code>, <code>readGeno</code> and <code>readGT</code> functions
+are lightweight versions of <code>readVcf</code> and import a single
+variable. The return object is a vector, matrix or CompressedList
+instead of a VCF class. 
+</p>
+</dd>
+</dl>
+ 
+<p><code>readVcf</code> calls <code><a href="scanVcf-methods.html">scanVcf</a></code>, the details of which can be 
+found with <code>?scanVcf</code>.
+</p>
+</dd>
+<dt>Header lines (aka Meta-information): </dt><dd>
+<p>readVcf() reads and parses fields according to the multiplicity and
+data type specified in the header lines. Fields without header lines are
+skipped (not read or parsed). To see what fields are present in the
+header use <code>scanVcfHeader()</code>. See ?<code>VCFHeader</code> for more details.
+</p>
+<p>Passing <code>verbose = TRUE</code> to <code>readVcf()</code> prints the fields
+with header lines that will be parsed by <code>readVcf</code>.
+</p>
+</dd>
+<dt>Data type: </dt><dd>
+<p>CHROM, POS, ID and REF fields are used to create the <code>GRanges</code>
+stored in the <code>VCF</code> object and accessible with the <code>rowRanges</code>
+accessor.
+</p>
+<p>REF, ALT, QUAL and FILTER are parsed into the <code>DataFrame</code> in the 
+<code>fixed</code> slot. Because ALT can have more than one value per variant 
+it is represented as a <code>DNAStringSetList</code>. REF is a <code>DNAStringSet</code>,
+QUAL is <code>numeric</code> and FILTER is a <code>character</code>. Accessors include
+<code>fixed</code>, <code>ref</code>, <code>alt</code>, <code>qual</code>, and <code>filt</code>.
+</p>
+<p>Data from the INFO field can be accessed with the <code>info</code> accessor.
+Genotype data (i.e., data immediately following the FORMAT field in the 
+VCF) can be accessed with the <code>geno</code> accessor. INFO and genotype data 
+types are determined according to the &lsquo;Number&rsquo; and &lsquo;Type&rsquo; 
+information in the file header as follows:
+</p>
+<p>&lsquo;Number&rsquo; should only be 0  when &lsquo;Type&rsquo; is 'flag'. These
+fields are parsed as logical vectors.
+</p>
+<p>If &lsquo;Number&rsquo; is 1, &lsquo;info&rsquo; data are parsed into a 
+<code>vector</code> and &lsquo;geno&rsquo; into a <code>matrix</code>.
+</p>
+<p>If &lsquo;Number&rsquo; is &gt;1, &lsquo;info&rsquo; data are parsed into a
+<code>DataFrame</code> with the same number of columns. &lsquo;geno&rsquo; are
+parsed into an <code>array</code> with the same dimensions as &lsquo;Number&rsquo;. 
+Columns of the &lsquo;geno&rsquo; matrices are the samples.
+</p>
+<p>If &lsquo;Number&rsquo; is &lsquo;.&rsquo;, &lsquo;A&rsquo; or &lsquo;G&rsquo;, 
+both &lsquo;info&rsquo; and &lsquo;geno&rsquo; data are parsed into a <code>matrix</code>.
+</p>
+<p>When the header does not contain any &lsquo;INFO&rsquo; lines, the data are
+returned as a single, unparsed column.
+</p>
+</dd>
+<dt>Missing data: </dt><dd>
+<p>Missing data in VCF files on disk are represented by a dot (&quot;.&quot;). 
+<code>readVcf</code> retains the dot as a character string for data type 
+character and converts it to <code>NA</code> for data types numeric or double. 
+</p>
+<p>Because the data are stored in rectangular data structures there is a
+value for each <code>info</code> and <code>geno</code> field element in the <code>VCF</code> 
+class. If the element was missing or was not collected for a particular 
+variant the value will be <code>NA</code>.
+</p>
+<p>In the case of the ALT field we have the following treatment of 
+special characters / missing values:
+</p>
+
+<ul>
+<li><p> '.' true missings become empty characters
+</p>
+</li>
+<li><p> '*' are treated as missing and become empty characters
+</p>
+</li>
+<li><p> 'I' are treated as undefined and become '.'
+</p>
+</li></ul>
+
+</dd>
+<dt>Efficient Usage: </dt><dd>
+<p>Subsets of data (i.e., specific variables, positions or samples) can 
+be read from a VCF file by providing a <code>ScanVcfParam</code> object in
+the call to <code>readVcf</code>. Other lightweight options are the
+<code>readGT</code>, <code>readInfo</code> and <code>readGeno</code> functions which 
+return data as a matrix instead of the <code>VCF</code> class.
+</p>
+<p>Another option for handling large files is to iterate through the
+data in chunks by setting the <code>yieldSize</code> parameter in a 
+<code>VcfFile</code> object. Iteration can be through all data fields or
+a subset defined by a <code>ScanVcfParam</code>. See example below, 
+'Iterating through VCF with yieldSize'.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Value</h3>
+
+<p><code>readVcf</code> returns a <code><a href="VCF-class.html">VCF</a></code> object. See ?<code>VCF</code> for 
+complete details of the class structure. <code>readGT</code>, <code>readInfo</code> and
+<code>readGeno</code> return a <code>matrix</code>.
+</p>
+
+<dl>
+<dt>rowRanges: </dt><dd>
+<p>The CHROM, POS, ID and REF fields are used to create a <code>GRanges</code>
+object. Ranges are created using POS as the start value and width of 
+the reference allele (REF). By default, the IDs become the rownames
+('row.names = FALSE' to turn this off). If IDs are 
+missing (i.e., &lsquo;.&rsquo;) a string of CHROM:POS_REF/ALT is used instead. 
+The <code>genome</code> argument is stored in the seqinfo of the <code>GRanges</code> 
+and can be accessed with <code>genome(&lt;VCF&gt;)</code>.
+</p>
+<p>One metadata column, <code>paramRangeID</code>, is included with the
+<code>rowRanges</code>. This ID is meaningful when multiple ranges are
+specified in the <code>ScanVcfParam</code> and distinguishes which records
+match each range.
+</p>
+</dd>
+<dt>fixed: </dt><dd>
+<p>REF, ALT, QUAL and FILTER fields of the VCF are parsed into a 
+<code>DataFrame</code>.
+</p>
+<p>REF is returned as a DNAStringSet. 
+</p>
+<p>ALT is a CharacterList when it contains structural variants and a 
+DNAStringSetList otherwise. See also the 'Details' section 
+for 'Missing data'.
+</p>
+</dd>
+<dt>info: </dt><dd>
+<p>Data from the INFO field of the VCF is parsed into a <code>DataFrame</code>.
+</p>
+</dd>
+<dt>geno: </dt><dd>
+<p>If present, the genotype data are parsed into a list of <code>matrices</code> 
+or <code>arrays</code>. Each list element represents a field in the FORMAT 
+column of the VCF file. Rows are the variants, columns are the samples. 
+</p>
+</dd>
+<dt>colData: </dt><dd>
+<p>This slot contains a <code>DataFrame</code> describing the samples. If present, 
+the sample names following FORMAT in the VCF file become the row names.
+</p>
+</dd>
+<dt>metadata: </dt><dd> 
+<p>Header information present in the file is put into a <code>list</code>
+in <code>metadata</code>.
+</p>
+</dd>
+</dl>
+
+<p>See references for complete details of the VCF file format. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Valerie Obenchain&gt;
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://vcftools.sourceforge.net/specs.html">http://vcftools.sourceforge.net/specs.html</a> outlines the VCF
+specification.
+</p>
+<p><a href="http://samtools.sourceforge.net/mpileup.shtml">http://samtools.sourceforge.net/mpileup.shtml</a> contains
+information on the portion of the specification implemented by
+<code>bcftools</code>.
+</p>
+<p><a href="http://samtools.sourceforge.net/">http://samtools.sourceforge.net/</a> provides information on
+<code>samtools</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="indexVcf-method.html">indexVcf</a></code>,
+<code><a href="VcfFile-class.html">VcfFile</a></code>,
+<code><a href="../../Rsamtools/html/indexTabix.html">indexTabix</a></code>,
+<code><a href="../../Rsamtools/html/TabixFile-class.html">TabixFile</a></code>,
+<code><a href="../../Rsamtools/html/scanTabix.html">scanTabix</a></code>,
+<code><a href="../../Rsamtools/html/scanBcf.html">scanBcf</a></code>,
+<code><a href="VCF-class.html">expand,CollapsedVCF-method</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  fl &lt;- system.file("extdata", "ex2.vcf", package="VariantAnnotation") 
+  vcf &lt;- readVcf(fl, "hg19")
+  ## vcf &lt;- readVcf(fl, c("20"="hg19"))  ## 'genome' as named vector
+
+  ## ---------------------------------------------------------------------
+  ## Header and genome information 
+  ## ---------------------------------------------------------------------
+  vcf
+
+  ## all header information
+  hdr &lt;- header(vcf)
+
+  ## header information for 'info' and 'fixed' fields
+  info(hdr)
+  fixed(hdr)
+
+  ## ---------------------------------------------------------------------
+  ## Accessors
+  ## ---------------------------------------------------------------------
+  ## fixed fields together
+  head(fixed(vcf), 5)
+
+  ## fixed fields separately 
+  filt(vcf)
+  ref(vcf) 
+
+  ## info data 
+  info(hdr)
+  info(vcf)
+  info(vcf)$DP
+
+  ## geno data 
+  geno(hdr)
+  geno(vcf)
+  head(geno(vcf)$GT)
+
+  ## genome
+  unique(genome(rowRanges(vcf)))
+
+  ## ---------------------------------------------------------------------
+  ## Data subsets with lightweight read* functions 
+  ## ---------------------------------------------------------------------
+
+  ## Import a single 'info' or 'geno' variable
+  DP &lt;- readInfo(fl, "DP")
+  HQ &lt;- readGeno(fl, "HQ")
+
+  ## Import GT as numeric representation 
+  GT &lt;- readGT(fl)
+  ## Import GT as nucleotides 
+  GT &lt;- readGT(fl, nucleotides=TRUE)
+
+  ## ---------------------------------------------------------------------
+  ## Data subsets with ScanVcfParam
+  ## ---------------------------------------------------------------------
+
+  ## Subset on genome coordinates:
+  ## 'file' must have an index
+  rngs &lt;- GRanges("20", IRanges(c(14370, 1110000), c(17330, 1234600)))
+  names(rngs) &lt;- c("geneA", "geneB")
+  param &lt;- ScanVcfParam(which=rngs) 
+  compressVcf &lt;- bgzip(fl, tempfile())
+  tab &lt;- indexVcf(compressVcf)
+  vcf &lt;- readVcf(tab, "hg19", param)
+
+  ## When data are subset by range ('which' argument in ScanVcfParam),
+  ## the 'paramRangeID' column provides a map back to the original 
+  ## range in 'param'.
+  rowRanges(vcf)[,"paramRangeID"]
+  vcfWhich(param)
+
+  ## Subset on samples:
+  ## Consult the header for the sample names.
+  samples(hdr) 
+  ## Specify one or more names in 'samples' in a ScanVcfParam.
+  param &lt;- ScanVcfParam(samples="NA00002")
+  vcf &lt;- readVcf(tab, "hg19", param)
+  geno(vcf)$GT
+
+  ## Subset on 'fixed', 'info' or 'geno' fields:
+  param &lt;- ScanVcfParam(fixed="ALT", geno=c("GT", "HQ"), info=c("NS", "AF"))
+  vcf_tab &lt;- readVcf(tab, "hg19", param)
+  info(vcf_tab)
+  geno(vcf_tab)
+
+  ## No ranges are specified in the 'param' so tabix file is not
+  ## required. Instead, the uncompressed VCF can be used as 'file'.
+  vcf_fname &lt;- readVcf(fl, "hg19", param)
+
+  ## The header will always contain information for all variables
+  ## in the original file reguardless of how the data were subset.
+  ## For example, all 'geno' fields are listed in the header 
+  geno(header(vcf_fname))
+
+  ## but only 'GT' and 'HQ' are present in the VCF object.
+  geno(vcf_fname)
+
+  ## Subset on both genome coordinates and 'info', 'geno' fields: 
+  param &lt;- ScanVcfParam(geno="HQ", info="AF", which=rngs)
+  vcf &lt;- readVcf(tab, "hg19", param)
+
+  ## When any of 'fixed', 'info' or 'geno' are omitted (i.e., no
+  ## elements specified) all records are retrieved. Use NA to indicate
+  ## that no records should be retrieved. This param specifies
+  ## all 'fixed fields, the "GT" 'geno' field and none of 'info'.
+  ScanVcfParam(geno="GT", info=NA)
+
+  ## ---------------------------------------------------------------------
+  ## Iterate through VCF with 'yieldSize' 
+  ## ---------------------------------------------------------------------
+  fl &lt;- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+  param &lt;- ScanVcfParam(fixed="ALT", geno=c("GT", "GL"), info=c("LDAF"))
+  tab &lt;- VcfFile(fl, yieldSize=4000)
+  open(tab)
+  while (nrow(vcf_yield &lt;- readVcf(tab, "hg19", param=param)))
+      cat("vcf dim:", dim(vcf_yield), "\n")
+  close(tab)
+
+  ## ---------------------------------------------------------------------
+  ## Debugging with 'verbose'
+  ## ---------------------------------------------------------------------
+  ## readVcf() uses information in the header lines to parse the data to 
+  ## the correct number and type. Fields without header lines are skipped. 
+  ## If a call to readVcf() results in no info(VCF) or geno(VCF) data the
+  ## file may be missing header lines. Set 'verbose = TRUE' to get
+  ## a listing of fields found in the header.
+
+  ## readVcf(myfile, "mygenome", verbose=TRUE)
+
+  ## Header fields can also be discovered with scanVcfHeader().
+  hdr &lt;- scanVcfHeader(fl)
+  geno(hdr)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

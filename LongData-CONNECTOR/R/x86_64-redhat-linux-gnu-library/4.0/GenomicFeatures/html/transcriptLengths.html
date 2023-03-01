@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract the transcript lengths (and other metrics) from a...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for transcriptLengths {GenomicFeatures}"><tr><td>transcriptLengths {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Extract the transcript lengths (and other metrics) from a TxDb object</h2>
+
+<h3>Description</h3>
+
+<p>The <code>transcriptLengths</code> function extracts the transcript lengths from
+a <a href="TxDb-class.html">TxDb</a> object. It also returns the CDS and UTR lengths for each
+transcript if the user requests them.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+transcriptLengths(txdb, with.cds_len=FALSE,
+                  with.utr5_len=FALSE, with.utr3_len=FALSE, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>txdb</code></td>
+<td>
+
+<p>A <a href="TxDb-class.html">TxDb</a> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>with.cds_len, with.utr5_len, with.utr3_len</code></td>
+<td>
+
+<p><code>TRUE</code> or <code>FALSE</code>. Whether or not to also extract and return
+the CDS, 5' UTR, and 3' UTR lengths for each transcript.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments used by <code>transcripts</code> and other accessor 
+functions.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>All the lengths are counted in number of nucleotides.
+</p>
+<p>The length of a processed transcript is just the sum of the lengths of its
+exons. This should not be confounded with the length of the stretch of DNA
+transcribed into RNA (a.k.a. transcription unit), which can be obtained
+with <code>width(transcripts(txdb))</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A data frame with 1 row per transcript. The rows are guaranteed to be in
+the same order as the elements of the <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object
+returned by <code><a href="transcripts.html">transcripts</a>(txdb)</code>.
+The data frame has between 5 and 8 columns, depending on what the user
+requested via the <code>with.cds_len</code>, <code>with.utr5_len</code>, and
+<code>with.utr3_len</code> arguments.
+</p>
+<p>The first 3 columns are the same as the metadata columns of the object
+returned by
+</p>
+<pre>  transcripts(txdb, columns=c("tx_id", "tx_name", "gene_id"))
+</pre>
+<p>that is:
+</p>
+
+<ul>
+<li> <p><code>tx_id</code>: The internal transcript ID. This ID is unique within
+the scope of the <a href="TxDb-class.html">TxDb</a> object. It is not an official or public
+ID (like an Ensembl or FlyBase ID) or an Accession number, so it
+cannot be used to lookup the transcript in public data bases or in
+other <a href="TxDb-class.html">TxDb</a> objects. Furthermore, this ID could change when
+re-running the code that was used to make the <a href="TxDb-class.html">TxDb</a> object.
+</p>
+</li>
+<li> <p><code>tx_name</code>: An official/public transcript name or ID that can
+be used to lookup the transcript in public data bases or in other
+<a href="TxDb-class.html">TxDb</a> objects. This column is not guaranteed to contain unique
+values and it can contain NAs.
+</p>
+</li>
+<li> <p><code>gene_id</code>: The official/public ID of the gene that the
+transcript belongs to. Can be NA if the gene is unknown or if the
+transcript is not considered to belong to a gene.
+</p>
+</li></ul>
+
+<p>The other columns are quantitative:
+</p>
+
+<ul>
+<li> <p><code>nexon</code>: The number of exons in the transcript.
+</p>
+</li>
+<li> <p><code>tx_len</code>: The length of the processed transcript.
+</p>
+</li>
+<li> <p><code>cds_len</code>: [optional] The length of the CDS region of the
+processed transcript.
+</p>
+</li>
+<li> <p><code>utr5_len</code>: [optional] The length of the 5' UTR region of
+the processed transcript.
+</p>
+</li>
+<li> <p><code>utr3_len</code>: [optional] The length of the 3' UTR region of
+the processed transcript.
+</p>
+</li></ul>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Hervé Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="transcripts.html">transcripts</a></code>, <code><a href="transcriptsBy.html">transcriptsBy</a></code>,
+and <code><a href="transcriptsByOverlaps.html">transcriptsByOverlaps</a></code>, for extracting
+genomic feature locations from a <a href="TxDb-class.html">TxDb</a>-like object.
+</p>
+</li>
+<li> <p><code><a href="exonicParts.html">exonicParts</a></code> and <code><a href="exonicParts.html">intronicParts</a></code> for
+extracting non-overlapping exonic or intronic parts from a
+TxDb-like object.
+</p>
+</li>
+<li> <p><code><a href="extractTranscriptSeqs.html">extractTranscriptSeqs</a></code> for extracting transcript
+(or CDS) sequences from chromosome sequences.
+</p>
+</li>
+<li> <p><code><a href="coverageByTranscript.html">coverageByTranscript</a></code> for computing coverage by
+transcript (or CDS) of a set of ranges.
+</p>
+</li>
+<li> <p><code><a href="makeTxDbFromUCSC.html">makeTxDbFromUCSC</a></code>, <code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code>,
+and <code><a href="makeTxDbFromEnsembl.html">makeTxDbFromEnsembl</a></code>, for making a <a href="TxDb-class.html">TxDb</a>
+object from online resources.
+</p>
+</li>
+<li> <p><code><a href="makeTxDbFromGRanges.html">makeTxDbFromGRanges</a></code> and <code><a href="makeTxDbFromGFF.html">makeTxDbFromGFF</a></code>
+for making a <a href="TxDb-class.html">TxDb</a> object from a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a>
+object, or from a GFF or GTF file.
+</p>
+</li>
+<li><p> The <a href="TxDb-class.html">TxDb</a> class.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
+txdb &lt;- TxDb.Dmelanogaster.UCSC.dm3.ensGene
+dm3_txlens &lt;- transcriptLengths(txdb)
+head(dm3_txlens)
+
+dm3_txlens &lt;- transcriptLengths(txdb, with.cds_len=TRUE,
+                                      with.utr5_len=TRUE,
+                                      with.utr3_len=TRUE)
+head(dm3_txlens)
+
+## When cds_len is 0 (non-coding transcript), utr5_len and utr3_len
+## must also be 0:
+non_coding &lt;- dm3_txlens[dm3_txlens$cds_len == 0, ]
+stopifnot(all(non_coding[6:8] == 0))
+
+## When cds_len is not 0 (coding transcript), cds_len + utr5_len +
+## utr3_len must be equal to tx_len:
+coding &lt;- dm3_txlens[dm3_txlens$cds_len != 0, ]
+stopifnot(all(rowSums(coding[6:8]) == coding[[5]]))
+
+## A sanity check:
+stopifnot(identical(dm3_txlens$tx_id, mcols(transcripts(txdb))$tx_id))
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

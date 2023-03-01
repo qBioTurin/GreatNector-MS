@@ -1,0 +1,542 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: VCF class objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for VCF-class {VariantAnnotation}"><tr><td>VCF-class {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>VCF class objects</h2>
+
+<h3>Description</h3>
+
+<p>The VCF class is a virtual class extended from
+<code>RangedSummarizedExperiment</code>. The subclasses, <code>CompressedVCF</code>
+and <code>ExtendedVCF</code>, are containers for holding data from
+Variant Call Format files.
+</p>
+
+
+<h3>Details</h3>
+
+<p>The <code>VCF</code> class is a virtual class with two concrete subclasses,
+<code>CollapsedVCF</code> and <code>ExtendedVCF</code>. 
+</p>
+<p>Slots unique to <code>VCF</code> and subclasses,
+</p>
+
+<ul>
+<li> <p><code>fixed</code>: A <a href="../../S4Vectors/html/DataFrame-class.html">DataFrame</a> containing the REF, ALT, QUAL 
+and FILTER fields from a VCF file.
+</p>
+</li>
+<li> <p><code>info</code>: A <a href="../../S4Vectors/html/DataFrame-class.html">DataFrame</a> containing the INFO fields from 
+a VCF file.
+</p>
+</li></ul>
+
+<p>Slots inherited from <code>RangedSummarizedExperiment</code>,
+</p>
+
+<ul>
+<li> <p><code>metadata</code>: A <code>list</code> containing the 
+file header or other information about the overall experiment.
+</p>
+</li>
+<li> <p><code>rowRanges</code>: A <a href="../../GenomicRanges/html/GRanges-class.html">GRanges</a>-class instance defining the
+variant ranges and associated metadata columns of REF, ALT, QUAL 
+and FILTER. While the REF, ALT, QUAL and FILTER fields can
+be displayed as metadata columns they cannot be modified with
+<code>rowRanges&lt;-</code>. To modify these fields use <code>fixed&lt;-</code>. 
+</p>
+</li>
+<li> <p><code>colData</code>: A <a href="../../S4Vectors/html/DataFrame-class.html">DataFrame</a>-class instance describing the 
+samples and associated metadata.
+</p>
+</li>
+<li> <p><code>geno</code>: The <code>assays</code> slot from
+<code>RangedSummarizedExperiment</code> has been renamed as <code>geno</code>
+for the VCF class. This slot contains the genotype information
+immediately following the FORMAT field in a VCF file. Each element
+of the <code>list</code> or <code>SimpleList</code> is a matrix or array. 
+</p>
+</li></ul>
+
+<p>It is expected that users will not create instances of the VCF class
+but instead one of the concrete subclasses, CollapsedVCF or ExpandVCF.
+CollapsedVCF contains the ALT data as a <code>DNAStringSetList</code> allowing 
+for multiple alleles per variant. The ExpandedVCF ALT data is a 
+<code>DNAStringSet</code> where the ALT column has been expanded to create a 
+flat form of the data with one row per variant-allele combination. In 
+the case of strucutral variants, ALT will be a <code>CompressedCharacterList</code>
+or <code>character</code> in the collapsed or expanded forms.
+</p>
+
+
+<h3>Constructors</h3>
+
+
+<dl>
+<dt></dt><dd>
+<p><code>readVcf(file, genome, param, ..., row.names=TRUE)</code>
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>VCF(rowRanges = GRanges(), colData = DataFrame(), 
+                exptData = list(header = VCFHeader()), 
+                fixed = DataFrame(), info = DataFrame(), 
+                geno = SimpleList(), ..., collapsed=TRUE, 
+                verbose = FALSE)</code>
+Creates CollapsedVCF when <code>collapsed = TRUE</code> and an
+ExpandedVCF when <code>collapsed = FALSE</code>.
+</p>
+<p>This is a low-level constructor used internally. Most instances
+of the <code>VCF</code> class are created with <code>readVCF</code>.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Accessors</h3>
+
+<p>In the following code snippets <code>x</code> is a CollapsedVCF or ExpandedVCF 
+object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>rowRanges(x, ..., fixed = TRUE)</code>, <code>rowRanges(x) &lt;- value</code>:
+Gets or sets the rowRanges. The CHROM, POS, ID, POS and REF fields are
+used to create a <code>GRanges</code> object. The start of the ranges are
+defined by POS and the width is equal to the width of the reference
+allele REF.  The IDs become the rownames. If they are missing (i.e.,
+&lsquo;.&rsquo;) a string of CHROM:POS_REF/ALT is used instead.  The
+<code>genome</code> argument is stored in the seqinfo of the <code>GRanges</code> and
+can be accessed with <code>genome(&lt;VCF&gt;)</code>.
+</p>
+<p>When <code>fixed = TRUE</code>, REF, ALT, QUAL and FILTER metadata columns are 
+displayed as metadata columns. To modify the <code>fixed</code> fields, use
+the <code>fixed&lt;-</code> setter. 
+</p>
+<p>One metadata column, <code>paramRangeID</code>, is included with the
+<code>rowRanges</code>. This ID is meaningful when multiple ranges are
+specified in the <code>ScanVcfParam</code> and distinguishes which records
+match each range.
+</p>
+<p>The metadata columns of a VCF object are accessed with the following:
+</p>
+
+<ul>
+<li><p><code>ref(x)</code>, <code>ref(x) &lt;- value</code>:
+Gets or sets the reference allele (REF). <code>value</code> must 
+be a <code>DNAStringSet</code>. 
+
+</p>
+</li>
+<li><p><code>alt(x)</code>, <code>alt(x) &lt;- value</code>:
+Gets or sets the alternate allele data (ALT). When <code>x</code> is 
+a CollapsedVCF, <code>value</code> must be a <code>DNAStringSetList</code>
+or <code>CompressedCharacterList</code>. For ExpandedVCF, <code>value</code>
+must be a <code>DNAStringSet</code> or <code>character</code>.
+
+</p>
+</li>
+<li><p><code>qual(x)</code>, <code>qual(x) &lt;- value</code>:
+Returns or sets the quality scores (QUAL). <code>value</code> must 
+be an <code>numeric(1L)</code>.
+
+</p>
+</li>
+<li><p><code>filt(x)</code>, <code>filt(x) &lt;- value</code>:
+Returns or sets the filter data. <code>value</code> must 
+be a <code>character(1L)</code>. Names must be one of 'REF', 'ALT',
+'QUAL' or 'FILTER'.
+
+</p>
+</li></ul>
+
+</dd>
+<dt></dt><dd>
+<p><code>mcols(x)</code>, <code>mcols(x) &lt;- value</code>:
+These methods behave the same as <code>mcols(rowRanges(x))</code> and 
+<code>mcols(rowRanges(x)) &lt;- value</code>. This method does not manage the
+fixed fields, 'REF', 'ALT', 'QUAL' or 'FILTER'. To modify those
+columns use <code>fixed&lt;-</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>fixed(x)</code>, <code>fixed(x) &lt;- value</code>:
+Gets or sets a DataFrame of REF, ALT, QUAL and FILTER only. 
+Note these fields are displayed as metadata columns with
+the rowRanges() data (set to fixed = FALSE to suppress).
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>info(x, ..., row.names = TRUE)</code>, <code>info(x) &lt;- value</code>:
+Gets or sets a DataFrame of INFO variables. Row names are added
+if unique and <code>row.names=TRUE</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>geno(x, withDimnames=TRUE)</code>, <code>geno(x) &lt;- value</code>:
+oets a SimpleList of genotype data.
+<code>value</code> is a SimpleList. To replace a single variable in
+the SimpleList use <code>geno(x)$variable &lt;- value</code>; in this 
+case <code>value</code> must be a matrix or array. By default
+row names are returned; to override specify
+<code>geno(vcf, withDimnames=FALSE)</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>metadata(x)</code>:
+Gets a <code>list</code> of experiment-related data. By default this
+list includes the &lsquo;header&rsquo; information from the VCF file. 
+See the use of <code>header()</code> for details in extracting
+header information. 
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>colData(x)</code>, <code>colData(x) &lt;- value</code>:
+Gets or sets a <code>DataFrame</code> of sample-specific information. Each row 
+represents a sample in the VCF file. <code>value</code> must be a 
+<code>DataFrame</code> with rownames representing the samples in the VCF 
+file.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>genome(x)</code>:
+Extract the <code>genome</code> information from the <code>GRanges</code> object
+returned by the <code>rowRanges</code> accessor.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlevels(x)</code>:
+Extract the <code>seqlevels</code> from the <code>GRanges</code> object
+returned by the <code>rowRanges</code> accessor.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>strand(x)</code>:
+Extract the <code>strand</code> from the <code>GRanges</code> object
+returned by the <code>rowRanges</code> accessor.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>header(x)</code>, <code>header(x)&lt;- value</code>:
+Get or set the VCF header information. Replacement value
+must be a <code>VCFHeader</code> object. To modify individual elements 
+use <code>info&lt;-</code>, <code>geno&lt;-</code> or <code>meta&lt;-</code> on a 
+&lsquo;VCFHeader&rsquo; object. See ?<code>VCFHeader</code> man page for
+details.
+</p>
+
+<ul>
+<li><p><code>info(header(x))</code>
+</p>
+</li>
+<li><p><code>geno(header(x))</code>
+</p>
+</li>
+<li><p><code>meta(header(x))</code>
+</p>
+</li>
+<li><p><code>samples(header(x))</code>
+</p>
+</li></ul>
+
+</dd>
+<dt></dt><dd><p><code>vcfFields(x)</code>
+Returns a <code><a href="../../IRanges/html/CharacterList.html">CharacterList</a></code> of all available VCF
+fields, with names of <code>fixed</code>, <code>info</code>, <code>geno</code> and
+<code>samples</code> indicating the four categories. Each element is a
+character() vector of available VCF field names within each category. 
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Subsetting and combining</h3>
+
+<p>In the following code <code>x</code> is a VCF object, and ... is a list
+of VCF objects.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>x[i, j]</code>, <code>x[i, j] &lt;- value</code>: Gets or sets rows and columns.
+<code>i</code> and <code>j</code> can be integer or logical vectors. <code>value</code> is a
+replacement <code>VCF</code> object.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>subset(x, subset, select, ...)</code>: Restricts <code>x</code> by
+evaluating the <code>subset</code> argument in the scope of
+<code>rowData(x)</code> and <code>info(x)</code>, and <code>select</code> in the
+context of <code>colData(x)</code>. The <code>subset</code> argument restricts
+by rows, while the <code>select</code> argument restricts by column. The
+<code>...</code> are passed to the underlying <code>subset()</code> calls.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>cbind(...)</code>, <code>rbind(...)</code>: <code>cbind</code> combines objects with
+identical ranges (<code>rowRanges</code>) but different samples (columns in
+<code>assays</code>). The colnames in <code>colData</code> must match or an error is
+thrown. Columns with duplicate names in <code>fixed</code>, <code>info</code> and
+<code>mcols(rowRanges(VCF))</code> must contain the same data.
+</p>
+<p><code>rbind</code> combines objects with different ranges (<code>rowRanges</code>) and
+the same subjects (columns in <code>assays</code>). Columns with duplicate names
+in <code>colData</code> must contain the same data.  The &lsquo;Samples&rsquo;
+columns in <code>colData</code> (created by <code>readVcf</code>) are renamed with a
+numeric extension ordered as they were input to <code>rbind</code> e.g.,
+&ldquo;Samples.1, Samples.2, ...&rdquo; etc. 
+</p>
+<p><code>metadata</code> from all objects are combined into a
+<code>list</code> with no name checking.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>expand</h3>
+
+<p>In the following code snippets <code>x</code> is a CollapsedVCF object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>expand(x, ..., row.names = FALSE)</code>:
+Expand (unlist) the ALT column of a CollapsedVCF object to one row 
+per ALT value. Variables with Number='A' have one value per alternate
+allele and are expanded accordingly. The 'AD' genotype field 
+(and any variables with 'Number' set to 'R')
+is expanded into REF/ALT pairs. For all other fields, the rows
+are replicated to match the elementNROWS of ALT.
+</p>
+<p>The output is an ExpandedVCF with ALT as a <code>DNAStringSet</code> 
+or <code>character</code> (structural variants). By default rownames
+are NULL. When <code>row.names=TRUE</code> the expanded output has 
+duplicated rownames corresponding to the original <code>x</code>.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>genotypeCodesToNucleotides(vcf, ...)</h3>
+
+<p>This function converts the 'GT' genotype codes in a <code>VCF</code> object
+to nucleotides. See also ?<code>readGT</code> to read in only 'GT' data as 
+codes or nucleotides.
+</p>
+
+
+<h3>SnpMatrixToVCF(from, seqSource)</h3>
+
+<p>This function converts the output from the <a href="../../snpStats/html/read.plink.html">read.plink</a> 
+function to a <code>VCF</code> class. <code>from</code> must be a list of length 3
+with named elements &quot;map&quot;, &quot;fam&quot; and &quot;genotypes&quot;. <code>seqSource</code> can
+be a <code><a href="../../BSgenome/html/BSgenome.html">BSgenome</a></code> or an <a href="../../Rsamtools/html/FaFile-class.html">FaFile</a>
+used for reference sequence extraction.
+</p>
+
+
+<h3>Variant Type</h3>
+
+<p>Functions to identify variant type include <a href="isSNV-methods.html">isSNV</a>, 
+<a href="isSNV-methods.html">isInsertion</a>, <a href="isSNV-methods.html">isDeletion</a>, <a href="isSNV-methods.html">isIndel</a>, 
+<a href="isSNV-methods.html">isSubstitution</a> and <a href="isSNV-methods.html">isTransition</a>. See the ?<code>isSNV</code> 
+man page for details.
+</p>
+
+
+<h3>Arguments</h3>
+
+
+<dl>
+<dt>geno</dt><dd><p>A <code>list</code> or <code>SimpleList</code> of matrix elements,
+or a <code>matrix</code> containing the genotype information from a
+VCF file. If present, these data immediately follow the FORMAT
+field in the VCF. 
+</p>
+<p>Each element of the list must have the same dimensions, and dimension 
+names (if present) must be consistent across elements and with the row 
+names of <code>rowRanges</code>, <code>colData</code>. 
+</p>
+</dd>
+<dt>info</dt><dd><p>A <code>DataFrame</code> of data from the INFO field of a VCF file. 
+The number of rows must match that in the <code>rowRanges</code> object.
+</p>
+</dd>
+<dt>fixed</dt><dd><p>A <code>DataFrame</code> of REF, ALT, QUAL and FILTER 
+fields from a VCF file. The number of rows must match that
+of the <code>rowRanges</code> object.
+</p>
+</dd>
+<dt>rowRanges</dt><dd><p>A <code>GRanges</code> instance describing the ranges of
+interest. 
+Row names, if present, become the row names of the <code>VCF</code>. The length 
+of the <code>GRanges</code> must equal the number of rows of the matrices in 
+<code>geno</code>.
+</p>
+</dd>
+<dt>colData</dt><dd><p>A <code>DataFrame</code> describing the samples. Row names, if 
+present, become the column names of the <code>VCF</code>.
+</p>
+</dd>
+<dt>metadata</dt><dd><p>A <code>list</code> describing the header of the VCF file or 
+additional information for the overall experiment. 
+</p>
+</dd>
+<dt>...</dt><dd><p>For <code>cbind</code> and <code>rbind</code> a list of VCF objects.
+For all other methods ... are additional arguments passed to methods. 
+</p>
+</dd>
+<dt>collapsed</dt><dd><p>A <code>logical(1)</code> indicating whether a 
+CollapsedVCF or ExpandedVCF should be created. The ALT in a
+CollapsedVCF is a <code>DNAStringSetList</code> while in a
+ExpandedVCF it is a <code>DNAStringSet</code>. 
+</p>
+</dd>
+<dt>verbose</dt><dd><p>A <code>logical(1)</code> indicating whether messages
+about data coercion during construction should be printed.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Valerie Obenchain</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="../../GenomicRanges/html/GRanges-class.html">GRanges</a>,
+<a href="../../S4Vectors/html/DataFrame.html">DataFrame</a>,
+<a href="../../S4Vectors/html/SimpleList.html">SimpleList</a>,
+<a href="../../SummarizedExperiment/html/RangedSummarizedExperiment.html">RangedSummarizedExperiment</a>,
+<code><a href="readVcf-methods.html">readVcf</a></code>,
+<code><a href="writeVcf-methods.html">writeVcf</a></code>
+<code><a href="isSNV-methods.html">isSNV</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+## readVcf() parses data into a VCF object: 
+
+fl &lt;- system.file("extdata", "structural.vcf", package="VariantAnnotation")
+vcf &lt;- readVcf(fl, genome="hg19")
+
+## ----------------------------------------------------------------
+## Accessors 
+## ----------------------------------------------------------------
+## Variant locations are stored in the GRanges object returned by
+## the rowRanges() accessor.
+rowRanges(vcf)
+
+## Suppress fixed fields:
+rowRanges(vcf, fixed=FALSE)
+
+## Individual fields can be extracted with ref(), alt(), qual(), filt() etc.
+qual(vcf)
+ref(vcf)
+head(info(vcf))
+
+## All available VCF field names can be contracted with vcfFields(). 
+vcfFields(vcf)
+
+## Extract genotype fields with geno(). Access specific fields with 
+## '$' or '[['.
+geno(vcf)
+identical(geno(vcf)$GQ, geno(vcf)[[2]])
+
+## ----------------------------------------------------------------
+## Renaming seqlevels and subsetting 
+## ----------------------------------------------------------------
+## Overlap and matching operations require that the objects
+## being compared have the same seqlevels (chromosome names).
+## It is often the case that the seqlevesls in on of the objects
+## needs to be modified to match the other. In this VCF, the 
+## seqlevels are numbers instead of preceded by "chr" or "ch". 
+
+seqlevels(vcf)
+
+## Rename the seqlevels to start with 'chr'.
+vcf2 &lt;- renameSeqlevels(vcf, paste0("chr", seqlevels(vcf))) 
+seqlevels(vcf2)
+
+## The VCF can also be subset by seqlevel using 'keepSeqlevels'
+## or 'dropSeqlevels'. See ?keepSeqlevels for details. 
+vcf3 &lt;- keepSeqlevels(vcf2, "chr2", pruning.mode="coarse")
+seqlevels(vcf3)
+
+## ----------------------------------------------------------------
+## Header information 
+## ----------------------------------------------------------------
+
+## Header data can be modified in the 'meta', 'info' and 'geno'
+## slots of the VCFHeader object. See ?VCFHeader for details.
+
+## Current 'info' fields.
+rownames(info(header(vcf)))
+
+## Add a new field to the header.
+newInfo &lt;- DataFrame(Number=1, Type="Integer",
+                     Description="Number of Samples With Data",
+                     row.names="NS")
+info(header(vcf)) &lt;- rbind(info(header(vcf)), newInfo)
+rownames(info(header(vcf)))
+
+## ----------------------------------------------------------------
+## Collapsed and Expanded VCF 
+## ----------------------------------------------------------------
+## readVCF() produces a CollapsedVCF object.
+fl &lt;- system.file("extdata", "ex2.vcf", 
+                  package="VariantAnnotation")
+vcf &lt;- readVcf(fl, genome="hg19")
+vcf
+
+## The ALT column is a DNAStringSetList to allow for more
+## than one alternate allele per variant.
+alt(vcf)
+
+## For structural variants ALT is a CharacterList.
+fl &lt;- system.file("extdata", "structural.vcf", 
+                  package="VariantAnnotation")
+vcf &lt;- readVcf(fl, genome="hg19")
+alt(vcf)
+
+## ExpandedVCF is the 'flattened' counterpart of CollapsedVCF.
+## The ALT and all variables with Number='A' in the header are
+## expanded to one row per alternate allele.
+vcfLong &lt;- expand(vcf)
+alt(vcfLong)
+
+## Also see the ?VRanges class for an alternative form of
+## 'flattened' VCF data.
+
+## ----------------------------------------------------------------
+## isSNV()
+## ----------------------------------------------------------------
+## isSNV() returns a subset VCF containing SNVs only.
+
+vcf &lt;- VCF(rowRanges = GRanges("chr1", IRanges(1:4*3, width=c(1, 2, 1, 1))))
+alt(vcf) &lt;- DNAStringSetList("A", c("TT"), c("G", "A"), c("TT", "C"))
+ref(vcf) &lt;- DNAStringSet(c("G", c("AA"), "T", "G"))
+fixed(vcf)[c("REF", "ALT")]
+
+## SNVs are present in rows 1 (single ALT value), 3 (both ALT values) 
+## and 4 (1 of the 2 ALT values).
+vcf[isSNV(vcf, singleAltOnly=TRUE)] 
+vcf[isSNV(vcf, singleAltOnly=FALSE)] ## all 3 SNVs
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

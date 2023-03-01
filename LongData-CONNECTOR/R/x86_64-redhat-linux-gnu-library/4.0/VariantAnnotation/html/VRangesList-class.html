@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: VRangesList objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for VRangesList-class {VariantAnnotation}"><tr><td>VRangesList-class {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>VRangesList objects</h2>
+
+<h3>Description</h3>
+
+<p>VRangesList is a virtual class representing a list of
+<code><a href="VRanges-class.html">VRanges</a></code> objects and should behave much like any
+other derivative of <code>List</code>. It has both a simple and
+compressed implementation. VRangesList provides conveniences for
+manipulating sets of <code>VRanges</code> objects.
+</p>
+
+
+<h3>Constructor</h3>
+
+
+<dl>
+<dt></dt><dd>
+<p><code>VRangesList(...)</code>:
+Creates a VRangesList object from <code>VRanges</code> objects in ....
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Accessors</h3>
+
+
+<dl>
+<dt></dt><dd>
+<p><code>alt(x)</code>: Returns a CharacterList or RleList, effectively by
+calling <code>alt(x[[i]])</code> on each element of <code>x</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>ref(x)</code>:
+Returns a CharacterList, effectively by calling <code>ref(x[[i]])</code>
+on each element of <code>x</code>.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Utilities</h3>
+
+
+<dl>
+<dt></dt><dd>
+<p><code>stackSamples(x)</code>: Concentrates the elements in <code>x</code>,
+using <code>names(x)</code> to appropriately fill <code>sampleNames</code> in
+the result.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Michael Lawrence</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## construction
+example(VRanges)
+vrl &lt;- VRangesList(sampleA = vr, sampleB = vr)
+stackSamples(vrl)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

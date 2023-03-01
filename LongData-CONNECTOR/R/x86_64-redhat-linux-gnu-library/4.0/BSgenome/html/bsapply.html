@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: bsapply</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for bsapply {BSgenome}"><tr><td>bsapply {BSgenome}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>bsapply</h2>
+
+<h3>Description</h3>
+
+<p>Apply a function to each chromosome in a genome.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+bsapply(BSParams, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>BSParams</code></td>
+<td>
+
+<p>a BSParams object that holds the various parameters needed to
+configure the bsapply function
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>optional arguments to 'FUN'.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The <code>exclude</code> parameter of the <code>BSParams</code> object must be a
+character vector containing <em>regular expressions</em>. By default it's
+empty so nothing gets excluded. A popular option will probably be to set
+this to &quot;rand&quot; so that random bits of unassigned contigs are filtered out.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>BSParams</code> sets <code>simplify=FALSE</code>, an ordinary list is returned
+containing the results generated using the remaining BSParams specifications.
+If <code>BSParams</code> sets <code>simplify=TRUE</code>, an <code>sapply</code>-like
+simplification is performed on the results.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Carlson</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="BSParams-class.html">BSParams-class</a>, <a href="BSgenome-class.html">BSgenome-class</a>, <a href="BSgenome-utils.html">BSgenome-utils</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  ## Load the Worm genome:
+  library("BSgenome.Celegans.UCSC.ce2")
+
+  ## Count the alphabet frequencies for every chromosome but exclude
+  ## mitochrondrial and scaffold ones:
+  params &lt;- new("BSParams", X = Celegans, FUN = alphabetFrequency,
+                            exclude = c("M", "_"))
+  bsapply(params)
+
+  ## Or we can do this same function with simplify = TRUE:
+  params &lt;- new("BSParams", X = Celegans, FUN = alphabetFrequency,
+                            exclude = c("M", "_"), simplify = TRUE)
+  bsapply(params)
+
+
+  ## Examples to show how we might look for a string (in this case an
+  ## ebox motif) across the whole genome.  
+  Ebox &lt;- DNAStringSet("CACGTG")
+  pdict0 &lt;- PDict(Ebox)
+
+  params &lt;- new("BSParams", X = Celegans, FUN = countPDict, simplify = TRUE)
+  bsapply(params, pdict = pdict0)
+
+  params@FUN &lt;- matchPDict
+  bsapply(params, pdict = pdict0)
+
+  ## And since its really overkill to use matchPDict to find a single pattern:
+  params@FUN &lt;- matchPattern
+  bsapply(params, pattern = "CACGTG")
+
+
+  ## Examples on how to use the masks
+  library(BSgenome.Hsapiens.UCSC.hg38.masked)
+  genome &lt;- BSgenome.Hsapiens.UCSC.hg38.masked
+  ## I can make things verbose if I want to see the chromosomes getting processed.
+  options(verbose=TRUE)
+  ## For the 1st example, lets use default masks
+  params &lt;- new("BSParams", X = genome, FUN = alphabetFrequency,
+                            exclude = c(1:8,"M","X","_"), simplify = TRUE)
+  bsapply(params)
+
+  if (interactive()) {
+    ## Set up the motifList to filter out all double T's and all double C's
+    params@motifList &lt;-c("TT","CC")
+    bsapply(params)
+
+    ## Get rid of the motifList
+    params@motifList=as.character()
+  }
+
+  ##Enable all standard masks
+  params@maskList &lt;- c(RM=TRUE,TRF=TRUE)
+  bsapply(params)
+
+  ##Disable all standard masks
+  params@maskList &lt;- c(AGAPS=FALSE,AMB=FALSE)
+  bsapply(params)
+
+  options(verbose=FALSE)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>BSgenome</em> version 1.58.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

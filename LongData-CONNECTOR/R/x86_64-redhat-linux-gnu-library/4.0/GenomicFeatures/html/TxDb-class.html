@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TxDb objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for TxDb-class {GenomicFeatures}"><tr><td>TxDb-class {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>TxDb objects</h2>
+
+<h3>Description</h3>
+
+<p>The TxDb class is a container for storing transcript annotations.
+</p>
+<p>See <code>?<a href="FeatureDb-class.html">FeatureDb</a></code> for a more generic container for storing
+genomic locations of an arbitrary type of genomic features.
+</p>
+
+
+<h3>Methods</h3>
+
+<p>In the code snippets below, <code>x</code> is a TxDb object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>metadata(x)</code>:
+Return <code>x</code>'s metadata in a data frame.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlevels0(x)</code>:
+Get the <em>sequence levels</em> originally in <code>x</code>. This ignores any
+change the user might have made to the <em>sequence levels</em> with the
+<code>seqlevels</code> setter.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlevels(x)</code>, <code>seqlevels(x) &lt;- value</code>:
+Get or set the <em>sequence levels</em> in <code>x</code>.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqinfo(x)</code>, <code>seqinfo(x) &lt;- value</code>:
+Get or set the information about the underlying sequences.
+Note that, for now, the setter only supports replacement of the
+sequence names, i.e., except for their sequence names (accessed with
+<code>seqnames(value)</code> and <code>seqnames(seqinfo(x))</code>, respectively),
+<a href="../../GenomeInfoDb/html/Seqinfo.html">Seqinfo</a> objects <code>value</code> (supplied) and
+<code>seqinfo(x)</code> (current) must be identical.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>isActiveSeq(x)</code>:
+Return the currently active sequences for this txdb object as a
+named logical vector.  Only active sequences will be tapped when
+using the supplied accessor methods.  Inactive sequences will be
+ignored.  By default, all available sequences will be active.
+</p>
+</dd> 
+<dt></dt><dd>
+<p><code>isActiveSeq(x) &lt;- value</code>:
+Allows the user to change which sequences will be actively
+accessed by the accessor methods by altering the contents of this
+named logical vector.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>seqlevelsStyle(x)</code>, <code>seqlevelsStyle(x) &lt;- value</code>:
+Get or set the seqname style for <code>x</code>.
+See the <a href="../../GenomeInfoDb/html/seqlevelsStyle.html">seqlevelsStyle</a> generic getter and setter
+in the <span class="pkg">GenomeInfoDb</span> package for more information.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>as.list(x)</code>:
+Dump the entire db into a list of data frames, say <code>txdb_dump</code>,
+that can then be used to recreate the original db with
+<code>do.call(makeTxDb, txdb_dump)</code> with no loss of information
+(except possibly for some of the metadata).
+Note that the transcripts are dumped in the same order in all the
+data frames.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Hervé Pagès, Marc Carlson</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="makeTxDbFromUCSC.html">makeTxDbFromUCSC</a></code>, <code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code>,
+and <code><a href="makeTxDbFromEnsembl.html">makeTxDbFromEnsembl</a></code>, for making a <a href="TxDb-class.html">TxDb</a>
+object from online resources.
+</p>
+</li>
+<li> <p><code><a href="makeTxDbFromGRanges.html">makeTxDbFromGRanges</a></code> and <code><a href="makeTxDbFromGFF.html">makeTxDbFromGFF</a></code>
+for making a <a href="TxDb-class.html">TxDb</a> object from a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a>
+object, or from a GFF or GTF file.
+</p>
+</li>
+<li> <p><code><a href="../../AnnotationDbi/html/saveDb.html">saveDb</a></code> and
+<code><a href="../../AnnotationDbi/html/loadDb.html">loadDb</a></code> in the <span class="pkg">AnnotationDbi</span>
+package for saving and loading a TxDb object as an SQLite file.
+</p>
+</li>
+<li> <p><code><a href="transcripts.html">transcripts</a></code>, <code><a href="transcriptsBy.html">transcriptsBy</a></code>,
+and <code><a href="transcriptsByOverlaps.html">transcriptsByOverlaps</a></code>, for extracting
+genomic feature locations from a <a href="TxDb-class.html">TxDb</a>-like object.
+</p>
+</li>
+<li> <p><code><a href="transcriptLengths.html">transcriptLengths</a></code> for extracting the transcript
+lengths (and other metrics) from a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+</li>
+<li> <p><a href="select-methods.html">select-methods</a> for how to use the
+simple &quot;select&quot; interface to extract information from a
+TxDb object.
+</p>
+</li>
+<li><p> The <a href="FeatureDb-class.html">FeatureDb</a> class for storing genomic locations
+of an arbitrary type of genomic features.
+</p>
+</li>
+<li><p> The <a href="../../GenomeInfoDb/html/Seqinfo.html">Seqinfo</a> class in the <span class="pkg">GenomeInfoDb</span>
+package.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+txdb_file &lt;- system.file("extdata", "Biomart_Ensembl_sample.sqlite",
+                         package="GenomicFeatures")
+txdb &lt;- loadDb(txdb_file)
+txdb
+
+## Use of seqinfo():
+seqlevelsStyle(txdb)
+seqinfo(txdb)
+seqlevels(txdb)
+seqlengths(txdb)  # shortcut for 'seqlengths(seqinfo(txdb))'
+isCircular(txdb)  # shortcut for 'isCircular(seqinfo(txdb))'
+names(which(isCircular(txdb)))
+
+## You can set user-supplied seqlevels on 'txdb' to restrict any further
+## operations to a subset of chromosomes:
+seqlevels(txdb) &lt;- c("Y", "6")
+## Then you can restore the seqlevels stored in the db:
+seqlevels(txdb) &lt;- seqlevels0(txdb)
+
+## Use of as.list():
+txdb_dump &lt;- as.list(txdb)
+txdb_dump
+txdb1 &lt;- do.call(makeTxDb, txdb_dump)
+stopifnot(identical(as.list(txdb1), txdb_dump))
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract simple features from a FeatureDb object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for features {GenomicFeatures}"><tr><td>features {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Extract simple features from a FeatureDb object
+</h2>
+
+<h3>Description</h3>
+
+<p>Generic function to extract genomic features from a FeatureDb object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+features(x)
+## S4 method for signature 'FeatureDb'
+features(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+  
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>A <a href="FeatureDb-class.html">FeatureDb</a> object.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p> a GRanges object </p>
+
+
+<h3>Author(s)</h3>
+
+<p>M. Carlson
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="FeatureDb-class.html">FeatureDb</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  fdb &lt;- loadDb(system.file("extdata", "FeatureDb.sqlite",
+                                   package="GenomicFeatures"))
+  features(fdb)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

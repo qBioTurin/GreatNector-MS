@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Parameters for scanning VCF files</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for ScanVcfParam-class {VariantAnnotation}"><tr><td>ScanVcfParam-class {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Parameters for scanning VCF files</h2>
+
+<h3>Description</h3>
+
+<p>Use <code>ScanVcfParam()</code> to create a parameter object influencing 
+which records and fields are imported from a VCF file. Record
+parsing is based on genomic coordinates and requires a Tabix index
+file. Individual VCF elements can be specified in the &lsquo;fixed&rsquo;,
+&lsquo;info&rsquo;, &lsquo;geno&rsquo; and &lsquo;samples&rsquo; arguments.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  ScanVcfParam(fixed=character(), info=character(), geno=character(), 
+               samples=character(), trimEmpty=TRUE, which, ...)
+
+  ## Getters and Setters 
+ 
+  vcfFixed(object)
+  vcfFixed(object) &lt;- value
+  vcfInfo(object)
+  vcfInfo(object) &lt;- value
+  vcfGeno(object)
+  vcfGeno(object) &lt;- value
+  vcfSamples(object)
+  vcfSamples(object) &lt;- value
+  vcfTrimEmpty(object)
+  vcfTrimEmpty(object) &lt;- value
+  vcfWhich(object)
+  vcfWhich(object) &lt;- value
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>fixed</code></td>
+<td>
+<p>A character() vector of fixed fields to be returned. Possible
+values are ALT, QUAL and FILTER. The CHROM, POS, ID and REF fields are 
+needed to create the <code>GRanges</code> of variant locations. Because these 
+are essential fields there is no option to request or omit them. If not 
+specified, all fields are returned; if <code>fixed=NA</code> only REF is 
+returned. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>info</code></td>
+<td>
+<p>A character() vector naming the &lsquo;INFO&rsquo; fields to return.
+<code>scanVcfHeader()</code> returns a vector of available fields. If not 
+specified, all fields are returned; if <code>info=NA</code> no fields are returned.
+</p>
+</td></tr>
+<tr valign="top"><td><code>geno</code></td>
+<td>
+<p>A character() vector naming the &lsquo;GENO&rsquo; fields to return.
+<code>scanVcfHeader()</code> returns a vector of available fields. If not specified, 
+all fields are returned; if <code>geno=NA</code> no fields are returned and
+requests for specific samples are ignored.
+</p>
+</td></tr>
+<tr valign="top"><td><code>samples</code></td>
+<td>
+<p>A character() vector of sample names to return.
+<code>samples(scanVcfHeader())</code> returns all possible names. If not 
+specified, data for all samples are returned; if either
+<code>samples=NA</code> or <code>geno=NA</code> no fields are returned. Requests
+for specific samples when <code>geno=NA</code> are ignored.
+</p>
+</td></tr>
+<tr valign="top"><td><code>trimEmpty</code></td>
+<td>
+<p>A logical(1) indicating whether &lsquo;GENO&rsquo; fields
+with no values should be returned.
+</p>
+</td></tr>
+<tr valign="top"><td><code>which</code></td>
+<td>
+<p>A <code><a href="../../GenomicRanges/html/GRanges-class.html">GRanges</a></code> describing the sequences and
+ranges to be queried. Variants whose <code>POS</code> lies in the interval(s)
+<code>[start, end]</code> are returned. If <code>which</code> is not specified all
+ranges are returned. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>An instance of class <code>ScanVcfParam</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+<p>An instance of the corresponding slot, to be assigned to
+<code>object</code>. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Arguments passed to methods.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Objects from the Class</h3>
+
+<p>Objects can be created by calls of the form <code>ScanVcfParam()</code>.
+</p>
+
+
+<h3>Slots</h3>
+
+
+<dl>
+<dt><code>which</code>:</dt><dd><p>Object of class <code>"IntegerRangesList"</code> indicating
+which reference sequence and coordinate variants must overlap.
+</p>
+</dd>
+<dt><code>fixed</code>:</dt><dd><p>Object of class <code>"character"</code> indicating
+fixed fields to be returned.
+</p>
+</dd>
+<dt><code>info</code>:</dt><dd><p>Object of class <code>"character"</code> indicating
+portions of &lsquo;INFO&rsquo; to be returned.
+</p>
+</dd>
+<dt><code>geno</code>:</dt><dd><p>Object of class <code>"character"</code> indicating
+portions of &lsquo;GENO&rsquo; to be returned. 
+</p>
+</dd>
+<dt><code>samples</code>:</dt><dd><p>Object of class <code>"character"</code> indicating
+the samples to be returned.
+</p>
+</dd>
+<dt><code>trimEmpty</code>:</dt><dd><p>Object of class <code>"logical"</code> indicating
+whether empty &lsquo;GENO&rsquo; fields are to be returned.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Functions and methods</h3>
+
+<p>See 'Usage' for details on invocation.
+</p>
+<p>Constructor:
+</p>
+
+<dl>
+<dt>ScanVcfParam:</dt><dd><p>Returns a <code>ScanVcfParam</code> object. 
+The <code>which</code> argument to the constructor can be one of several types, 
+as documented above.</p>
+</dd>  
+</dl>
+
+<p>Accessors:
+</p>
+
+<dl>
+<dt>vcfFixed, vcfInfo, vcfGeno, vcfSamples, vcfTrimEmpty, vcfWhich:</dt><dd>
+<p>Return the corresponding field from <code>object</code>.
+</p>
+</dd>
+</dl>
+
+<p>Methods:
+</p>
+
+<dl>
+<dt>show</dt><dd><p>Compactly display the object.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Martin Morgan and Valerie Obenchain
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="readVcf-methods.html">readVcf</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  ScanVcfParam()
+
+  fl &lt;- system.file("extdata", "structural.vcf", package="VariantAnnotation")
+  compressVcf &lt;- bgzip(fl, tempfile())
+  idx &lt;- indexTabix(compressVcf, "vcf")
+  tab &lt;- TabixFile(compressVcf, idx)
+  ## ---------------------------------------------------------------------
+  ## 'which' argument
+  ## ---------------------------------------------------------------------
+  ## To subset on genomic coordinates, supply an object 
+  ## containing the ranges of interest. These ranges can
+  ## be given directly to the 'param' argument or wrapped
+  ## inside ScanVcfParam() as the 'which' argument. 
+
+  ## When using a list, the outer list names must correspond to valid
+  ## chromosome names in the vcf file. In this example they are "1" 
+  ## and "2".
+  gr1 &lt;- GRanges("1", IRanges(13219, 2827695, name="regionA"))
+  gr2 &lt;- GRanges(rep("2", 2), IRanges(c(321680, 14477080), 
+                 c(321689, 14477090), name=c("regionB", "regionC")))
+  grl &lt;- GRangesList("1"=gr1, "2"=gr2)
+  vcf &lt;- readVcf(tab, "hg19", grl)
+
+  ## Names of the ranges are in the 'paramRangeID' metadata column of the
+  ## GRanges object returned by the rowRanges() accessor.
+  rowRanges(vcf)
+
+  ## which can be used for subsetting the VCF object
+  vcf[rowRanges(vcf)$paramRangeID == "regionA"]
+ 
+  ## When using ranges, the seqnames must correspond to valid
+  ## chromosome names in the vcf file.
+  gr &lt;- unlist(grl, use.names=FALSE)
+  vcf &lt;- readVcf(tab, "hg19", gr)
+ 
+  ## ---------------------------------------------------------------------
+  ## 'fixed', 'info', 'geno' and 'samples' arguments
+  ## ---------------------------------------------------------------------
+  ## This param specifies the "GT" 'geno' field for a single sample
+  ## and the subset of ranges in 'which'. All 'fixed' and 'info' fields 
+  ## will be returned. 
+  ScanVcfParam(geno="GT", samples="NA00002", which=gr)
+ 
+  ## Here two 'fixed' and one 'geno' field are specified
+  ScanVcfParam(fixed=c("ALT", "QUAL"), geno="GT", info=NA) 
+
+  ## Return only the 'fixed' fields
+  ScanVcfParam(geno=NA, info=NA) 
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

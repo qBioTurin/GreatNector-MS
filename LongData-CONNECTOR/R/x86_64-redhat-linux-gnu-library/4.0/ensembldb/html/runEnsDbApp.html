@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Search annotations interactively</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for runEnsDbApp {ensembldb}"><tr><td>runEnsDbApp {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Search annotations interactively
+</h2>
+
+<h3>Description</h3>
+
+<p>This function starts the interactive <code>EnsDb</code> shiny web application that
+allows to look up gene/transcript/exon annotations from an <code>EnsDb</code>
+annotation package installed locally.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+	runEnsDbApp(...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments passed to the <code><a href="../../shiny/html/runApp.html">runApp</a></code> function
+from the <code>shiny</code> package.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The <code>shiny</code> based web application allows to look up any annotation
+available in any of the locally installed <code>EnsDb</code> annotation packages.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If the button <em>Return &amp; close</em> is clicked, the function returns
+the results of the present query either as <code>data.frame</code> or as
+<code>GRanges</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="EnsDb.html">EnsDb</a></code>, <code><a href="EnsDb-exonsBy.html">genes</a></code>
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

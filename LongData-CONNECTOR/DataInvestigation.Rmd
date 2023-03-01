@@ -1,0 +1,544 @@
+---
+title: "Data Investigation"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results = 'asis',warning = F)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+
+# Connector Clustering
+I primi plot rappresentano la divisione in cluster ottenuti usando CONNECTOR (le colonne) per ogni esperimento (le righe). I colori dipendono dai pazienti, il numero di relapse (in ordine).
+
+```{r dataPlot, warning=F,echo=F,fig.width = 10, fig.height = 8}
+
+TemporalCurve = readRDS(file = "RData/DataWithoutCurves/Summary.Rds")
+MeanCurves = readRDS(file = "RData/DataWithoutCurves/MeanCurves.Rds")
+
+steps = c("BASELINE"," M6"," M12"," M18"," M24"," M36"," M48","M60"," M72" )
+names(steps) = c(0,6 ,12, 18, 24, 36, 48, 60, 72)
+
+TemporalCurve$Step = steps[paste(TemporalCurve$Time)]
+TemporalCurve$Step = factor(x = TemporalCurve$Step ,levels = steps)
+TemporalCurve$Exp = gsub(TemporalCurve$Exp,pattern = "_prod",replacement = "")
+TemporalCurve = TemporalCurve %>% 
+  mutate( Discrete.AGE.AT.ONSET =  ifelse(AGE.AT.ONSET<30, "under 30", "over equal 30"),
+          Discrete.DISEASE.DURATION =  ifelse(DISEASE.DURATION<5, "less 5", "greater equal 5") )
+
+MeanCurves$Step = steps[paste(MeanCurves$Time)]
+MeanCurves$Step = factor(x = MeanCurves$Step ,levels = steps)
+MeanCurves$Exp = gsub(MeanCurves$Exp,pattern = "_prod",replacement = "")
+
+TemporalCurve$Exp = factor(x = TemporalCurve$Exp ,levels = c("CD4","Th1","Th17","Treg","EDSS"))
+MeanCurves$Exp = factor(x = MeanCurves$Exp ,levels = c("CD4","Th1","Th17","Treg","EDSS"))
+
+EDSSCurve = TemporalCurve %>%
+  filter(Exp == "EDSS") %>%
+  dplyr::select(ID, Cluster) %>% 
+  distinct() %>%
+  rename(EDSS = Cluster)
+
+TemporalCurve = TemporalCurve %>% filter(Exp != "EDSS")
+TemporalCurve = merge(TemporalCurve,EDSSCurve,by="ID",all = T)
+MeanCurves = MeanCurves %>% filter(Exp != "EDSS")
+
+
+
+rel = grep(pattern = "RELAPSES", colnames(TemporalCurve))
+do.call(rbind,
+        lapply(TemporalCurve %>% 
+                 filter(Relapses!="No rel") %>% 
+                 dplyr::select(ID) %>%
+                 distinct() %>% 
+                 unlist(),
+               function(i){
+                 TemporalCurve_sub = TemporalCurve %>% filter(ID == i)
+                 ftime = gsub(pattern = "M",
+                              replacement = "",
+                              x = TemporalCurve_sub[1,rel][!is.na(TemporalCurve_sub[1,rel] )]
+                 )
+                 ftime = unlist( strsplit(x = ftime,split = ",") )
+                 ftime = min(as.numeric(ftime))
+                 TemporalCurve_sub = TemporalCurve_sub %>% 
+                   dplyr::select(ID,Time, Exp,Observation) %>% 
+                   na.omit() %>%
+                   dplyr::group_by(Exp) %>%
+                   dplyr::mutate(dif = Time - ftime ) %>% 
+                   filter(dif > 0)  %>% 
+                   filter(dif == min(dif)) %>% 
+                   ungroup() %>%
+                   dplyr::select(-dif,-Observation)
+                 if(dim(TemporalCurve_sub)[1] == 0 )
+                   TemporalCurve_sub = data.frame(ID =NA, Time =NA, Exp = c("CD4","Th17","Treg","Th1") )
+                 TemporalCurve_sub$FirstRel = ftime
+                 
+                 return(TemporalCurve_sub)
+               })
+) -> firstRelapse
+firstRelapse = merge(firstRelapse,TemporalCurve,all.x = T,by = c("ID","Time", "Exp")) %>% drop_na(Time)
+featCol = c("ID","GENDER","Discrete.AGE.AT.ONSET","Discrete.DISEASE.DURATION","PREVIOUS.IMMUNOMODULANT.THERAPY","PREVIOUS.IMMUNOSUPPRESSANT.THERAPY","Aut..post.ATZ","Relapses","EDSS")
+
+tmp = TemporalCurve%>%
+  arrange(Time) %>% 
+  drop_na(Observation) 
+
+for(f in featCol){
+  tmp[,f] = as.factor(tmp[,f])
+  print(
+    ggplot(tmp) +
+      geom_point(data = firstRelapse,
+                 aes(x = Step, y = Observation, group = ID, col = as.factor(unlist(firstRelapse[,f]))),size = 2 )+
+      geom_line(aes(x = Step, y = Observation,group = ID, col = tmp[,f]))+
+      geom_line(data = MeanCurves, aes(x = Step, y = Mean,group = Exp),linetype = "dashed",size = 1)+
+      facet_grid(Exp ~ Cluster,scales = "free_y") +
+      theme_bw()+
+      scale_x_discrete(breaks = steps,limit = steps)+
+      theme(legend.position = "bottom")+
+      labs(x="",y="",col = f)
+  )
+}
+
+
+```
+
+```{r clusterUnion, warning=F,echo=F,fig.width = 10, fig.height = 8}
+
+TemporalCurveSub = TemporalCurve %>% 
+  dplyr::select(Cluster,Exp,ID) %>%
+  distinct() %>%
+  spread(value = Cluster,key = Exp) 
+
+ConsMatrix = diag(0,nrow = length(TemporalCurveSub$ID))
+colnames(ConsMatrix) = rownames(ConsMatrix) = levels(TemporalCurveSub$ID)
+
+for(i in levels(TemporalCurveSub$ID)){
+  for(j in levels(TemporalCurveSub$ID)){
+    ConsMatrix[i,j] = sum(TemporalCurveSub %>%
+                            filter(ID ==i) %>%
+                            dplyr::select(-ID) == TemporalCurveSub %>% 
+                            filter(ID ==j) %>%
+                            dplyr::select(-ID))
+  } 
+}
+
+# ConsMatrix[upper.tri(ConsMatrix,diag = T)] <- NA
+
+m = as.data.frame( ConsMatrix) %>%
+  mutate(Var1 = rownames(ConsMatrix)) %>% 
+  gather(-Var1,key = "Var2",value = "Value")  
+
+dataframe = as.data.frame(ConsMatrix)
+curvename.ordered = rownames(
+  dataframe[
+    with(dataframe, order(CA0001,CA0002,GA0001,PR0001,PR0003,ZG0001,ZG0002,ZG0003,ZG0004,ZG0006,ZG0007,ZG0008,ZG0009,ZG0011,ZG0012, ZG0013,ZG0015,ZG0016,ZG0018,ZG0019,ZG0020)),
+  ]
+)
+
+#curvename.ordered = m %>% group_by(Var1) %>% arrange(Value)  %>% filter(Var1 == "GA0001") %>% ungroup() %>% dplyr::select(Var2)
+
+m$Var2<-factor(m$Var2,levels = curvename.ordered  )
+m$Var1<-factor(m$Var1,levels = rev(curvename.ordered)  )
+
+
+ggplot() +
+  geom_tile(data = m, 
+            aes(x = Var1, y = Var2, fill = Value)) + 
+  scale_fill_gradient2(midpoint = 2, low = "blue", 
+                       mid = "yellow", high = "red")
+
+
+```
+
+# kmeans Clustering
+
+Provo ad unire tutti i cluster che ho ottenuto nei vari esperimenti e ne faccio un secondo clustering (usendo il metodo di kmeans algorithm) per trovare i gruppi di pazienti (meta-pazienti) che hanno clusters di connector simili. 
+
+```{r NumClusterinf, warning=F,echo=F,fig.width = 10, fig.height = 8}
+
+seed = 144
+
+#install.packages("klaR")
+library(klaR)
+
+v = 1:3
+names(v) = LETTERS[1:3]
+TemporalCurveSub->TemporalCurveSub_num
+for(i in 2:length(TemporalCurveSub_num))
+  TemporalCurveSub_num[,i] = v[TemporalCurveSub[,i]]
+
+
+cl = t(sapply(2:7, function(k){
+  set.seed(seed)
+  cluster <- kmeans(TemporalCurveSub_num[,-1],
+                    k,
+                    iter.max = 1000) 
+  return(data.frame(With=sum(cluster$withinss),K=k))
+}))
+
+cl = data.frame(K = unlist(cl[,2]), With = unlist(cl[,1]))
+kopt = cl$K[which.min( c(cl$With[1],abs(diff(cl$With))) )]-1
+kopt=3
+ggplot(cl,aes(x= K,y=With)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = kopt)
+
+set.seed(seed)
+cluster <- kmeans(TemporalCurveSub_num[,-1],
+                  kopt,
+                  iter.max = 1000 ) 
+
+#don't use the record ID as a clustering variable!
+
+a = data.frame(TemporalCurveSub,ClusterKmeans = cluster$cluster)
+
+knitr::kable(a)
+
+```
+
+```{r dataplotClusterKmeans, warning=F,echo=F,fig.width = 10, fig.height = 8}
+
+TemporalCurveCl = merge(TemporalCurve,a[,c("ID","ClusterKmeans")])
+firstRelapse= merge(firstRelapse,a[,c("ID","ClusterKmeans")])
+tmp = TemporalCurveCl%>%
+  arrange(Time) %>% 
+  drop_na(Observation) 
+
+for(f in c(featCol,"Cluster") ){
+  tmp[,f] = as.factor(tmp[,f])
+  print(
+    ggplot(tmp) +
+      geom_point(data = firstRelapse,
+                 aes(x = Step, y = Observation, group = ID, col = as.factor(unlist(firstRelapse[,f]))),size = 2 )+
+      geom_line(aes(x = Step, y = Observation,group = ID, col = tmp[,f]))+
+      facet_grid(Exp ~ ClusterKmeans,scales = "free_y") +
+      theme_bw()+
+      scale_x_discrete(breaks = steps,limit = steps)+
+      theme(legend.position = "bottom")+
+      labs(x="",y="",col = f)
+  )
+}
+
+gr = TemporalCurveCl %>%
+  #group_by(Time,Exp,ClusterKmodes) %>%
+  #dplyr::summarise(Mean = mean(Observation,na.rm = T)) %>% 
+  dplyr::select(Time, Observation, ClusterKmeans, Exp,ID) %>%
+  dplyr::mutate(Month = ifelse(Time < 5, Time*6, (Time-1)*12 ) )
+
+#saveRDS(TemporalCurveCl,file = "Data/temporalCurveClustered.RDs")
+
+# write.table(x = gr, file = "Model/Input/reference.csv",
+#             row.names = F,
+#             col.names = T,
+#             quote = F ) 
+```
+
+
+# Data at the beginning time
+
+```{r timeZero, warning=F,echo=F,fig.width = 10, fig.height = 8,results = 'asis'}
+
+load("RData/Feature.RData")
+
+Feature = Feature %>% 
+  mutate( `Discrete AGE AT ONSET` =  ifelse(`AGE AT ONSET`<30, "under 30", "over equal 30"),
+          `Discrete DISEASE DURATION` =  ifelse(`DISEASE DURATION`<5, "less 5", "greater equal 5") )
+
+
+exper = c("CD4","EDSS","Th17_prod","Th1_prod","Treg_prod")
+
+ZeroPoint = do.call( "rbind",
+                     lapply(exper,function(ex) {
+                       load(paste0("./RData/temporal",ex,".RData"))
+                       temporalCurve$Type = ex
+                       return(temporalCurve)
+                     })
+) %>% na.omit() %>% filter(Time == 0)
+
+ZeroPoint = merge(Feature,ZeroPoint)
+
+rel = grep(pattern = "RELAPSES", colnames(ZeroPoint))
+ZeroPoint$NumberRelapses = 0
+
+for( i in unique(ZeroPoint$ID)){
+  ZeroPoint[which(ZeroPoint$ID == i),"NumberRelapses"] =
+    length(ZeroPoint[which(ZeroPoint$ID == i)[1],rel][!is.na(ZeroPoint[which(ZeroPoint$ID == i)[1],rel] )]
+    )
+}
+
+ZeroPoint = ZeroPoint %>%
+  mutate(Relapses = ifelse(NumberRelapses ==0, "No rel","At least one"))
+ZeroPoint$TypeRel = sapply(1:length(ZeroPoint[,1]),
+                           function(x) gsub(pattern = "NA",replacement = "",paste(ZeroPoint[x,rel],collapse = "")) )
+
+ZeroPoint$NumberRelapses = as.factor(ZeroPoint$NumberRelapses)
+
+featCol = gsub(x = gsub(x = featCol,replacement = " ",pattern = "\\.") , pattern = "Aut ",replacement = "Aut.")
+
+ZeroPoint[ , c("Observation","Relapses","Type", featCol[-which(featCol=="EDSS")])] %>%
+  gather(-ID,-Observation,-Relapses,-Type, key= "Feat", value = "FeatValue") %>%
+  ggplot() +
+  geom_boxplot(aes(x = FeatValue, y = Observation, fill = FeatValue))+
+  facet_grid(Type~Feat,scales = "free")+
+  theme_bw()+
+  theme(legend.position = "none")
+
+for(f in featCol[-which(featCol%in% c("ID","EDSS"))]){
+  print(
+    ZeroPoint %>%
+      ggplot() +
+      geom_histogram(aes(x=Observation,fill=ZeroPoint[,f]))+
+      facet_grid(Relapses~Type,scales = "free_x") +
+      theme_bw() +
+      labs(x = "Observations at time 0", y = "Number of patients",col = f)
+  )
+  print(knitr::kable(table(ZeroPoint[,f],ZeroPoint$Type)))
+  
+}
+
+data = ZeroPoint %>%
+  dplyr::select(Type,ID,Observation) %>%
+  spread(value = Observation, key = Type) %>% na.omit()
+
+
+cl = t(sapply(2:7, function(k){
+  set.seed(42)
+  cluster <- kmeans(data[,-1],
+                    k,
+                    iter.max = 1000) 
+  return(data.frame(With=sum(cluster$withinss),K=k))
+}))
+
+cl = data.frame(K = unlist(cl[,2]), With = unlist(cl[,1]))
+kopt = cl$K[which.min( c(cl$With[1],abs(diff(cl$With))) )]-1
+
+kopt=3
+
+ggplot(cl,aes(x= K,y=With)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = kopt)
+
+set.seed(42)
+cluster <- kmeans(data[,-1],
+                  kopt,
+                  iter.max = 1000 ) 
+
+#don't use the record ID as a clustering variable!
+
+a = data.frame(data,ClusterKmeansZero = cluster$cluster)
+
+# set.seed(43)
+# tsne_out <-Rtsne::Rtsne(X = data[,-1],perplexity = 8)
+# a$x = tsne_out$Y[,1]
+# a$y = tsne_out$Y[,2]
+# 
+# ggplot(a) + 
+#   geom_point(aes(x = x, y = y, col = as.factor(ClusterKmeansZero)) ) +
+#   theme_bw()
+# 
+# TemporalCurveCl = merge(TemporalCurveCl,a[,c("ID","ClusterKmeansZero")])
+# firstRelapse2 = merge(firstRelapse,TemporalCurveCl[,c("ID","ClusterKmeans","ClusterKmeansZero")])
+# 
+# ggplot(TemporalCurveCl%>%
+#          arrange(Time) %>% drop_na(Observation) ) +
+#   geom_point(data = firstRelapse2,
+#              aes(x = Step, y = Observation, group = ID, col = as.factor(ClusterKmeansZero)),size = 2 )+
+#   scale_shape_manual(values=1:nlevels(TemporalCurve$ID)) +
+#   geom_line(aes(x = Step, y = Observation,group = ID, col = as.factor(ClusterKmeansZero)) )+
+#   facet_grid(Exp~ ClusterKmeans,scales = "free_y") +
+#   theme_bw()+
+#   theme(legend.position = "bottom")+
+#   scale_x_discrete(breaks = steps,limit = steps)+
+#   labs(title = "Colored with respect to kmeans clustering at time 0",x = "", y="")
+
+```
+
+
+## Statistical test
+
+```{r stat.tests,echo=F,fig.width = 10, fig.height = 8,results = 'asis',message=F}
+
+for(f in featCol[-which(featCol%in% c("ID","EDSS"))]){
+  l = length(unique(ZeroPoint[,f]))==2
+  p = min(table(ZeroPoint[,f],ZeroPoint[,"Type"])) > 3
+  if(p && l){
+    
+    cat(paste0("### ",f))
+    
+    ZeroPoint.tmp = ZeroPoint
+    colnames(ZeroPoint.tmp)[colnames(ZeroPoint) == f] = "Var1"
+    
+    cat("\n - **shapiro.test to check the normal distribution**")
+    testShp = do.call(rbind,lapply(unique(ZeroPoint.tmp$Type),function(t){ 
+      sh = ZeroPoint.tmp %>%
+        filter(Type == t) %>%
+        group_by(Type,Var1) %>%
+        summarise(shapiro.statistic = shapiro.test(Observation)$statistic,
+                  shapiro.p.value = shapiro.test(Observation)$p.value,
+                  Hp = ifelse(shapiro.p.value>0.05,"Normal","Not normal"))
+      return(sh)
+    } )
+    )
+    print(knitr::kable(testShp))
+    
+    idTest = testShp %>%
+      filter(shapiro.p.value<0.05) %>%
+      dplyr::select(Type) %>%
+      distinct() %>%
+      unlist()
+    
+    cat(paste0("\n These have at least one group not normal distributed: ", paste(idTest,collapse = ", "),".\n") )
+
+   cat("\n - **Wilcoxon-Mann-Whitne or t-test (if both groups are normal) to check if the groups are similar**")
+    
+    testU = do.call(rbind,lapply(unique(ZeroPoint.tmp$Type),function(t)
+    { 
+      vars = unique(ZeroPoint.tmp$Var1) 
+        ob1 = ZeroPoint.tmp %>%
+          filter(Type == t, Var1 == vars[1]) %>%
+          dplyr::select(Observation)
+        ob2 = ZeroPoint.tmp %>%
+          filter(Type == t, Var1 == vars[2]) %>%
+          dplyr::select(Observation)
+      if(t %in% idTest)
+        pv =wilcox.test(ob2$Observation,ob1$Observation)$p.value
+      else
+        pv =t.test(ob2$Observation,ob1$Observation)$p.value
+      sh = data.frame(Type = t, Test = paste0(vars[2]," vs ",vars[1]), p.value = pv)
+      sh = sh %>%
+        mutate(Hp = ifelse(p.value>0.05,"not different","different"))
+      return(sh)
+    })
+    )
+    print(knitr::kable(testU))
+  }
+}
+```
+
+<!-- # Kmeans Clustering adding the Th17/Treg intial condition -->
+
+<!-- ```{r NumClusterinf2, warning=F,echo=F,fig.width = 10, fig.height = 8} -->
+
+<!-- seed = 144 -->
+
+<!-- #install.packages("klaR") -->
+<!-- library(klaR) -->
+
+<!-- v = 1:3 -->
+<!-- names(v) = LETTERS[1:3] -->
+<!-- TemporalCurveSub->TemporalCurveSub_num -->
+<!-- for(i in 2:length(TemporalCurveSub_num)) -->
+<!--   TemporalCurveSub_num[,i] = v[TemporalCurveSub[,i]] -->
+
+<!-- data_sub = data %>%  -->
+<!--   mutate( Th17_Treg = Th17_prod/Treg_prod) %>%  -->
+<!--   dplyr::select(ID,Th17_Treg) -->
+<!-- TemporalCurveSub_num = merge(data_sub,TemporalCurveSub_num,by = "ID") -->
+
+<!-- cl = t(sapply(2:7, function(k){ -->
+<!--   set.seed(seed) -->
+<!--   cluster <- kmeans(TemporalCurveSub_num[,-1], -->
+<!--                     k, -->
+<!--                     iter.max = 1000)  -->
+<!--   return(data.frame(With=sum(cluster$withinss),K=k)) -->
+<!-- })) -->
+
+<!-- cl = data.frame(K = unlist(cl[,2]), With = unlist(cl[,1])) -->
+<!-- kopt = cl$K[which.min( c(cl$With[1],abs(diff(cl$With))) )]-1 -->
+<!-- kopt=3 -->
+<!-- ggplot(cl,aes(x= K,y=With)) + -->
+<!--   geom_line() + -->
+<!--   geom_point() + -->
+<!--   geom_vline(xintercept = kopt) -->
+
+<!-- set.seed(seed) -->
+<!-- cluster <- kmeans(TemporalCurveSub_num[,-1], -->
+<!--                   kopt, -->
+<!--                   iter.max = 1000 )  -->
+
+<!-- #don't use the record ID as a clustering variable! -->
+
+<!-- a = data.frame(TemporalCurveSub_num,ClusterKmeans = cluster$cluster) -->
+
+<!-- knitr::kable(a) -->
+
+<!-- ``` -->
+
+<!-- ```{r dataplotClusterKmeans2, warning=F,echo=F,fig.width = 10, fig.height = 8} -->
+
+<!-- TemporalCurveCl = merge(TemporalCurve,a[,c("ID","ClusterKmeans")]) -->
+<!-- infoCl = TemporalCurveCl %>% dplyr::select(-Observation,-Time,-Step) %>% distinct() -->
+
+<!-- firstRelapse = merge(firstRelapse,a[,c("ID","ClusterKmeans")]) -->
+
+<!-- ggplot(TemporalCurveCl%>% -->
+<!--          arrange(Time) %>% drop_na(Observation) ) + -->
+<!--   geom_point(data = firstRelapse, -->
+<!--              aes(x = Step, y = Observation, group = ID, col =ID),size = 2 )+        scale_x_discrete(breaks = steps,limit = steps)+ -->
+<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = ID))+ -->
+<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
+<!--   theme_bw()+ -->
+<!--   theme(legend.position = "bottom")+ -->
+<!--   labs(title = "Colored with respect to IDs",x = "", y="") -->
+
+<!-- ggplot(TemporalCurveCl%>% -->
+<!--          arrange(Time) %>% drop_na(Observation) ) + -->
+<!--   geom_point(data = firstRelapse, -->
+<!--              aes(x = Step, y = Observation, group = ID, col = Relapses),size = 2 )+ -->
+<!--   scale_x_discrete(breaks = steps,limit = steps)+ -->
+<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = Relapses))+ -->
+<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
+<!--   theme_bw()+ -->
+<!--   theme(legend.position = "bottom")+ -->
+<!--   labs(title = "Colored with respect to number of relapses",x = "", y="") -->
+<!-- knitr::kable(infoCl %>%  -->
+<!--                dplyr::select(-Exp) %>%  -->
+<!--                distinct() %>% -->
+<!--                group_by(ClusterKmeans) %>%  -->
+<!--                dplyr::count(Relapses)) -->
+
+<!-- ggplot(TemporalCurveCl%>% -->
+<!--          arrange(Time) %>% drop_na(Observation) ) + -->
+<!--   geom_point(data = firstRelapse, -->
+<!--              aes(x = Step, y = Observation, group = ID, col = Cluster),size = 2 )+ -->
+<!--   scale_x_discrete(breaks = steps,limit = steps)+ -->
+<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = Cluster))+ -->
+<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
+<!--   theme_bw()+ -->
+<!--   theme(legend.position = "bottom")+ -->
+<!--   labs(title = "Colored with respect to the connector's clusters obtained for each experiment", -->
+<!--        x = "", y="") -->
+<!-- knitr::kable(infoCl %>% group_by(Exp,ClusterKmeans) %>% dplyr::count(Cluster)) -->
+
+<!-- ggplot(TemporalCurveCl%>% -->
+<!--          arrange(Time) %>% drop_na(Observation) ) + -->
+<!--   geom_point(data = firstRelapse, -->
+<!--              aes(x = Step, y = Observation, group = ID, col = EDSS),size = 2 )+ -->
+<!--   scale_x_discrete(breaks = steps,limit = steps)+ -->
+<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = EDSS))+ -->
+<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
+<!--   theme_bw()+ -->
+<!--   theme(legend.position = "bottom")+ -->
+<!--   labs(title = "Colored with respect to EDSS connector clustering", -->
+<!--        x = "", y="") -->
+<!-- knitr::kable(infoCl %>%  -->
+<!--                dplyr::select(-Exp) %>%  -->
+<!--                distinct() %>% -->
+<!--                group_by(ClusterKmeans) %>% dplyr::count(EDSS)) -->
+
+<!-- gr = TemporalCurveCl %>% -->
+<!--   #group_by(Time,Exp,ClusterKmodes) %>% -->
+<!--   #dplyr::summarise(Mean = mean(Observation,na.rm = T)) %>%  -->
+<!--   dplyr::select(Time, Observation, ClusterKmeans, Exp,ID) %>% -->
+<!--   dplyr::mutate(Month = ifelse(Time < 5, Time*6, (Time-1)*12 ) ) -->
+
+<!-- # write.table(x = gr, file = "Model/Input/reference.csv", -->
+<!-- #             row.names = F, -->
+<!-- #             col.names = T, -->
+<!-- #             quote = F )  -->
+<!-- ``` -->

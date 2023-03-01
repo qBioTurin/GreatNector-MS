@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Test correctness of the parameters before execute a function</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for common_test {epimod}"><tr><td>common_test {epimod}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Test correctness of the parameters before execute a function</h2>
+
+<h3>Description</h3>
+
+<p>Check if the passed parameters are well defined to execute the specified function, verifying
+the existence of the resource path, the length of the array, the value of solver type etc.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+common_test(
+  net_fname,
+  functions_fname = NULL,
+  reference_data = NULL,
+  target_value = NULL,
+  ini_v,
+  lb_v,
+  ub_v,
+  solver_fname,
+  i_time,
+  f_time,
+  s_time,
+  parameters_fname = NULL,
+  volume = getwd(),
+  parallel_processors = 1,
+  solver_type = "LSODA",
+  n_run = 1,
+  distance_measure = NULL,
+  n_config = 1,
+  out_fname = NULL,
+  timeout = "1d",
+  extend = FALSE,
+  seed = NULL,
+  ini_vector_mod = FALSE,
+  threshold.stop = NULL,
+  max.call = 1e+07,
+  max.time = NULL,
+  taueps = 0.01,
+  user_files = NULL,
+  event_times = NULL,
+  event_function = NULL,
+  caller_function
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>net_fname</code></td>
+<td>
+<p>.PNPRO file storing the Petri Net (and all its generalizations) model. In case there are multiple nets defined within the PNPRO file, the first one in the list is the will be automatically selected.</p>
+</td></tr>
+<tr valign="top"><td><code>functions_fname</code></td>
+<td>
+<p>R file storing the user defined functions to generate instances of the parameters summarized in the parameters_fname file.</p>
+</td></tr>
+<tr valign="top"><td><code>reference_data</code></td>
+<td>
+<p>csv file storing the data to be compared with the simulations’ result.</p>
+</td></tr>
+<tr valign="top"><td><code>target_value</code></td>
+<td>
+<p>String reporting the target function, implemented in *functions_fname*, to obtain the place or a combination of places from which the PRCCs over the time have to be calculated. In details, the function takes in input a data.frame, namely output, defined by a number of columns equal to the number of places plus one corresponding to the time, and number of rows equals to number of time steps defined previously. Finally, it must return the column (or a combination of columns) corresponding to the place (or combination of places) for which the PRCCs have to be calculated for each time step.</p>
+</td></tr>
+<tr valign="top"><td><code>ini_v</code></td>
+<td>
+<p>Initial values for the parameters to be optimized.</p>
+</td></tr>
+<tr valign="top"><td><code>lb_v, ub_v</code></td>
+<td>
+<p>Vectors with length equal to the number of parameters which are varying. Lower/Upper bounds for each parameter.</p>
+</td></tr>
+<tr valign="top"><td><code>solver_fname</code></td>
+<td>
+<p>.solver file (generated in with the function model_generation).</p>
+</td></tr>
+<tr valign="top"><td><code>i_time</code></td>
+<td>
+<p>Initial solution time.</p>
+</td></tr>
+<tr valign="top"><td><code>f_time</code></td>
+<td>
+<p>Final solution time.</p>
+</td></tr>
+<tr valign="top"><td><code>s_time</code></td>
+<td>
+<p>Time step defining the frequency at which explicit estimates for the system values are desired.</p>
+</td></tr>
+<tr valign="top"><td><code>parameters_fname</code></td>
+<td>
+<p>Textual file in which the parameters to be studied are listed associated with their range of variability. This file is defined by three mandatory columns: (1) a tag representing the parameter type: i for the complete initial marking (or condition), p for a single parameter (either a single rate or initial marking), and g for a rate associated with general transitions (Pernice et al. 2019) (the user must define a file name coherently with the one used in the general transitions file); (2) the name of the transition which is varying (this must correspond to name used in the PN draw in GreatSPN editor), if the complete initial marking is considered (i.e., with tag i) then by default the name init is used; (3) the function used for sampling the value of the variable considered, it could be either a R function or an user-defined function (in this case it has to be implemented into the R script passed through the functions_fname input parameter). Let us note that the output of this function must have size equal to the length of the varying parameter, that is 1 when tags p or g are used, and the size of the marking (number of places) when i is used. The remaining columns represent the input parameters needed by the functions defined in the third column.</p>
+</td></tr>
+<tr valign="top"><td><code>volume</code></td>
+<td>
+<p>The folder to mount within the Docker image providing all the necessary files.</p>
+</td></tr>
+<tr valign="top"><td><code>parallel_processors</code></td>
+<td>
+<p>Integer for the number of available processors to use for parallelizing the simulations.</p>
+</td></tr>
+<tr valign="top"><td><code>solver_type</code></td>
+<td>
+
+<ul>
+<li><p> Deterministic: three explicit methods which can be efficiently used  for systems without stiffness: Runge-Kutta 5th order integration, Dormand-Prince method, and Kutta-Merson method (ODE-E, ODE-RKF, ODE45). Instead for systems with stiffness we provided a Backward Differentiation Formula (LSODA);
+</p>
+</li>
+<li><p> Stochastic: the Gillespie algorithm,which is an exact stochastic method widely used to simulate chemical systems whose behaviour can be described by the Master equations (SSA); or an approximation method of the SSA called tau-leaping method (TAUG), which provides a good compromise between the solution execution time  and its quality.
+</p>
+</li>
+<li><p> Hybrid: Stochastic  Hybrid  Simulation, based on the co-simulation of discrete and continuous events (HLSODA).
+</p>
+</li></ul>
+<p> Default is LSODA.</p>
+</td></tr>
+<tr valign="top"><td><code>n_run</code></td>
+<td>
+<p>Integer for the number of stochastic simulations to run. If n_run is greater than 1 when the deterministic process is analyzed (solver_type is *Deterministic*), then n_run identical simulation are generated.</p>
+</td></tr>
+<tr valign="top"><td><code>distance_measure</code></td>
+<td>
+<p>String reporting the distance function, implemented in *functions_fname*, to exploit for ranking the simulations. Such function takes 2 arguments: the reference data and a list of data_frames containing simulations' output. It has to return a data.frame with the id of the simulation and its corresponding distance from the reference data.</p>
+</td></tr>
+<tr valign="top"><td><code>n_config</code></td>
+<td>
+<p>Number of configurations to generate, to use only if some parameters are generated from a stochastic distribution, which has to be encoded in the functions defined in *functions_fname* or in *parameters_fname*.</p>
+</td></tr>
+<tr valign="top"><td><code>out_fname</code></td>
+<td>
+<p>Prefix to the output file name</p>
+</td></tr>
+<tr valign="top"><td><code>timeout</code></td>
+<td>
+<p>Maximum execution time allowed to each configuration.</p>
+</td></tr>
+<tr valign="top"><td><code>extend</code></td>
+<td>
+<p>If TRUE the actual configuration is extended including n_config new configurations.</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+<p>.RData file that can be used to initialize the internal random generator.</p>
+</td></tr>
+<tr valign="top"><td><code>ini_vector_mod</code></td>
+<td>
+<p>Logical value for ... . Default is FALSE.</p>
+</td></tr>
+<tr valign="top"><td><code>threshold.stop, max.call, max.time</code></td>
+<td>
+<p>These are GenSA arguments, which can be used to control the behavior of the algorithm. (see <code>GenSA</code>)
+</p>
+
+<ul>
+<li><p> threshold.stop (Numeric) represents the threshold for which the program will stop when the expected objective function value will reach it. Default value is NULL.
+</p>
+</li>
+<li><p> max.call (Integer) represents the maximum number of call of the objective function. Default is 1e7.
+</p>
+</li>
+<li><p> max.time (Numeric) is the maximum running time in seconds. Default value is NULL.
+</p>
+</li></ul>
+<p> These arguments not always work, actually.</p>
+</td></tr>
+<tr valign="top"><td><code>taueps</code></td>
+<td>
+<p>The error control parameter from the tau-leaping approach.</p>
+</td></tr>
+<tr valign="top"><td><code>user_files</code></td>
+<td>
+<p>Vector of user files to copy inside the docker directory</p>
+</td></tr>
+<tr valign="top"><td><code>event_times</code></td>
+<td>
+<p>Vector representing the time points at which the simulation has to stop in order to
+simulate a discrete event that modifies the marking of the net given a specific rule defined in *functions_fname*.</p>
+</td></tr>
+<tr valign="top"><td><code>event_function</code></td>
+<td>
+<p>String reporting the function, implemented in *functions_fname*, to exploit for modifying the total marking at a specific time point.
+Such function takes in input: 1) a vector representing the marking of the net (called *marking*), and 2) the time point at which the simulation has stopped (called *time*).
+In particular, *time* takes values from *event_times*.</p>
+</td></tr>
+<tr valign="top"><td><code>caller_function</code></td>
+<td>
+<p>a string defining which function will be executed with the specified parameters (generation, sensitivity, calibration, analysis)</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Paolo Castagno, Daniele Baccega, Luca Rosso
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>epimod</em> version 1.0.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

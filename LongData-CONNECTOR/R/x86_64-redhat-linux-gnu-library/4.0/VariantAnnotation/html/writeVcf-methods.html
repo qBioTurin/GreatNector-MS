@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Write VCF files</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for writeVcf {VariantAnnotation}"><tr><td>writeVcf {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Write VCF files</h2>
+
+<h3>Description</h3>
+
+<p>Write Variant Call Format (VCF) files to disk</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'VCF,character'
+writeVcf(obj, filename, index = FALSE, ...)
+## S4 method for signature 'VCF,connection'
+writeVcf(obj, filename, index = FALSE, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p>Object containing data to be written out. At
+present only accepts <a href="VCF-class.html">VCF</a>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>filename</code></td>
+<td>
+<p>The character() name of the VCF file, or a connection
+(e.g., <code><a href="../../base/html/connections.html">file</a>()</code>), to be written out. A connection opened
+with <code>open = "a"</code> will have header information written only if
+the file does not already exist.</p>
+</td></tr>
+<tr valign="top"><td><code>index</code></td>
+<td>
+<p>Whether to bgzip the output file and generate a tabix index.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additional arguments, passed to methods.
+</p>
+
+<ul>
+<li><p>nchunk: Integer or NA. When provided this argument
+overrides the default chunking behavior of <code>writeVcf</code>, 
+see Details section. An integer value specifies the number
+of records in each chunk; NA disables chunking.
+</p>
+</li></ul>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>A VCF file can be written out from data in a <code>VCF</code> object. More
+general methods to write out from other objects may be added in the future.
+</p>
+<p><code>writeVcf</code> writes out the header fields in a <code>VCF</code> object 
+'as-is' with the exception of these key-value pairs:
+</p>
+
+<ul>
+<li><p>  fileformat: When missing, a line is added at the top of the
+file with the current supported version.
+<code>VariantAnnotation</code> &gt;=1.27.6 supports VCFv4.3.
+</p>
+</li>
+<li><p>  fileDate: When missing, a line is added with today's date.
+If the key-value pair exists, the date is overwritten with
+today's date.
+</p>
+</li>
+<li><p>  contig: When missing, <code>VariantAnnotation</code> attempts to
+use the <code>Seqinfo</code> of the <code>VCF</code> object to determine
+the contig information.
+</p>
+</li></ul>
+
+<p>Large VCF files (i.e., &gt; 1e5 records) are written out in 
+chunks; VCF files with &lt; 1e5 records are not chunked. The optimal number of
+records per chunk depends on both the number of records and complexity of the
+data. Currently <code>writeVcf</code> determines records per chunk based on the
+total number of records only. To override this behavior or experiment with
+other values use <code>nchunk</code> as an integer or NA. An integer value
+represents the number of records per chunk regardless of the size of the
+VCF; NA disables all chunking.
+</p>
+
+<ul>
+<li><p> writeVcf(vcf, tempfile())                ## default chunking
+</p>
+</li>
+<li><p> writeVcf(vcf, tempfile(), nchunk = 1e6)  ## chunk by 1e6
+</p>
+</li>
+<li><p> writeVcf(vcf, tempfile(), nchunk = NA)   ## no chunking
+</p>
+</li></ul>
+ 
+
+
+<h3>Value</h3>
+
+<p>VCF file
+</p>
+
+
+<h3>Note</h3>
+
+<p>NOTE: <code>VariantAnnotation</code> &gt;= 1.27.6 supports VCFv4.3. See the NOTE on 
+the <code>?VCFHeader</code> man page under the <code>meta()</code> extractor for 
+a description of how header parsing has changed to accommodate the new 
+header lines with key name of 'META'.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Valerie Obenchain and Michael Lawrence</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://vcftools.sourceforge.net/specs.html">http://vcftools.sourceforge.net/specs.html</a> outlines the VCF
+specification.
+</p>
+<p><a href="http://samtools.sourceforge.net/mpileup.shtml">http://samtools.sourceforge.net/mpileup.shtml</a> contains
+information on the portion of the specification implemented by
+<code>bcftools</code>.
+</p>
+<p><a href="http://samtools.sourceforge.net/">http://samtools.sourceforge.net/</a> provides information on
+<code>samtools</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="readVcf-methods.html">readVcf</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  fl &lt;- system.file("extdata", "ex2.vcf", package="VariantAnnotation")
+ 
+  out1.vcf &lt;- tempfile()
+  out2.vcf &lt;- tempfile() 
+  in1 &lt;- readVcf(fl, "hg19")
+  writeVcf(in1, out1.vcf)
+  in2 &lt;- readVcf(out1.vcf, "hg19")
+  writeVcf(in2, out2.vcf)
+  in3 &lt;- readVcf(out2.vcf, "hg19")
+  stopifnot(all(in2 == in3))
+
+  ## write incrementally
+  out3.vcf &lt;- tempfile()
+  con &lt;- file(out3.vcf, open="a")
+  writeVcf(in1[1:2,], con)
+  writeVcf(in1[-(1:2),], con)
+  close(con)
+  readVcf(out3.vcf, "hg19")
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

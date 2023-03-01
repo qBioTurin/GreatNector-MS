@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generates a set of simulation's configurations</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for experiment.configurations {epimod}"><tr><td>experiment.configurations {epimod}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generates a set of simulation's configurations</h2>
+
+<h3>Description</h3>
+
+<p>This is an internal function generating a set of configurations. The generation process is driven by the functions listed in param_list. Such functions either are native R functions or user defined ones. In the latter case, the functions have to be defined in a single file and passed through the argument parm_fname
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+experiment.configurations(
+  n_config,
+  parm_fname = NULL,
+  parm_list = NULL,
+  out_dir,
+  out_fname,
+  ini_vector = NULL,
+  ini_vector_mod = FALSE,
+  extend = FALSE,
+  config = list()
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>n_config, </code></td>
+<td>
+<p>number of configuratons to generate</p>
+</td></tr>
+<tr valign="top"><td><code>parm_fname, </code></td>
+<td>
+<p>file with the definition of user defined functions</p>
+</td></tr>
+<tr valign="top"><td><code>parm_list, </code></td>
+<td>
+<p>file listing the name of the functions, the parameters and the name under which the parameters have to be saved</p>
+</td></tr>
+<tr valign="top"><td><code>out_dir, </code></td>
+<td>
+<p>output directory specified by the user</p>
+</td></tr>
+<tr valign="top"><td><code>out_fname, </code></td>
+<td>
+<p>prefix used to name output files</p>
+</td></tr>
+<tr valign="top"><td><code>extend, </code></td>
+<td>
+<p>unused parameter. Placeholder for future development</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Marco Beccuti, Paolo Castagno, Simone Pernice
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+experiment.configurations(nconfig = 10,
+                          param_list = list.csv,
+                          out_dir="/path/to/output/directory",
+                          out_fname="example")
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>epimod</em> version 1.0.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

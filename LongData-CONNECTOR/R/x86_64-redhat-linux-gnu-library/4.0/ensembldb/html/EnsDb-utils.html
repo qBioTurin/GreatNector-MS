@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Utility functions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for getGeneRegionTrackForGviz {ensembldb}"><tr><td>getGeneRegionTrackForGviz {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Utility functions</h2>
+
+<h3>Description</h3>
+
+<p>Utility functions integrating <code>EnsDb</code> objects with other
+Bioconductor packages.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+## S4 method for signature 'EnsDb'
+getGeneRegionTrackForGviz(x,
+        filter = AnnotationFilterList(), chromosome = NULL,
+        start = NULL, end = NULL, featureIs = "gene_biotype")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<p>(In alphabetic order)
+</p>
+<table summary="R argblock">
+<tr valign="top"><td><code>chromosome</code></td>
+<td>
+
+<p>For <code>getGeneRegionTrackForGviz</code>: optional chromosome name to
+restrict the returned entry to a specific chromosome.
+</p>
+</td></tr>
+<tr valign="top"><td><code>end</code></td>
+<td>
+
+<p>For <code>getGeneRegionTrackForGviz</code>: optional chromosomal end
+coordinate specifying, together with <code>start</code>, the chromosomal
+region from which features should be retrieved.
+</p>
+</td></tr>
+<tr valign="top"><td><code>featureIs</code></td>
+<td>
+
+<p>For <code>getGeneRegionTrackForGviz</code>: whether the gene
+(<code>"gene_biotype"</code>) or the transcript biotype
+(<code>"tx_biotype"</code>) should be returned in column <code>"feature"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+
+<p>A filter describing which results to retrieve from the database. Can
+be a single object extending
+<code><a href="../../AnnotationFilter/html/AnnotationFilter.html">AnnotationFilter</a></code>, an
+<code><a href="../../AnnotationFilter/html/AnnotationFilterList.html">AnnotationFilterList</a></code> object
+combining several such objects or a <code>formula</code> representing a
+filter expression (see examples below or
+<code><a href="../../AnnotationFilter/html/AnnotationFilter.html">AnnotationFilter</a></code> for more details).
+</p>
+</td></tr>
+<tr valign="top"><td><code>start</code></td>
+<td>
+
+<p>For <code>getGeneRegionTrackForGviz</code>: optional chromosomal start
+coordinate specifying, together with <code>end</code>, the chromosomal
+region from which features should be retrieved.
+</p>
+</td></tr>
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>For <code>toSAF</code> a <code>GRangesList</code> object. For all other
+methods an <code>EnsDb</code> instance.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>For <code>getGeneRegionTrackForGviz</code>: see method description above.
+</p>
+
+
+<h3>Methods and Functions</h3>
+
+
+<dl>
+<dt>getGeneRegionTrackForGviz</dt><dd>
+<p>Retrieve a <code>GRanges</code> object with transcript features from the
+<code>EnsDb</code> that can be used directly in the <code>Gviz</code> package
+to create a <code>GeneRegionTrack</code>. Using the <code>filter</code>,
+<code>chromosome</code>, <code>start</code> and <code>end</code> arguments it is
+possible to fetch specific features (e.g. lincRNAs) from the
+database.
+</p>
+<p>If <code>chromosome</code>, <code>start</code> and <code>end</code> is provided the
+function internally first retrieves all transcripts that have an
+exon or an intron in the specified chromosomal region and
+subsequently fetch all of these transcripts. This ensures that all
+transcripts of the region are returned, even those that have
+<em>only</em> an intron in the region.
+</p>
+<p>The function returns a <code>GRanges</code> object with additional
+annotation columns <code>"feature"</code>, <code>"gene"</code>, <code>"exon"</code>,
+<code>"exon_rank"</code>, <code>"trancript"</code>, <code>"symbol"</code> specifying
+the feature type (either gene or transcript biotype), the
+(Ensembl) gene ID, the exon ID, the rank/index of the exon in the
+transcript, the transcript ID and the gene symbol/name.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="EnsDb-exonsBy.html">transcripts</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(EnsDb.Hsapiens.v86)
+edb &lt;- EnsDb.Hsapiens.v86
+######   getGeneRegionTrackForGviz
+##
+## Get all genes encoded on chromosome Y in the specifyed region.
+AllY &lt;- getGeneRegionTrackForGviz(edb, chromosome = "Y", start = 5131959,
+                                  end = 7131959)
+## We could plot this now using plotTracks(GeneRegionTrack(AllY))
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

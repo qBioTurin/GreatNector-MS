@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: BSgenome utilities</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for BSgenome-utils {BSgenome}"><tr><td>BSgenome-utils {BSgenome}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>BSgenome utilities</h2>
+
+<h3>Description</h3>
+
+<p>Utilities for BSgenome objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'BSgenome'
+vmatchPattern(pattern, subject, max.mismatch=0, min.mismatch=0,
+              with.indels=FALSE, fixed=TRUE, algorithm="auto",
+              exclude="", maskList=logical(0), userMask=IRangesList(),
+              invertUserMask=FALSE)
+## S4 method for signature 'BSgenome'
+vcountPattern(pattern, subject, max.mismatch=0, min.mismatch=0,
+              with.indels=FALSE, fixed=TRUE, algorithm="auto",
+              exclude="", maskList=logical(0), userMask=IRangesList(),
+              invertUserMask=FALSE)
+
+## S4 method for signature 'BSgenome'
+vmatchPDict(pdict, subject, max.mismatch=0, min.mismatch=0,
+            fixed=TRUE, algorithm="auto", verbose=FALSE,
+            exclude="", maskList=logical(0))
+## S4 method for signature 'BSgenome'
+vcountPDict(pdict, subject, max.mismatch=0, min.mismatch=0,
+            fixed=TRUE, algorithm="auto", collapse=FALSE,
+            weight=1L, verbose=FALSE, exclude="", maskList=logical(0))
+
+## S4 method for signature 'BSgenome'
+matchPWM(pwm, subject, min.score="80%", exclude="", maskList=logical(0))
+## S4 method for signature 'BSgenome'
+countPWM(pwm, subject, min.score="80%", exclude="", maskList=logical(0))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>pattern</code></td>
+<td>
+
+<p>A <a href="../../Biostrings/html/DNAString.html">DNAString</a> object containing the pattern sequence.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subject</code></td>
+<td>
+
+<p>A <a href="BSgenome-class.html">BSgenome</a> object containing the subject sequences.
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.mismatch, min.mismatch</code></td>
+<td>
+
+<p>The maximum and minimum number of mismatching letters allowed (see
+<code>?`<a href="../../Biostrings/html/lowlevel-matching.html">lowlevel-matching</a>`</code> for the details).
+If non-zero, an inexact matching algorithm is used.
+</p>
+</td></tr>
+<tr valign="top"><td><code>with.indels</code></td>
+<td>
+
+<p>If <code>TRUE</code> then indels are allowed. In that case, <code>min.mismatch</code>
+must be <code>0</code> and <code>max.mismatch</code> is interpreted as the maximum
+&quot;edit distance&quot; allowed between any pattern and any of its matches
+(see <code>?`<a href="../../Biostrings/html/matchPattern.html">matchPattern</a>`</code> for the details).
+</p>
+</td></tr>
+<tr valign="top"><td><code>fixed</code></td>
+<td>
+
+<p>If <code>FALSE</code> then IUPAC extended letters are interpreted as ambiguities
+(see <code>?`<a href="../../Biostrings/html/lowlevel-matching.html">lowlevel-matching</a>`</code> for the details).
+</p>
+</td></tr>
+<tr valign="top"><td><code>algorithm</code></td>
+<td>
+
+<p>For <code>vmatchPattern</code> and <code>vcountPattern</code> one of the following:
+<code>"auto"</code>, <code>"naive-exact"</code>, <code>"naive-inexact"</code>,
+<code>"boyer-moore"</code>, <code>"shift-or"</code>, or <code>"indels"</code>.
+</p>
+<p>For <code>vmatchPDict</code> and <code>vcountPDict</code> one of the following:
+<code>"auto"</code>, <code>"naive-exact"</code>, <code>"naive-inexact"</code>,
+<code>"boyer-moore"</code>, or <code>"shift-or"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>exclude</code></td>
+<td>
+
+<p>A character vector with strings that will be used to filter out
+chromosomes whose names match these strings.
+</p>
+</td></tr>
+<tr valign="top"><td><code>maskList</code></td>
+<td>
+
+<p>A named logical vector of maskStates preferred when used with a
+BSGenome object.  When using the bsapply function, the masks will
+be set to the states in this vector.
+</p>
+</td></tr>
+<tr valign="top"><td><code>userMask</code></td>
+<td>
+
+<p>An <a href="../../IRanges/html/IntegerRangesList-class.html">IntegerRangesList</a>, containing a mask to be applied
+to each chromosome. See <code><a href="bsapply.html">bsapply</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>invertUserMask</code></td>
+<td>
+
+<p>Whether the <code>userMask</code> should be inverted.
+</p>
+</td></tr>
+<tr valign="top"><td><code>collapse, weight</code></td>
+<td>
+
+<p>ignored arguments.
+</p>
+</td></tr>
+<tr valign="top"><td><code>pdict</code></td>
+<td>
+
+<p>A <a href="../../Biostrings/html/PDict.html">PDict</a> or <a href="../../Biostrings/html/DNAStringSet.html">DNAStringSet</a> object
+containing the pattern sequences.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p><code>TRUE</code> or <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>pwm</code></td>
+<td>
+
+<p>A numeric matrix with row names A, C, G and T representing a Position
+Weight Matrix.
+</p>
+</td></tr>
+<tr valign="top"><td><code>min.score</code></td>
+<td>
+
+<p>The minimum score for counting a match.
+Can be given as a character string containing a percentage (e.g.
+<code>"85%"</code>) of the highest possible score or as a single number.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object for <code>vmatchPattern</code>.
+</p>
+<p>A data.frame object for <code>vcountPattern</code> and <code>countPWM</code>
+with three columns: &quot;seqname&quot; (factor), &quot;strand&quot; (factor), and
+&quot;count&quot; (integer).
+</p>
+<p>A <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object for <code>vmatchPDict</code> with
+one metadata column: &quot;index&quot;, which represents a mapping to a
+position in the original pattern dictionary.
+</p>
+<p>A <a href="../../S4Vectors/html/DataFrame.html">DataFrame</a> object for <code>vcountPDict</code> with four
+columns: &quot;seqname&quot; ('factor' Rle), &quot;strand&quot; ('factor' Rle), 
+&quot;index&quot; (integer) and &quot;count&quot; ('integer' Rle). As with <code>vmatchPDict</code>
+the index column represents a mapping to a position in the original
+pattern dictionary.
+</p>
+<p>A <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object for <code>matchPWM</code> with two
+metadata columns: &quot;score&quot; (numeric), and &quot;string&quot; (DNAStringSet).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>P. Aboyoun</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../Biostrings/html/matchPattern.html">matchPattern</a></code>,
+<code><a href="../../Biostrings/html/matchPDict.html">matchPDict</a></code>,
+<code><a href="../../Biostrings/html/matchPWM.html">matchPWM</a></code>,
+<code><a href="bsapply.html">bsapply</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+library(BSgenome.Celegans.UCSC.ce2)
+data(HNF4alpha)
+
+pattern &lt;- consensusString(HNF4alpha)
+vmatchPattern(pattern, Celegans, fixed="subject")
+vcountPattern(pattern, Celegans, fixed="subject")
+
+pdict &lt;- PDict(HNF4alpha)
+vmatchPDict(pdict, Celegans)
+vcountPDict(pdict, Celegans)
+
+pwm &lt;- PWM(HNF4alpha)
+matchPWM(pwm, Celegans)
+countPWM(pwm, Celegans)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>BSgenome</em> version 1.58.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

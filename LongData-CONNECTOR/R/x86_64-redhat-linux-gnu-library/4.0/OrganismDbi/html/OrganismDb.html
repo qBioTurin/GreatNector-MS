@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: MultiDb and OrganismDb objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for MultiDb-class {OrganismDbi}"><tr><td>MultiDb-class {OrganismDbi}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>MultiDb and OrganismDb objects</h2>
+
+<h3>Description</h3>
+
+<p>The OrganismDb class is a container for storing knowledge
+about existing Annotation packages and the relationships between these
+resources.  The purpose of this object and it's associated methods is
+to provide a means by which users can conveniently query for data from
+several different annotation resources at the same time using a
+familiar interface.
+</p>
+<p>The supporting methods <code>select</code>, <code>columns</code> and <code>keys</code> are
+used together to extract data from an <code>OrganismDb</code>
+object in a manner that should be consistent with how these are used
+on the supporting annotation resources.
+</p>
+<p>The family of <code>seqinfo</code> style getters (<code>seqinfo</code>,
+<code>seqlevels</code>, <code>seqlengths</code>, <code>isCircular</code>, <code>genome</code>,
+and <code>seqnameStyle</code>) is also supported for OrganismDb objects
+provided that the object in question has an embedded TxDb
+object.
+</p>
+
+
+<h3>Methods</h3>
+
+<p>In the code snippets below, <code>x</code> is a OrganismDb object.
+</p>
+
+<dl>
+<dt></dt><dd>
+<p><code>keytypes(x)</code>:
+allows the user to discover which keytypes can be passed in to
+<code>select</code> or <code>keys</code> and the <code>keytype</code> argument.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>keys(x, keytype, pattern, column, fuzzy)</code>: Return keys for
+the database contained in the <a href="OrganismDb.html">TxDb</a> object .
+</p>
+<p>The <code>keytype</code> argument specifies the kind of keys that will
+be returned and is always required.
+</p>
+<p>If <code>keys</code> is used with <code>pattern</code>, it will pattern match
+on the <code>keytype</code>.
+</p>
+<p>But if the <code>column</code> argument is also provided along with the
+<code>pattern</code> argument, then <code>pattern</code> will be matched
+against the values in <code>column</code> instead.
+</p>
+<p>If <code>keys</code> is called with <code>column</code> and no <code>pattern</code>
+argument, then it will return all keys that have corresponding
+values in the <code>column</code> argument.
+</p>
+<p>Thus, the behavior of <code>keys</code> all depends on how many arguments are
+specified.
+</p>
+<p>Use of the <code>fuzzy</code> argument will toggle fuzzy matching to
+TRUE or FALSE.  If <code>pattern</code> is not used, fuzzy is ignored.
+</p>
+</dd>    
+<dt></dt><dd>
+<p><code>columns(x)</code>:
+shows which kinds of data can be returned for the
+<code>OrganismDb</code> object.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>select(x, keys, columns, keytype)</code>:
+When all the appropriate arguments are specifiedm <code>select</code>
+will retrieve the matching data as a data.frame based on
+parameters for selected <code>keys</code> and <code>columns</code> and
+<code>keytype</code> arguments.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>mapIds(x, keys, columns, keytype, ..., multiVals)</code>:
+When all the appropriate arguments are specifiedm <code>mapIds</code>
+will retrieve the matching data as a vector or list based on
+parameters for selected <code>keys</code> and <code>columns</code> and
+<code>keytype</code> arguments.  The multiVals argument can be used to
+choose the format of the values returned.  Possible values for
+multiVals are:
+</p>
+
+<dl>
+<dt>first:</dt><dd><p>This value means that when there are multiple matches only the 1st thing that comes back will be returned. This is the default behavior</p>
+</dd>
+<dt>list:</dt><dd><p>This will just returns a list object to the end user</p>
+</dd>
+<dt>filter:</dt><dd><p>This will remove all elements that contain multiple matches and will therefore return a shorter vector than what came in whenever some of the keys match more than one value</p>
+</dd>
+<dt>asNA:</dt><dd><p>This will return an NA value whenever there are multiple matches</p>
+</dd>
+<dt>CharacterList:</dt><dd><p>This just returns a SimpleCharacterList object</p>
+</dd>
+<dt>FUN:</dt><dd><p>You can also supply a function to the <code>multiVals</code> argument for custom behaviors.  The function must take a single argument and return a single value.  This function will be applied to all the elements and will serve a 'rule' that for which thing to keep when there is more than one element.  So for example this example function will always grab the last element in each result: <code> last &lt;- function(x){x[[length(x)]]} </code>
+</p>
+</dd>
+</dl>
+
+</dd>
+<dt></dt><dd>
+<p><code>selectByRanges(x, ranges, columns, overlaps,
+      ignore.strand)</code>: When all the appropriate arguments are specified,
+<code>selectByRanges</code> will return an annotated GRanges object that
+has been generated based on what you passed in to the ranges
+argument and whether that overlapped with what you specified in
+the overlaps argument. Internally this function will get
+annotation features and overlaps by calling the appropriate
+annotation methods indicated by the overlaps argument.  The value
+for overlaps can be any of: gene, tx, exons, cds, 5utr, introns or
+3utr.  The default value is 'tx' which will return to you, your
+annotated ranges based on whether the overlapped with the
+transcript ranges of any gene in the associated TxDb object based
+on the gene models it contains.  Also: the number of ranges
+returned to you will match the number of genes that your ranges
+argument overlapped for the type of overlap that you specified.
+So if some of your ranges are large and overlap several features
+then you will get many duplicated ranges returned with one for
+each gene that has an overlapping feature.  The columns values
+that you request will be returned in the mcols for the annotated
+GRanges object that is the return value for this function.
+Finally, the ignore.strand argument is provided to indicate
+whether or not findOverlaps should ignore or respect the strand.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>selectRangesById(x, keys, columns, keytype, feature)</code>: When
+all the appropriate arguments are specified,
+<code>selectRangesById</code> will return a GRangesList object that
+correspond to gene models GRanges for the keys that you specify
+with the keys and keytype arguments. The annotation ranges
+retrieved for this will be specified by the feature argument and
+can be: gene, tx, exon or cds.  The default is 'tx' which will
+return the transcript ranges for each gene as a GRanges object in
+the list.  Extra data can also be returned in the mcols values for
+those GRanges by using the columns argument.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>resources(x)</code>: shows where the db files are for resources
+that are used to store the data for the <code>OrganismDb</code> object.
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>TxDb(x)</code>: Accessor for the TxDb object of a
+<code>OrganismDb</code> object.  
+</p>
+</dd>
+<dt></dt><dd>
+<p><code>TxDb(x) &lt;- value</code>: Allows you to swap in an alternative TxDb
+for a given <code>OrganismDb</code> object.  This is most often useful
+when combined with <code>saveDb(TxDb, file)</code>, which returns the
+saved TxDb, so that you can save a TxDb to disc and then assign
+the saved version right into your <code>OrganismDb</code> object.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Marc Carlson</p>
+
+
+<h3>See Also</h3>
+
+ 
+
+<ul>
+<li> <p><a href="../../AnnotationDbi/html/AnnotationDb-class.html">AnnotationDb-class</a> for more descriptsion
+of methods <code>select</code>,<code>keytypes</code>,<code>keys</code> and <code>columns</code>.
+</p>
+</li>
+<li> <p><a href="makeOrganismPackage.html">makeOrganismPackage</a> for functions
+used to generate an <code>OrganismDb</code> based package.
+</p>
+</li>
+<li> <p><a href="rangeBasedAccessors.html">rangeBasedAccessors</a> for the range based methods
+used in extracting data from a <code>OrganismDb</code> object.
+</p>
+</li>
+<li><p>GenomeInfoDb.
+</p>
+</li>
+<li><p><a href="../../GenomeInfoDb/html/seqinfo.html">seqlevels</a>.
+</p>
+</li>
+<li><p><a href="../../GenomeInfoDb/html/seqinfo.html">seqlengths</a>.
+</p>
+</li>
+<li><p><a href="../../GenomeInfoDb/html/seqinfo.html">isCircular</a>.
+</p>
+</li>
+<li><p><a href="../../GenomeInfoDb/html/seqinfo.html">genome</a>.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## load a package that creates an OrganismDb
+library(Homo.sapiens)
+ls(2)
+## then the methods can be used on this object.
+columns &lt;- columns(Homo.sapiens)[c(7,10,11,12)]
+keys &lt;- head(keys(org.Hs.eg.db, "ENTREZID"))
+keytype &lt;- "ENTREZID"
+res &lt;- select(Homo.sapiens, keys, columns, keytype)
+head(res)
+res &lt;-  mapIds(Homo.sapiens, keys=c('1','10'), column='ALIAS',
+               keytype='ENTREZID',  multiVals="CharacterList")
+
+## get symbols for ranges in question:
+ranges &lt;-  GRanges(seqnames=Rle(c('chr11'), c(2)),
+                    IRanges(start=c(107899550, 108025550),
+                            end=c(108291889, 108050000)), strand='*',
+                    seqinfo=seqinfo(Homo.sapiens))
+selectByRanges(Homo.sapiens, ranges, 'SYMBOL')
+
+## Or extract the gene model for the 'A1BG' gene:
+selectRangesById(Homo.sapiens, 'A1BG', keytype='SYMBOL')
+
+
+## Get the DB connections or DB file paths associated with those for
+## each.
+dbconn(Homo.sapiens)
+dbfile(Homo.sapiens)
+
+## extract the taxonomyId
+taxonomyId(Homo.sapiens)
+
+##extract the resources
+resources(Homo.sapiens)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>OrganismDbi</em> version 1.32.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

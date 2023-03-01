@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: PolyPhenDb Columns</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for PolyPhenDbColumns {VariantAnnotation}"><tr><td>PolyPhenDbColumns {VariantAnnotation}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>PolyPhenDb Columns</h2>
+
+<h3>Description</h3>
+
+<p>Description of the PolyPhen Sqlite Database Columns
+</p>
+
+
+<h3>Column descriptions</h3>
+
+<p>These column names are displayed when <code>columns</code> is called on a
+<code>PolyPhenDb</code> object.
+</p>
+
+<ul>
+<li><p> rsid : rsid
+</p>
+</li></ul>
+
+<p>Original query :
+</p>
+
+<ul>
+<li><p> OSNPID : original SNP identifier from user input
+</p>
+</li>
+<li><p> OSNPACC : original protein identifier from user input
+</p>
+</li>
+<li><p> OPOS : original substitution position in the protein sequence
+from user input
+</p>
+</li>
+<li><p> OAA1 : original wild type (reference) aa residue from user input 
+</p>
+</li>
+<li><p> OAA2 : original mutant (reference) aa residue from user input 
+</p>
+</li></ul>
+
+<p>Mapped query :
+</p>
+
+<ul>
+<li><p> SNPID : SNP identifier mapped to dbSNP rsID if available,
+otherwise same as o_snp_id. This value was used as the 
+rsid column 
+</p>
+</li>
+<li><p> ACC : protein UniProtKB accession if known protein, otherwise
+same as o_acc 
+</p>
+</li>
+<li><p> POS : substitution position mapped to UniProtKB protein sequence
+if known, otherwise same as o_pos 
+</p>
+</li>
+<li><p> AA1 : wild type aa residue 
+</p>
+</li>
+<li><p> AA2 : mutant aa residue 
+</p>
+</li>
+<li><p> NT1 : wild type allele nucleotide 
+</p>
+</li>
+<li><p> NT2 : mutant allele nucleotide 
+</p>
+</li></ul>
+
+<p>PolyPhen-2 prediction :
+</p>
+
+<ul>
+<li><p> PREDICTION : qualitative ternary classification FPR thresholds 
+</p>
+</li></ul>
+
+<p>PolyPhen-1 prediction :
+</p>
+
+<ul>
+<li><p> BASEDON : prediction basis 
+</p>
+</li>
+<li><p> EFFECT : predicted substitution effect on the protein structure or
+function
+</p>
+</li></ul>
+
+<p>PolyPhen-2 classifiers : 
+</p>
+
+<ul>
+<li><p> PPH2CLASS : binary classifier outcome (&quot;damaging&quot; or &quot;neutral&quot;) 
+</p>
+</li>
+<li><p> PPH2PROB : probability of the variation being dammaging 
+</p>
+</li>
+<li><p> PPH2FPR : false positive rate at the pph2_prob level 
+</p>
+</li>
+<li><p> PPH2TPR : true positive rate at the pph2_prob level 
+</p>
+</li>
+<li><p> PPH2FDR : false discovery rate at the pph2_prob level 
+</p>
+</li></ul>
+
+<p>UniProtKB-SwissProt derived protein sequence annotations :
+</p>
+
+<ul>
+<li><p> SITE : substitution SITE annotation 
+</p>
+</li>
+<li><p> REGION : substitution REGION annotation 
+</p>
+</li>
+<li><p> PHAT : PHAT matrix element for substitution in the 
+TRANSMEM region 
+</p>
+</li></ul>
+
+<p>Multiple sequence alignment scores :
+</p>
+
+<ul>
+<li><p> DSCORE : difference of PSIC scores for two aa variants 
+(Score1 - Score2) 
+</p>
+</li>
+<li><p> SCORE1 : PSIC score for wild type aa residue (aa1) 
+</p>
+</li>
+<li><p> SCORE2 : PSIC score for mutant aa residue (aa2) 
+</p>
+</li>
+<li><p> NOBS : number of residues observed at the substitution position
+in the multiple alignment (sans gaps)
+</p>
+</li></ul>
+
+<p>Protein 3D structure features : 
+</p>
+
+<ul>
+<li><p> NSTRUCT : initial number of BLAST hits to similar proteins with
+3D structures in PDB 
+</p>
+</li>
+<li><p> NFILT : number of 3D BLAST hits after identity threshold filtering 
+</p>
+</li>
+<li><p> PDBID : protein structure identifier from PDB 
+</p>
+</li>
+<li><p> PDBPOS : position of substitution in PDB protein sequence 
+</p>
+</li>
+<li><p> PDBCH : PDB polypeptide chain identifier 
+</p>
+</li>
+<li><p> IDENT : sequence identity between query and aligned PDB sequences 
+</p>
+</li>
+<li><p> LENGTH : PDB sequence alignment length 
+</p>
+</li>
+<li><p> NORMACC : normalized accessible surface 
+</p>
+</li>
+<li><p> SECSTR : DSSP secondary structure assignment 
+</p>
+</li>
+<li><p> MAPREG : region of the phi-psi (Ramachandran) map derived from the
+residue dihedral angles 
+</p>
+</li>
+<li><p> DVOL : change in residue side chain volume 
+</p>
+</li>
+<li><p> DPROP : change in solvent accessible surface propensity resulting
+from the substitution 
+</p>
+</li>
+<li><p> BFACT : normalized B-factor (temperature factor) for the residue
+</p>
+</li>
+<li><p> HBONDS : number of hydrogen sidechain-sidechain and
+sidechain-mainchain bonds formed by the residue 
+</p>
+</li>
+<li><p> AVENHET : average number of contacts with heteroatoms per residue 
+</p>
+</li>
+<li><p> MINDHET : closest contact with heteroatom 
+</p>
+</li>
+<li><p> AVENINT : average number of contacts with other chains per residue 
+</p>
+</li>
+<li><p> MINDINT : closest contact with other chain 
+</p>
+</li>
+<li><p> AVENSIT : average number of contacts with critical sites per
+residue 
+</p>
+</li>
+<li><p> MINDSIT : closest contact with a critical site
+</p>
+</li></ul>
+
+<p>Nucleotide sequence features (CpG/codon/exon junction) :
+</p>
+
+<ul>
+<li><p> TRANSV : whether substitution is a transversion 
+</p>
+</li>
+<li><p> CODPOS : position of the substitution within the codon 
+</p>
+</li>
+<li><p> CPG : whether or not the substitution changes CpG context
+</p>
+</li>
+<li><p> MINDJNC : substitution distance from exon/intron junction 
+</p>
+</li></ul>
+
+<p>Pfam protein family :
+</p>
+
+<ul>
+<li><p> PFAMHIT : Pfam identifier of the query protein
+</p>
+</li></ul>
+
+<p>Substitution scores : 
+</p>
+
+<ul>
+<li><p> IDPMAX : maximum congruency of the mutant aa residue to all 
+sequences in multiple alignment 
+</p>
+</li>
+<li><p> IDPSNP : maximum congruency of the mutant aa residue to the
+sequence in alignment with the mutant residue 
+</p>
+</li>
+<li><p> IDQMIN : query sequence identity with the closest homologue
+deviating from the wild type aa residue
+</p>
+</li></ul>
+
+<p>Comments : 
+</p>
+
+<ul>
+<li><p> COMMENTS : Optional user comments 
+</p>
+</li></ul>
+
+
+
+<h3>Author(s)</h3>
+
+<p>Valerie Obenchain</p>
+
+
+<h3>See Also</h3>
+
+<p><code>?PolyPhenDb</code>
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>VariantAnnotation</em> version 1.36.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

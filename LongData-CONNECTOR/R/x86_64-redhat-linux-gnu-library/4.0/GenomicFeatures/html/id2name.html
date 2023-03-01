@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Map internal ids to external names for a given feature type</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for id2name {GenomicFeatures}"><tr><td>id2name {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Map internal ids to external names for a given feature type
+</h2>
+
+<h3>Description</h3>
+
+<p>Utility function for retrieving the mapping from the internal ids
+to the external names of a given feature type.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+id2name(txdb, feature.type=c("tx", "exon", "cds"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>txdb</code></td>
+<td>
+<p>A <a href="TxDb-class.html">TxDb</a> object.</p>
+</td></tr>
+<tr valign="top"><td><code>feature.type</code></td>
+<td>
+<p>The feature type for which the mapping must be
+retrieved.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Transcripts, exons and CDS in a <a href="TxDb-class.html">TxDb</a> object are
+stored in seperate tables where the primary key is an integer
+called <em>feature internal id</em>. This id is stored in the
+<code>"tx_id"</code> column for transcripts, in the <code>"exon_id"</code>
+column for exons, and in the <code>"cds_id"</code> column for CDS.
+Unlike other commonly used ids like Entrez Gene IDs or Ensembl IDs,
+this internal id was generated at the time the <a href="TxDb-class.html">TxDb</a>
+object was created and has no meaning outside the scope of this object.
+</p>
+<p>The <code>id2name</code> function can be used to translate this internal
+id into a more informative id or name called <em>feature external
+name</em>. This name is stored in the <code>"tx_name"</code> column for
+transcripts, in the <code>"exon_name"</code> column for exons, and in
+the <code>"cds_name"</code> column for CDS.
+</p>
+<p>Note that, unlike the feature internal id, the feature external
+name is not guaranteed to be unique or even defined (the column
+can contain <code>NA</code>s).
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named character vector where the names are the internal ids and the
+values the external names.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hervé Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="transcripts.html">transcripts</a></code>, <code><a href="transcriptsBy.html">transcriptsBy</a></code>,
+and <code><a href="transcriptsByOverlaps.html">transcriptsByOverlaps</a></code>, for how to extract
+genomic features from a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+</li>
+<li><p> The <a href="TxDb-class.html">TxDb</a> class.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+txdb1_file &lt;- system.file("extdata", "hg19_knownGene_sample.sqlite",
+                          package="GenomicFeatures")
+txdb1 &lt;- loadDb(txdb1_file)
+id2name(txdb1, feature.type="tx")[1:4]
+id2name(txdb1, feature.type="exon")[1:4]
+id2name(txdb1, feature.type="cds")[1:4]
+
+txdb2_file &lt;- system.file("extdata", "Biomart_Ensembl_sample.sqlite",
+                          package="GenomicFeatures")
+txdb2 &lt;- loadDb(txdb2_file)
+id2name(txdb2, feature.type="tx")[1:4]
+id2name(txdb2, feature.type="exon")[1:4]
+id2name(txdb2, feature.type="cds")[1:4]
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

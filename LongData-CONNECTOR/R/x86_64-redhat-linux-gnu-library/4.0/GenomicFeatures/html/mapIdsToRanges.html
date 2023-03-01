@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Map IDs to Genomic Ranges</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for mapIdsToRanges {GenomicFeatures}"><tr><td>mapIdsToRanges {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Map IDs to Genomic Ranges</h2>
+
+<h3>Description</h3>
+
+<p>Map IDs to Genomic Ranges
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+mapIdsToRanges(x, ...)
+
+## S4 method for signature 'TxDb'
+mapIdsToRanges(x, keys, type = c("cds", "exon", "tx",
+  "gene"), columns = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Database to use for mapping</p>
+</td></tr>
+<tr valign="top"><td><code>keys</code></td>
+<td>
+<p>Values to lookup, passed to <code><a href="transcripts.html">transcripts</a></code> et. al.</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+<p>Types of feature to return</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Additional metadata columns to include in the output</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additional arguments passed to methods</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code><a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a></code> corresponding to the keys
+</p>
+
+
+<h3>Methods (by class)</h3>
+
+
+<ul>
+<li> <p><code>TxDb</code>: TxDb method
+</p>
+</li></ul>
+
+
+<h3>Examples</h3>
+
+<pre>
+fl &lt;- system.file(package = "GenomicFeatures", "extdata", "sample_ranges.rds")
+txdb &lt;- makeTxDbFromGRanges(readRDS(fl))
+
+keys &lt;- list(tx_name = c("ENST00000371582", "ENST00000371588",
+    "ENST00000494752", "ENST00000614008", "ENST00000496771"))
+mapIdsToRanges(txdb, keys = keys, type = "tx")
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

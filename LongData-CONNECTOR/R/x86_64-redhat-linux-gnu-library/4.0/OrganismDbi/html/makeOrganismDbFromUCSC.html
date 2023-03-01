@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Make a OrganismDb object from annotations available at the...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for makeOrganismDbFromUCSC {OrganismDbi}"><tr><td>makeOrganismDbFromUCSC {OrganismDbi}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Make a OrganismDb object from annotations available at the
+UCSC Genome Browser
+</h2>
+
+<h3>Description</h3>
+
+<p>The <code>makeOrganismDbFromUCSC</code> function allows the user
+to make a <a href="OrganismDb.html">OrganismDb</a> object from transcript annotations
+available at the UCSC Genome Browser.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+makeOrganismDbFromUCSC(
+        genome="hg19",
+        tablename="knownGene",
+        transcript_ids=NULL,
+        circ_seqs=NULL,
+        url="http://genome.ucsc.edu/cgi-bin/",
+        goldenPath.url=getOption("UCSC.goldenPath.url"),
+        miRBaseBuild=NA)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>genome</code></td>
+<td>
+<p>genome abbreviation used by UCSC and obtained by
+<code><a href="../../rtracklayer/html/ucscGenomes.html">ucscGenomes</a>()[ , "db"]</code>.
+For example: <code>"hg19"</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>tablename</code></td>
+<td>
+<p>name of the UCSC table containing the transcript
+annotations to retrieve. Use the <code>supportedUCSCtables</code> utility
+function to get the list of supported tables. Note that not all
+tables are available for all genomes.</p>
+</td></tr>
+<tr valign="top"><td><code>transcript_ids</code></td>
+<td>
+<p>optionally, only retrieve transcript
+annotation data for the specified set of transcript ids.
+If this is used, then the meta information displayed for the
+resulting <a href="OrganismDb.html">OrganismDb</a> object will say 'Full dataset: no'.
+Otherwise it will say 'Full dataset: yes'.</p>
+</td></tr>
+<tr valign="top"><td><code>circ_seqs</code></td>
+<td>
+<p>a character vector to list out which chromosomes
+should be marked as circular.</p>
+</td></tr>
+<tr valign="top"><td><code>url,goldenPath.url</code></td>
+<td>
+<p>use to specify the location of an
+alternate UCSC Genome Browser.</p>
+</td></tr>
+<tr valign="top"><td><code>miRBaseBuild</code></td>
+<td>
+<p>specify the string for the appropriate build
+Information from mirbase.db to use for microRNAs.  This can be
+learned by calling <code>supportedMiRBaseBuildValues</code>.  By default,
+this value will be set to <code>NA</code>, which will inactivate the
+<code>microRNAs</code> accessor.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>makeOrganismDbFromUCSC</code> is a convenience function that feeds
+data from the UCSC source to the lower level <code><a href="OrganismDb.html">OrganismDb</a></code>
+function.
+See <code>?<a href="makeOrganismDbFromBiomart.html">makeOrganismDbFromBiomart</a></code> for a similar function
+that feeds data from a BioMart database.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <a href="OrganismDb.html">OrganismDb</a> object.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>M. Carlson
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="makeOrganismDbFromBiomart.html">makeOrganismDbFromBiomart</a></code> for convenient ways to make a
+<a href="OrganismDb.html">OrganismDb</a> object from BioMart online resources.
+</p>
+</li>
+<li> <p><code><a href="../../rtracklayer/html/ucscGenomes.html">ucscGenomes</a></code> in the <span class="pkg">rtracklayer</span>
+package.
+</p>
+</li>
+<li><p> The <code><a href="../../GenomicFeatures/html/makeTxDbPackage.html">supportedMiRBaseBuildValues</a></code> function for
+listing all the possible values for the <code>miRBaseBuild</code>
+argument.
+</p>
+</li>
+<li><p> The <a href="OrganismDb.html">OrganismDb</a> class.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+## Display the list of genomes available at UCSC:
+library(rtracklayer)
+library(RMariaDB)
+ucscGenomes()[ , "db"]
+
+## Display the list of tables supported by makeOrganismDbFromUCSC():
+supportedUCSCtables()
+
+\dontrun{
+## Retrieving a full transcript dataset for Yeast from UCSC:
+odb1 &lt;- makeOrganismDbFromUCSC(genome="sacCer2", tablename="ensGene")
+}
+
+## Retrieving an incomplete transcript dataset for Mouse from UCSC
+## (only transcripts linked to Entrez Gene ID 22290):
+transcript_ids &lt;- c(
+    "uc009uzf.1",
+    "uc009uzg.1",
+    "uc009uzh.1",
+    "uc009uzi.1",
+    "uc009uzj.1"
+)
+
+odb2 &lt;- makeOrganismDbFromUCSC(genome="mm9", tablename="knownGene",
+                          transcript_ids=transcript_ids)
+odb2
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>OrganismDbi</em> version 1.32.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

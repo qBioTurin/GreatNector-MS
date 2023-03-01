@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Validate indices</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for validateIndices {matrixStats}"><tr><td>validateIndices {matrixStats}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Validate indices</h2>
+
+<h3>Description</h3>
+
+<p>Computes validated positive indices from given indices.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+validateIndices(idxs = NULL, maxIdx, allowOutOfBound = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>idxs</code></td>
+<td>
+<p>A <code><a href="../../base/html/vector.html">vector</a></code> indicating subset of elements to
+operate over. If <code><a href="../../base/html/NULL.html">NULL</a></code>, no subsetting is done.</p>
+</td></tr>
+<tr valign="top"><td><code>maxIdx</code></td>
+<td>
+<p>The possible max index.</p>
+</td></tr>
+<tr valign="top"><td><code>allowOutOfBound</code></td>
+<td>
+<p>Allow positive out of bound to indicate
+<code><a href="../../base/html/NA.html">NA</a></code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Returns a validated integers list indicating the indices.
+If some of the indices cannot be represented as an integer, the
+indices are returned as doubles.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+idxs &lt;- validateIndices(c(-4, 0, -3, -1), 5)  # [2, 5]
+
+idxs &lt;- validateIndices(c(4, 4, 8, 2, 3), 8)  # [4, 4, 8, 2, 3]
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>matrixStats</em> version 0.62.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

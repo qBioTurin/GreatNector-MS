@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Compute coverage by transcript (or CDS) of a set of ranges</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for coverageByTranscript {GenomicFeatures}"><tr><td>coverageByTranscript {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Compute coverage by transcript (or CDS) of a set of ranges</h2>
+
+<h3>Description</h3>
+
+<p><code>coverageByTranscript</code> computes the transcript (or CDS) coverage
+of a set of ranges.
+</p>
+<p><code>pcoverageByTranscript</code> is a version of <code>coverageByTranscript</code>
+that operates element-wise.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+coverageByTranscript(x, transcripts, ignore.strand=FALSE)
+
+pcoverageByTranscript(x, transcripts, ignore.strand=FALSE, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>An object representing a set of ranges (typically aligned reads).
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a>, <a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a>,
+<a href="../../GenomicAlignments/html/GAlignments.html">GAlignments</a>,
+<a href="../../GenomicAlignments/html/GAlignmentPairs.html">GAlignmentPairs</a>, and
+<a href="../../GenomicAlignments/html/GAlignmentsList.html">GAlignmentsList</a> objects are supported.
+</p>
+<p>More generally, for <code>coverageByTranscript</code> <code>x</code> can be
+any object for which <code><a href="../../GenomeInfoDb/html/seqinfo.html">seqinfo</a>()</code> and
+<code><a href="../../GenomicRanges/html/coverage.html">coverage</a>()</code> are supported (e.g. a
+<a href="../../Rsamtools/html/BamFile.html">BamFile</a> object).
+Note that, for such objects, <code>coverage()</code> is expected to return an
+<a href="../../IRanges/html/RleList.html">RleList</a> object whose names are <code>seqlevels(x)</code>).
+</p>
+<p>More generally, for <code>pcoverageByTranscript</code> <code>x</code> can be
+any object for which <code><a href="../../GenomicRanges/html/grglist.html">grglist</a>()</code> is supported.
+It should have the length of <code>transcripts</code> or length 1. If the
+latter, it is recycled to the length of <code>transcripts</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>transcripts</code></td>
+<td>
+
+<p>A <a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> object representing the exons of
+each transcript for which to compute coverage. For each transcript, the
+exons must be ordered by <em>ascending rank</em>, that is, by their position
+in the transcript. This means that, for a transcript located on the minus
+strand, the exons should typically be ordered by descending position on
+the reference genome. If <code>transcripts</code> was obtained with
+<code><a href="transcriptsBy.html">exonsBy</a></code>, then the exons are guaranteed to be ordered by
+ascending rank. See <code>?<a href="transcriptsBy.html">exonsBy</a></code> for more information.
+</p>
+<p>Alternatively, <code>transcripts</code> can be a <a href="TxDb-class.html">TxDb</a> object, or any
+<a href="TxDb-class.html">TxDb</a>-like object that supports the <code><a href="transcriptsBy.html">exonsBy</a>()</code>
+extractor (e.g. an <a href="../../ensembldb/html/EnsDb.html">EnsDb</a> object). In this case it
+is replaced with the <a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> object returned
+by <code><a href="transcriptsBy.html">exonsBy</a>(transcripts, by="tx", use.names=TRUE)</code>.
+</p>
+<p>For <code>pcoverageByTranscript</code>, <code>transcripts</code> should have the
+length of <code>x</code> or length 1. If the latter, it is recycled to the
+length of <code>x</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ignore.strand</code></td>
+<td>
+
+<p>TRUE or FALSE. If FALSE (the default) then the strand of a range in
+<code>x</code> and exon in <code>transcripts</code> must be the same in order for
+the range to contribute coverage to the exon. If TRUE then the strand
+is ignored.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments passed to the internal call to
+<code><a href="../../GenomicRanges/html/grglist.html">grglist</a>()</code>.
+More precisely, when <code>x</code> is not a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a>
+or <a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> object,
+<code>pcoverageByTranscript</code> replace it with the
+<a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> object returned by
+<code><a href="../../GenomicRanges/html/grglist.html">grglist</a>(x, ...)</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>An <a href="../../IRanges/html/RleList.html">RleList</a> object <em>parallel</em> to <code>transcripts</code>,
+that is, the i-th element in it is an integer-<a href="../../S4Vectors/html/Rle.html">Rle</a>
+representing the coverage of the i-th transcript in <code>transcripts</code>.
+Its <code>lengths()</code> is guaranteed to be identical to
+<code>sum(width(transcripts))</code>. The names and metadata columns on
+<code>transcripts</code> are propagated to it.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Hervé Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="transcripts.html">transcripts</a></code>, <code><a href="transcriptsBy.html">transcriptsBy</a></code>,
+and <code><a href="transcriptsByOverlaps.html">transcriptsByOverlaps</a></code>, for extracting
+genomic feature locations from a <a href="TxDb-class.html">TxDb</a>-like object.
+</p>
+</li>
+<li> <p><code><a href="transcriptLengths.html">transcriptLengths</a></code> for extracting the transcript
+lengths (and other metrics) from a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+</li>
+<li> <p><code><a href="extractTranscriptSeqs.html">extractTranscriptSeqs</a></code> for extracting transcript
+(or CDS) sequences from chromosome sequences.
+</p>
+</li>
+<li><p> The <a href="../../IRanges/html/RleList.html">RleList</a> class defined and documented in the
+<span class="pkg">IRanges</span> package.
+</p>
+</li>
+<li><p> The <a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> class defined and documented
+in the <span class="pkg">GenomicRanges</span> package.
+</p>
+</li>
+<li><p> The <code><a href="../../GenomicRanges/html/coverage.html">coverage</a></code> methods defined in the
+<span class="pkg">GenomicRanges</span> package.
+</p>
+</li>
+<li><p> The <code><a href="transcriptsBy.html">exonsBy</a></code> function for extracting exon ranges
+grouped by transcript.
+</p>
+</li>
+<li> <p><code><a href="../../GenomicAlignments/html/findCompatibleOverlaps.html">findCompatibleOverlaps</a></code> in the
+<span class="pkg">GenomicAlignments</span> package for finding which reads are
+<em>compatible</em> with the splicing of which transcript.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## ---------------------------------------------------------------------
+## 1. A SIMPLE ARTIFICIAL EXAMPLE WITH ONLY ONE TRANSCRIPT
+## ---------------------------------------------------------------------
+
+## Get some transcripts:
+library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
+txdb &lt;- TxDb.Dmelanogaster.UCSC.dm3.ensGene
+dm3_transcripts &lt;- exonsBy(txdb, by="tx", use.names=TRUE)
+dm3_transcripts
+
+## Let's pick up the 1st transcript: FBtr0300689. It as 2 exons and 1
+## intron:
+my_transcript &lt;- dm3_transcripts["FBtr0300689"]
+
+## Let's create 3 artificial aligned reads. We represent them as a
+## GRanges object of length 3 that contains the genomic positions of
+## the 3 reads. Note that these reads are simple alignments i.e. each
+## of them can be represented with a single range. This would not be
+## the case if they were junction reads.
+my_reads &lt;- GRanges(c("chr2L:7531-7630",
+                      "chr2L:8101-8200",
+                      "chr2L:8141-8240"))
+
+## The coverage of the 3 reads on the reference genome is:
+coverage(my_reads)
+
+## As you can see, all the genomic positions in the 3 ranges participate
+## to the coverage. This can be confirmed by comparing:
+sum(coverage(my_reads))
+## with:
+sum(width(my_reads))
+## They should always be the same.
+
+## When computing the coverage on a transcript, only the part of the
+## read that overlaps with the transcript participates to the coverage.
+## Let's look at the individual coverage of each read on transcript
+## FBtr0300689:
+
+## The 1st read is fully contained within the 1st exon:
+coverageByTranscript(my_reads[1], my_transcript)
+
+## Note that the length of the Rle (1880) is the length of the transcript.
+
+## The 2nd and 3rd reads overlap the 2 exons and the intron. Only the
+## parts that overlap the exons participate to coverage:
+coverageByTranscript(my_reads[2], my_transcript)
+coverageByTranscript(my_reads[3], my_transcript)
+
+## The coverage of the 3 reads together is:
+coverageByTranscript(my_reads, my_transcript)
+
+## Note that this is the sum of the individual coverages. This can be
+## checked with:
+stopifnot(all(
+  coverageByTranscript(my_reads, my_transcript)
+  ==
+  Reduce("+", lapply(seq_along(my_reads),
+      function(i) coverageByTranscript(my_reads[i], my_transcript)), 0L)
+))
+
+## ---------------------------------------------------------------------
+## 2. COMPUTE THE FULL TRANSCRIPTOME COVERAGE OF A SET OF ALIGNED READS
+## ---------------------------------------------------------------------
+
+## Load the aligned reads:
+library(pasillaBamSubset)
+library(GenomicAlignments)
+reads &lt;- readGAlignments(untreated1_chr4())
+
+## Compute the full transcriptome coverage by calling
+## coverageByTranscript() on 'dm3_transcripts':
+tx_cvg &lt;- coverageByTranscript(reads, dm3_transcripts, ignore.strand=TRUE)
+tx_cvg
+
+## A sanity check:
+stopifnot(identical(lengths(tx_cvg), sum(width(dm3_transcripts))))
+
+## We can also use pcoverageByTranscript() to compute 'tx_cvg'.
+## For this we first create a GAlignmentsList object "parallel" to
+## 'dm3_transcripts' where the i-th list element contains the aligned
+## reads that overlap with the i-th transcript:
+hits &lt;- findOverlaps(reads, dm3_transcripts, ignore.strand=TRUE)
+tx2reads &lt;- setNames(as(t(hits), "List"), names(dm3_transcripts))
+reads_by_tx &lt;- extractList(reads, tx2reads)  # GAlignmentsList object
+reads_by_tx
+
+## Call pcoverageByTranscript():
+tx_cvg2 &lt;- pcoverageByTranscript(reads_by_tx, dm3_transcripts,
+                                 ignore.strand=TRUE)
+stopifnot(identical(tx_cvg, tx_cvg2))
+
+## A more meaningful coverage is obtained by counting for each
+## transcript only the reads that are *compatible* with its splicing:
+compat_hits &lt;- findCompatibleOverlaps(reads, dm3_transcripts)
+tx2reads &lt;- setNames(as(t(compat_hits), "List"), names(dm3_transcripts))
+compat_reads_by_tx &lt;- extractList(reads, tx2reads)
+
+tx_compat_cvg &lt;- pcoverageByTranscript(compat_reads_by_tx,
+                                       dm3_transcripts,
+                                       ignore.strand=TRUE)
+## A sanity check:
+stopifnot(all(all(tx_compat_cvg &lt;= tx_cvg)))
+
+## ---------------------------------------------------------------------
+## 3. COMPUTE CDS COVERAGE OF A SET OF ALIGNED READS
+## ---------------------------------------------------------------------
+
+## coverageByTranscript() can also be used to compute CDS coverage:
+cds &lt;- cdsBy(txdb, by="tx", use.names=TRUE)
+cds_cvg &lt;- coverageByTranscript(reads, cds, ignore.strand=TRUE)
+cds_cvg
+
+## A sanity check:
+stopifnot(identical(lengths(cds_cvg), sum(width(cds))))
+
+## ---------------------------------------------------------------------
+## 4. ALTERNATIVELY, THE CDS COVERAGE CAN BE OBTAINED FROM THE
+##    TRANSCRIPT COVERAGE BY TRIMMING THE 5' AND 3' UTRS
+## ---------------------------------------------------------------------
+
+tx_lens &lt;- transcriptLengths(txdb, with.utr5_len=TRUE, with.utr3_len=TRUE)
+stopifnot(identical(tx_lens$tx_name, names(tx_cvg)))  # sanity
+
+## Keep the rows in 'tx_lens' that correspond to a list element in
+## 'cds_cvg' and put them in the same order as in 'cds_cvg':
+m &lt;- match(names(cds_cvg), names(tx_cvg))
+tx_lens &lt;- tx_lens[m, ]
+utr5_width &lt;- tx_lens$utr5_len
+utr3_width &lt;- tx_lens$utr3_len
+cds_cvg2 &lt;- windows(tx_cvg[m], start=1L+utr5_width, end=-1L-utr3_width)
+
+## A sanity check:
+stopifnot(identical(cds_cvg2, cds_cvg))
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

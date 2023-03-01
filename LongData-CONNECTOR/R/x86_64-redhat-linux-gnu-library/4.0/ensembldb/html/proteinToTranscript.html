@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Map protein-relative coordinates to positions within the...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for proteinToTranscript {ensembldb}"><tr><td>proteinToTranscript {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Map protein-relative coordinates to positions within the transcript</h2>
+
+<h3>Description</h3>
+
+<p><code>proteinToTranscript</code> maps protein-relative coordinates to positions within
+the encoding transcript. Note that the returned positions are relative to
+the complete transcript length, which includes the 5' UTR.
+</p>
+<p>Similar to the <code><a href="proteinToGenome.html">proteinToGenome()</a></code> function, <code>proteinToTranscript</code> compares
+for each protein whether the length of its sequence matches the length of
+the encoding CDS and throws a warning if that is not the case. Incomplete
+3' or 5' CDS of the encoding transcript are the most common reasons for a
+mismatch between protein and transcript sequences.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+proteinToTranscript(x, db, id = "name", idType = "protein_id")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p><code>IRanges</code> with the coordinates within the protein(s). The
+object has also to provide some means to identify the protein (see
+details).</p>
+</td></tr>
+<tr valign="top"><td><code>db</code></td>
+<td>
+<p><code>EnsDb</code> object to be used to retrieve genomic coordinates of
+encoding transcripts.</p>
+</td></tr>
+<tr valign="top"><td><code>id</code></td>
+<td>
+<p><code>character(1)</code> specifying where the protein identifier can be
+found. Has to be either <code>"name"</code> or one of <code>colnames(mcols(prng))</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>idType</code></td>
+<td>
+<p><code>character(1)</code> defining what type of IDs are provided. Has to
+be one of <code>"protein_id"</code> (default), <code>"uniprot_id"</code> or <code>"tx_id"</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
+be passed to the function as <code>names</code> of the <code>x</code> <code>IRanges</code> object, or
+alternatively in any one of the metadata columns (<code>mcols</code>) of <code>x</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>IRangesList</code>, each element being the mapping results for one of the input
+ranges in <code>x</code>. Each element is a <code>IRanges</code> object with the positions within
+the encoding transcript (relative to the start of the transcript, which
+includes the 5' UTR). The transcript ID is reported as the name of each
+<code>IRanges</code>. The <code>IRanges</code> can be of length &gt; 1 if the provided
+protein identifier is annotated to more than one Ensembl protein ID (which
+can be the case if Uniprot IDs are provided). If the coordinates can not be
+mapped (because the protein identifier is unknown to the database) an
+<code>IRanges</code> with negative coordinates is returned.
+</p>
+<p>The following metadata columns are available in each <code>IRanges</code> in the result:
+</p>
+
+<ul>
+<li> <p><code>"protein_id"</code>: the ID of the Ensembl protein for which the within-protein
+coordinates were mapped to the genome.
+</p>
+</li>
+<li> <p><code>"tx_id"</code>: the Ensembl transcript ID of the encoding transcript.
+</p>
+</li>
+<li> <p><code>"cds_ok"</code>: contains <code>TRUE</code> if the length of the CDS matches the length
+of the amino acid sequence and <code>FALSE</code> otherwise.
+</p>
+</li>
+<li> <p><code>"protein_start"</code>: the within-protein sequence start coordinate of the
+mapping.
+</p>
+</li>
+<li> <p><code>"protein_end"</code>: the within-protein sequence end coordinate of the mapping.
+</p>
+</li></ul>
+
+
+
+<h3>Note</h3>
+
+<p>While mapping of Ensembl protein IDs to Ensembl transcript IDs is 1:1, a
+single Uniprot identifier can be annotated to several Ensembl protein IDs.
+<code>proteinToTranscript</code> calculates in such cases transcript-relative
+coordinates for each annotated Ensembl protein.
+</p>
+<p>Mapping using Uniprot identifiers needs also additional internal checks that
+can have a significant impact on the performance of the function. It is thus
+strongly suggested to first identify the Ensembl protein identifiers for the
+list of input Uniprot identifiers (e.g. using the <code><a href="ProteinFunctionality.html">proteins()</a></code> function and
+use these as input for the mapping function.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other coordinate mapping functions: 
+<code><a href="cdsToTranscript.html">cdsToTranscript</a>()</code>,
+<code><a href="genomeToProtein.html">genomeToProtein</a>()</code>,
+<code><a href="genomeToTranscript.html">genomeToTranscript</a>()</code>,
+<code><a href="proteinToGenome.html">proteinToGenome</a>()</code>,
+<code><a href="transcriptToCds.html">transcriptToCds</a>()</code>,
+<code><a href="transcriptToGenome.html">transcriptToGenome</a>()</code>,
+<code><a href="transcriptToProtein.html">transcriptToProtein</a>()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(EnsDb.Hsapiens.v86)
+## Restrict all further queries to chromosome x to speed up the examples
+edbx &lt;- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
+
+## Define an IRange with protein-relative coordinates within a protein for
+## the gene SYP
+syp &lt;- IRanges(start = 4, end = 17)
+names(syp) &lt;- "ENSP00000418169"
+res &lt;- proteinToTranscript(syp, edbx)
+res
+## Positions 4 to 17 within the protein span are encoded by the region
+## from nt 23 to 64.
+
+## Perform the mapping for multiple proteins identified by their Uniprot
+## IDs.
+ids &lt;- c("O15266", "Q9HBJ8", "unexistant")
+prngs &lt;- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
+names(prngs) &lt;- ids
+
+res &lt;- proteinToTranscript(prngs, edbx, idType = "uniprot_id")
+
+## The result is a list, same length as the input object
+length(res)
+names(res)
+
+## No protein/encoding transcript could be found for the last one
+res[[3]]
+
+## The first protein could be mapped to multiple Ensembl proteins. The
+## region within all transcripts encoding the region in the protein are
+## returned
+res[[1]]
+
+## The result for the region within the second protein
+res[[2]]
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

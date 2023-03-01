@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: XtraSNPlocs objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for XtraSNPlocs-class {BSgenome}"><tr><td>XtraSNPlocs-class {BSgenome}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>XtraSNPlocs objects</h2>
+
+<h3>Description</h3>
+
+<p>The XtraSNPlocs class is a container for storing extra SNP locations and
+alleles for a given organism. 
+While a <a href="SNPlocs-class.html">SNPlocs</a> object can store only molecular variations of class
+<em>snp</em>, an XtraSNPlocs object contains molecular variations of other
+classes (<em>in-del</em>, <em>heterozygous</em>, <em>microsatellite</em>,
+<em>named-locus</em>, <em>no-variation</em>, <em>mixed</em>,
+<em>multinucleotide-polymorphism</em>).
+</p>
+<p>XtraSNPlocs objects are usually made in advance by a volunteer and made
+available to the Bioconductor community as <em>XtraSNPlocs data packages</em>.
+See <code>?<a href="injectSNPs.html">available.SNPs</a></code> for how to get the list of
+<em><a href="SNPlocs-class.html">SNPlocs</a> and XtraSNPlocs data packages</em> curently available.
+</p>
+<p>The main focus of this man page is on how to extract SNPs from an
+XtraSNPlocs object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'XtraSNPlocs'
+snpcount(x)
+
+## S4 method for signature 'XtraSNPlocs'
+snpsBySeqname(x, seqnames,
+        columns=c("seqnames", "start", "end", "strand", "RefSNP_id"),
+        drop.rs.prefix=FALSE, as.DataFrame=FALSE)
+
+## S4 method for signature 'XtraSNPlocs'
+snpsByOverlaps(x, ranges,
+        columns=c("seqnames", "start", "end", "strand", "RefSNP_id"),
+        drop.rs.prefix=FALSE, as.DataFrame=FALSE, ...)
+
+## S4 method for signature 'XtraSNPlocs'
+snpsById(x, ids,
+        columns=c("seqnames", "start", "end", "strand", "RefSNP_id"),
+        ifnotfound=c("error", "warning", "drop"), as.DataFrame=FALSE)
+
+## S4 method for signature 'XtraSNPlocs'
+colnames(x, do.NULL=TRUE, prefix="col")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>An XtraSNPlocs object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>seqnames</code></td>
+<td>
+
+<p>The names of the sequences for which to get SNPs. NAs and duplicates
+are not allowed. The supplied <code>seqnames</code> must be a subset of
+<code>seqlevels(x)</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+
+<p>The names of the columns to return. Valid column names are:
+<code>seqnames</code>, <code>start</code>, <code>end</code>, <code>width</code>, <code>strand</code>,
+<code>RefSNP_id</code>, <code>alleles</code>, <code>snpClass</code>, <code>loctype</code>.
+See Details section below for a description of these columns.
+</p>
+</td></tr>
+<tr valign="top"><td><code>drop.rs.prefix</code></td>
+<td>
+
+<p>Should the <code>rs</code> prefix be dropped from the returned RefSNP ids?
+(RefSNP ids are stored in the <code>RefSNP_id</code> metadata column of the
+returned object.)
+</p>
+</td></tr>
+<tr valign="top"><td><code>as.DataFrame</code></td>
+<td>
+
+<p>Should the result be returned in a <a href="../../S4Vectors/html/DataFrame.html">DataFrame</a> instead
+of a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object?
+</p>
+</td></tr>
+<tr valign="top"><td><code>ranges</code></td>
+<td>
+
+<p>One or more regions of interest specified as a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a>
+object. A single region of interest can be specified as a character string
+of the form <code>"ch14:5201-5300"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments, for use in specific methods.
+</p>
+<p>Arguments passed to the <code>snpsByOverlaps</code> method for XtraSNPlocs
+objects thru <code>...</code> are used internally in the call to
+<code><a href="../../IRanges/html/subsetByOverlaps.html">subsetByOverlaps</a>()</code>.
+See <code>?IRanges::<a href="../../IRanges/html/subsetByOverlaps.html">subsetByOverlaps</a></code> in the <span class="pkg">IRanges</span>
+package and <code>?GenomicRanges::<a href="../../GenomicRanges/html/subsetByOverlaps.html">subsetByOverlaps</a></code>
+in the <span class="pkg">GenomicRanges</span> package for more information about the
+<code>subsetByOverlaps()</code> generic and its method for
+<a href="../../GenomicRanges/html/GenomicRanges.html">GenomicRanges</a> objects.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ids</code></td>
+<td>
+
+<p>The RefSNP ids to look up (a.k.a. <em>rs ids</em>). Can be integer or
+character vector, with or without the <code>"rs"</code> prefix. NAs are not
+allowed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ifnotfound</code></td>
+<td>
+
+<p>What to do if SNP ids are not found.
+</p>
+</td></tr>
+<tr valign="top"><td><code>do.NULL, prefix</code></td>
+<td>
+
+<p>These arguments are ignored.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code>snpcount</code> returns a named integer vector containing the number
+of SNPs for each chromosome in the reference genome.
+</p>
+<p><code>snpsBySeqname</code> and <code>snpsById</code> both return a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object with 1 element per SNP,
+unless <code>as.DataFrame</code> is set to <code>TRUE</code> in which case they
+return a <a href="../../S4Vectors/html/DataFrame.html">DataFrame</a> with 1 row per SNP.
+When a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object is returned, the columns
+requested via the <code>columns</code> argument are stored as metada columns
+of the object, except for the following columns: <code>seqnames</code>,
+<code>start</code>, <code>end</code>, <code>width</code>, and <code>strand</code>.
+These &quot;spatial columns&quot; (in the sense that they describe the genomic
+locations of the SNPs) can be accessed by calling the corresponding
+getter on the <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+<p>Summary of available columns (<code>my_snps</code> being the returned object):
+</p>
+
+<ul>
+<li> <p><code>seqnames</code>: The name of the chromosome where each SNP is
+located. Access with <code>seqnames(my_snps)</code> when <code>my_snps</code>
+is a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>start</code> and <code>end</code>: The starting and ending coordinates of
+each SNP with respect to the chromosome indicated in <code>seqnames</code>.
+Coordinated are 1-based and with respect to the 5' end of the plus
+strand of the chromosome in the reference genome.
+Access with <code>start(my_snps)</code>, <code>end(my_snps)</code>,
+or <code>ranges(my_snps)</code> when <code>my_snps</code> is a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>width</code>: The number of nucleotides spanned by each SNP
+<em>on the reference genome</em> (e.g. a width of 0 means the SNP
+is an insertion). Access with <code>width( my_snps)</code> when
+<code>my_snps</code> is a <a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>strand</code>: The strand that the alleles of each SNP was reported
+to. Access with <code>strand(my_snps)</code> when <code>my_snps</code> is a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>RefSNP_id</code>: The RefSNP id (a.k.a. <em>rs id</em>) of each SNP.
+Access with <code>mcols(my_snps)$RefSNP_id</code> when <code>my_snps</code> is a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>alleles</code>: The alleles of each SNP in the format used by dbSNP.
+Access with <code>mcols(my_snps)$alleles</code> when <code>my_snps</code> is a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>snpClass</code>: Class of each SNP. Possible values are
+<code>in-del</code>, <code>heterozygous</code>, <code>microsatellite</code>,
+<code>named-locus</code>, <code>no-variation</code>, <code>mixed</code>, and
+<code>multinucleotide-polymorphism</code>.
+Access with <code>mcols(my_snps)$snpClass</code> when <code>my_snps</code> is a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li> <p><code>loctype</code>: See <a href="ftp://ftp.ncbi.nih.gov/snp/00readme.txt">ftp://ftp.ncbi.nih.gov/snp/00readme.txt</a>
+for the 6 loctype codes used by dbSNP, and their meanings.
+WARNING: The code assigned to each SNP doesn't seem to be reliable.
+For example, loctype codes 1 and 3 officially stand for insertion
+and deletion, respectively. However, when looking at the SNP ranges
+it actually seems to be the other way around.
+Access with <code>mcols(my_snps)$loctype</code> when <code>my_snps</code> is a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li></ul>
+
+<p><code>colnames(x)</code> returns the names of the available columns.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>H. Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="injectSNPs.html">available.SNPs</a></code>
+</p>
+</li>
+<li> <p><a href="../../GenomicRanges/html/GRanges.html">GRanges</a> objects in the <span class="pkg">GenomicRanges</span>
+package.
+</p>
+</li>
+<li> <p><a href="SNPlocs-class.html">SNPlocs</a> packages and objects for molecular variations
+of class <em>snp</em>.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+library(XtraSNPlocs.Hsapiens.dbSNP144.GRCh38)
+snps &lt;- XtraSNPlocs.Hsapiens.dbSNP144.GRCh38
+snpcount(snps)
+colnames(snps)
+
+## ---------------------------------------------------------------------
+## snpsBySeqname()
+## ---------------------------------------------------------------------
+
+## Get the location, RefSNP id, and alleles for all "extra SNPs"
+## located on chromosome 22 or MT:
+snpsBySeqname(snps, c("ch22", "chMT"), columns=c("RefSNP_id", "alleles"))
+
+## ---------------------------------------------------------------------
+## snpsByOverlaps()
+## ---------------------------------------------------------------------
+
+## Get the location, RefSNP id, and alleles for all "extra SNPs"
+## overlapping some regions of interest:
+snpsByOverlaps(snps, "ch22:33.63e6-33.64e6",
+               columns=c("RefSNP_id", "alleles"))
+
+## With the regions of interest being all the known CDS for hg38
+## (except for the chromosome naming convention, hg38 is the same
+## as GRCh38):
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb &lt;- TxDb.Hsapiens.UCSC.hg38.knownGene
+hg38_cds &lt;- cds(txdb)
+seqlevelsStyle(hg38_cds)  # UCSC
+seqlevelsStyle(snps)      # dbSNP
+seqlevelsStyle(hg38_cds) &lt;- seqlevelsStyle(snps)
+genome(hg38_cds) &lt;- genome(snps)
+snpsByOverlaps(snps, hg38_cds, columns=c("RefSNP_id", "alleles"))
+
+## ---------------------------------------------------------------------
+## snpsById()
+## ---------------------------------------------------------------------
+
+## Get the location and alleles for some RefSNP ids:
+my_rsids &lt;- c("rs367617508", "rs398104919", "rs3831697", "rs372470289",
+              "rs141568169", "rs34628976", "rs67551854")
+snpsById(snps, my_rsids, c("RefSNP_id", "alleles"))
+
+## See ?XtraSNPlocs.Hsapiens.dbSNP144.GRCh38 for more examples of using
+## snpsBySeqname() and snpsById().
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>BSgenome</em> version 1.58.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Support for other than Ensembl seqlevel style</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for seqlevelsStyle {ensembldb}"><tr><td>seqlevelsStyle {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Support for other than Ensembl seqlevel style</h2>
+
+<h3>Description</h3>
+
+<p>The methods and functions on this help page allow to integrate
+<code>EnsDb</code> objects and the annotations they provide with other
+Bioconductor annotation packages that base on chromosome names
+(seqlevels) that are different from those defined by Ensembl.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+## S4 method for signature 'EnsDb'
+seqlevelsStyle(x)
+
+## S4 replacement method for signature 'EnsDb'
+seqlevelsStyle(x) &lt;- value
+
+## S4 method for signature 'EnsDb'
+supportedSeqlevelsStyles(x)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<p>(In alphabetic order)
+</p>
+<table summary="R argblock">
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>For <code>seqlevelsStyle&lt;-</code>: a character string specifying the
+seqlevels style that should be set. Use the
+<code>supportedSeqlevelsStyle</code> to list all available and supported
+seqlevel styles.
+</p>
+</td></tr>
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>An <code>EnsDb</code> instance.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>For <code>seqlevelsStyle</code>: see method description above.
+</p>
+<p>For <code>supportedSeqlevelsStyles</code>: see method description above.
+</p>
+
+
+<h3>Methods and Functions</h3>
+
+
+<dl>
+<dt>seqlevelsStyle</dt><dd>
+<p>Get the style of the seqlevels in which results returned from the
+<code>EnsDb</code> object are encoded. By default, and internally,
+seqnames as provided by Ensembl are used.
+</p>
+<p>The method returns a character string specifying the currently used
+seqlevelstyle.
+</p>
+</dd>
+<dt>seqlevelsStyle&lt;-</dt><dd>
+<p>Change the style of the seqlevels in which results returned from
+the <code>EnsDb</code> object are encoded. Changing the seqlevels helps
+integrating annotations from <code>EnsDb</code> objects e.g. with
+annotations from packages that base on UCSC annotations.
+</p>
+</dd>
+<dt>supportedSeqlevelsStyles</dt><dd>
+<p>Lists all seqlevel styles for which mappings between seqlevel
+styles are available in the <code>GenomeInfoDb</code> package.
+</p>
+<p>The method returns a character vector with supported seqlevel
+styles for the organism of the <code>EnsDb</code> object.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Note</h3>
+
+<p>The mapping between different seqname styles is performed based on
+data provided by the <code>GenomeInfoDb</code> package. Note that in most
+instances no mapping is provided for seqnames other than for primary
+chromosomes. By default functions from the <code>ensembldb</code> package
+return the <em>original</em> seqname is in such cases. This behaviour
+can be changed with the <code>ensembldb.seqnameNotFound</code> global
+option. For the special keyword <code>"ORIGINAL"</code> (the default), the
+original seqnames are returned, for <code>"MISSING"</code> an error is
+thrown if a seqname can not be mapped. In all other cases, the value
+of the option is returned as seqname if no mapping is available
+(e.g. setting <code>options(ensembldb.seqnameNotFound=NA)</code> returns an
+<code>NA</code> if the seqname is not mappable).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="EnsDb-class.html">EnsDb</a></code>
+<code><a href="EnsDb-exonsBy.html">transcripts</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(EnsDb.Hsapiens.v86)
+edb &lt;- EnsDb.Hsapiens.v86
+
+## Get the internal, default seqlevel style.
+seqlevelsStyle(edb)
+
+## Get the seqlevels from the database.
+seqlevels(edb)
+
+## Get all supported mappings for the organism of the EnsDb.
+supportedSeqlevelsStyles(edb)
+
+## Change the seqlevels to UCSC style.
+seqlevelsStyle(edb) &lt;- "UCSC"
+seqlevels(edb)
+
+## Change the option ensembldb.seqnameNotFound to return NA in case
+## the seqname can not be mapped form Ensembl to UCSC.
+options(ensembldb.seqnameNotFound = NA)
+
+seqlevels(edb)
+
+## Restoring the original setting.
+options(ensembldb.seqnameNotFound = "ORIGINAL")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

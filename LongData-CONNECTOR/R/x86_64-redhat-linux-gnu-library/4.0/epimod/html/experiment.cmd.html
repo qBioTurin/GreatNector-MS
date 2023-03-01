@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generate the command template to configure and run a...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for experiment.cmd {epimod}"><tr><td>experiment.cmd {epimod}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generate the command template to configure and run a simulation</h2>
+
+<h3>Description</h3>
+
+<p>Function generating the command line used to run the solver with the appropriate configuration
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+experiment.cmd(
+  solver_fname,
+  solver_type = "LSODA",
+  taueps = 0.01,
+  seed,
+  timeout
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>solver_fname, </code></td>
+<td>
+<p>the solver executable file</p>
+</td></tr>
+<tr valign="top"><td><code>solver_type, </code></td>
+<td>
+<p>the type of solver (LSODA, HLSODA, ..)</p>
+</td></tr>
+<tr valign="top"><td><code>taueps, </code></td>
+<td>
+<p>controls the time step for tau-leap algorithm</p>
+</td></tr>
+<tr valign="top"><td><code>timeout, </code></td>
+<td>
+<p>available time to run n_run simulations (See TIMEOUT(1) to check the syntax)</p>
+</td></tr>
+<tr valign="top"><td><code>event_times, </code></td>
+<td>
+<p>times at which the marking is updated through the event_function</p>
+</td></tr>
+<tr valign="top"><td><code>event_function, </code></td>
+<td>
+<p>specifies the rule to update the marking</p>
+</td></tr>
+<tr valign="top"><td><code>out_fname, </code></td>
+<td>
+<p>output filename prefix</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>a string
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Paolo Castagno, Simone Pernice
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+experiment.cmd(id=1, solver_fname="Solver.solver", s_time=365, f_time=730, timeout="1d", out_fname="simulation")
+
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>epimod</em> version 1.0.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

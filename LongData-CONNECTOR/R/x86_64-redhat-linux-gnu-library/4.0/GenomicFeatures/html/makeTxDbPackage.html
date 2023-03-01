@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Making a TxDb package from annotations available at the UCSC...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for makeTxDbPackage {GenomicFeatures}"><tr><td>makeTxDbPackage {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Making a TxDb package from annotations available at the
+UCSC Genome Browser, biomaRt or from another source.
+</h2>
+
+<h3>Description</h3>
+
+<p>A <a href="TxDb-class.html">TxDb</a> package is an annotation package containing a
+<a href="TxDb-class.html">TxDb</a> object.
+</p>
+<p>The <code>makeTxDbPackageFromUCSC</code> function allows the user
+to make a <a href="TxDb-class.html">TxDb</a> package from transcript annotations
+available at the UCSC Genome Browser.
+</p>
+<p>The <code>makeTxDbPackageFromBiomart</code> function allows the user
+to do the same thing as <code>makeTxDbPackageFromUCSC</code> except that the
+annotations originate from biomaRt.
+</p>
+<p>Finally, the <code>makeTxDbPackage</code> function allows the user to make a
+<a href="TxDb-class.html">TxDb</a> package directly from a <a href="TxDb-class.html">TxDb</a> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+makeTxDbPackageFromUCSC(
+    version=,
+    maintainer,
+    author,
+    destDir=".",
+    license="Artistic-2.0",
+    genome="hg19",
+    tablename="knownGene",
+    transcript_ids=NULL,
+    circ_seqs=NULL,
+    url="http://genome.ucsc.edu/cgi-bin/",
+    goldenPath.url=getOption("UCSC.goldenPath.url"),
+    taxonomyId=NA,
+    miRBaseBuild=NA)
+
+makeFDbPackageFromUCSC(
+    version,
+    maintainer,
+    author,
+    destDir=".",
+    license="Artistic-2.0",
+    genome="hg19",
+    track="tRNAs",
+    tablename="tRNAs",
+    columns = UCSCFeatureDbTableSchema(genome, track, tablename),
+    url="http://genome.ucsc.edu/cgi-bin/",
+    goldenPath.url=getOption("UCSC.goldenPath.url"),
+    chromCol=NULL,
+    chromStartCol=NULL,
+    chromEndCol=NULL,
+    taxonomyId=NA)
+
+makeTxDbPackageFromBiomart(
+    version,
+    maintainer,
+    author,
+    destDir=".",
+    license="Artistic-2.0",
+    biomart="ENSEMBL_MART_ENSEMBL",
+    dataset="hsapiens_gene_ensembl",
+    transcript_ids=NULL,
+    circ_seqs=NULL,
+    filter=NULL,
+    id_prefix="ensembl_",
+    host="www.ensembl.org",
+    port=80,
+    taxonomyId=NA,
+    miRBaseBuild=NA)
+
+makeTxDbPackage(txdb,
+                version,
+                maintainer,
+                author,
+                destDir=".",
+                license="Artistic-2.0",
+                pkgname=NULL,
+                provider=NULL,
+                providerVersion=NULL)
+
+supportedMiRBaseBuildValues()
+
+makePackageName(txdb)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>version</code></td>
+<td>
+<p>What is the version number for this package?</p>
+</td></tr>
+<tr valign="top"><td><code>maintainer</code></td>
+<td>
+<p>Who is the package maintainer? (must include email
+to be valid). Should be a <code><a href="../../utils/html/person.html">person</a></code> object, or something
+coercible to one, like a string. May be omitted if the <code>author</code>
+argument is a <code>person</code> containing someone with the maintainer role.</p>
+</td></tr>
+<tr valign="top"><td><code>author</code></td>
+<td>
+<p>Who is the creator of this package? Should be
+a <code><a href="../../utils/html/person.html">person</a></code> object, or something coercible to one, like a
+character vector of names. The <code>maintainer</code> argument will be
+merged into this list.</p>
+</td></tr>
+<tr valign="top"><td><code>destDir</code></td>
+<td>
+<p>A path where the package source should be assembled.</p>
+</td></tr>
+<tr valign="top"><td><code>license</code></td>
+<td>
+<p>What is the license (and it's version)</p>
+</td></tr>
+<tr valign="top"><td><code>biomart</code></td>
+<td>
+<p>which BioMart database to use.
+Get the list of all available BioMart databases with the
+<code><a href="../../biomaRt/html/listMarts.html">listMarts</a></code> function from the biomaRt
+package. See the details section below for a list of BioMart
+databases with compatible transcript annotations.</p>
+</td></tr>
+<tr valign="top"><td><code>dataset</code></td>
+<td>
+<p>which dataset from BioMart. For example:
+<code>"hsapiens_gene_ensembl"</code>, <code>"mmusculus_gene_ensembl"</code>,
+<code>"dmelanogaster_gene_ensembl"</code>, <code>"celegans_gene_ensembl"</code>,
+<code>"scerevisiae_gene_ensembl"</code>, etc in the ensembl database.
+See the examples section below for how to discover which datasets
+are available in a given BioMart database.</p>
+</td></tr>
+<tr valign="top"><td><code>genome</code></td>
+<td>
+<p>genome abbreviation used by UCSC and obtained by
+<code><a href="../../rtracklayer/html/ucscGenomes.html">ucscGenomes</a>()[ , "db"]</code>.
+For example: <code>"hg18"</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>track</code></td>
+<td>
+<p>name of the UCSC track.  Use
+<code>supportedUCSCFeatureDbTracks</code> to get the list of available
+tracks for a particular genome</p>
+</td></tr>
+<tr valign="top"><td><code>tablename</code></td>
+<td>
+<p>name of the UCSC table containing the transcript
+annotations to retrieve. Use the <code><a href="makeTxDbFromUCSC.html">supportedUCSCtables</a></code>
+utility function to get the list of tables known to work with
+<code>makeTxDbFromUCSC</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>transcript_ids</code></td>
+<td>
+<p>optionally, only retrieve transcript
+annotation data for the specified set of transcript ids.
+If this is used, then the meta information displayed for the
+resulting <a href="TxDb-class.html">TxDb</a> object will say 'Full dataset: no'.
+Otherwise it will say 'Full dataset: yes'.</p>
+</td></tr>
+<tr valign="top"><td><code>circ_seqs</code></td>
+<td>
+<p>a character vector to list out which chromosomes
+should be marked as circular.</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+<p>Additional filters to use in the BioMart query. Must be
+a named list. An example is <code>filter=as.list(c(source="entrez"))</code></p>
+</td></tr>
+<tr valign="top"><td><code>host</code></td>
+<td>
+<p>The host URL of the BioMart. Defaults to www.ensembl.org.</p>
+</td></tr>
+<tr valign="top"><td><code>port</code></td>
+<td>
+<p>The port to use in the HTTP communication with the host.</p>
+</td></tr>
+<tr valign="top"><td><code>id_prefix</code></td>
+<td>
+<p>Specifies the prefix used in BioMart attributes. For
+example, some BioMarts may have an attribute specified as
+<code>"ensembl_transcript_id"</code> whereas others have the same attribute
+specified as <code>"transcript_id"</code>. Defaults to <code>"ensembl_"</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>a named character vector to list out the names and
+types of the other columns that the downloaded track should
+have.  Use <code>UCSCFeatureDbTableSchema</code> to retrieve this
+information for a particular table.</p>
+</td></tr>
+<tr valign="top"><td><code>url,goldenPath.url</code></td>
+<td>
+<p>use to specify the location of an
+alternate UCSC Genome Browser.</p>
+</td></tr>
+<tr valign="top"><td><code>chromCol</code></td>
+<td>
+<p>If the schema comes back and the 'chrom' column has been
+labeled something other than 'chrom', use this argument to indicate
+what that column has been labeled as so we can properly designate it.
+This could happen (for example) with the knownGene track tables, which
+has no 'chromStart' or 'chromEnd' columns, but which DOES have columns
+that could reasonably substitute for these columns under particular
+circumstances.  Therefore we allow these three columns to have arguments
+so that their definition can be re-specified</p>
+</td></tr>
+<tr valign="top"><td><code>chromStartCol</code></td>
+<td>
+<p>Same thing as chromCol, but for renames of 'chromStart'</p>
+</td></tr>
+<tr valign="top"><td><code>chromEndCol</code></td>
+<td>
+<p>Same thing as chromCol, but for renames of 'chromEnd'</p>
+</td></tr>
+<tr valign="top"><td><code>txdb</code></td>
+<td>
+<p>A <a href="TxDb-class.html">TxDb</a> object that represents a handle to a
+transcript database. This object type is what is returned by
+<code>makeTxDbFromUCSC</code>, <code>makeTxDbFromUCSC</code> or
+<code>makeTxDb</code></p>
+</td></tr>
+<tr valign="top"><td><code>taxonomyId</code></td>
+<td>
+<p>By default this value is NA and the organism
+provided (or inferred) will be used to look up the correct value for
+this.  But you can use this argument to override that and supply
+your own valid taxId here</p>
+</td></tr>
+<tr valign="top"><td><code>miRBaseBuild</code></td>
+<td>
+<p>specify the string for the appropriate build
+Information from mirbase.db to use for microRNAs.  This can be
+learned by calling <code>supportedMiRBaseBuildValues</code>.  By default,
+this value will be set to <code>NA</code>, which will inactivate the
+<code>microRNAs</code> accessor.</p>
+</td></tr>
+<tr valign="top"><td><code>pkgname</code></td>
+<td>
+<p>By default this value is NULL and does not need to be
+filled in (a package name will be generated for you).  But if you
+override this value, then the package and it's object will be
+instead named after this value.  Be aware that the standard rules
+for package names will apply, (so don't include spaces,
+underscores or dashes)</p>
+</td></tr>
+<tr valign="top"><td><code>provider</code></td>
+<td>
+<p>If not given, a default is taken from the
+'Data source' field of the metadata table.</p>
+</td></tr>
+<tr valign="top"><td><code>providerVersion</code></td>
+<td>
+<p>If not given, a default is taken from one of
+'UCSC table', 'BioMart version' or 'Data source' fields of the
+metadata table.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>makeTxDbPackageFromUCSC</code> is a convenience function that calls
+both the <code><a href="makeTxDbFromUCSC.html">makeTxDbFromUCSC</a></code> and the
+<code><a href="makeTxDbPackage.html">makeTxDbPackage</a></code> functions.  The
+<code>makeTxDbPackageFromBiomart</code> follows a similar pattern and
+calls the <code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code> and
+<code><a href="makeTxDbPackage.html">makeTxDbPackage</a></code> functions.
+<code>supportedMiRBaseBuildValues</code> is a convenience function that will
+list all the possible values for the miRBaseBuild argument.
+<code>makePackageName</code> creates a package name from a TxDb object.
+This function is also used by OrganismDbi.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <a href="TxDb-class.html">TxDb</a> object.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>M. Carlson
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="makeTxDbFromUCSC.html">makeTxDbFromUCSC</a></code>,
+<code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code>,
+<code><a href="makeTxDb.html">makeTxDb</a></code>,
+<code><a href="../../rtracklayer/html/ucscGenomes.html">ucscGenomes</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## First consider relevant helper/discovery functions:
+## Get the list of tables known to work with makeTxDbPackageFromUCSC():
+supportedUCSCtables(genome="hg19")
+
+## Can also list all the possible values for the miRBaseBuild argument:
+supportedMiRBaseBuildValues()
+
+## Next are examples of actually building a package:
+## Not run: 
+## Makes a transcript package for Yeast from the ensGene table at UCSC:
+makeTxDbPackageFromUCSC(version="0.01",
+                        maintainer="Some One &lt;so@someplace.org&gt;",
+                        author="Some One &lt;so@someplace.com&gt;",
+                        genome="sacCer2",
+                        tablename="ensGene")
+
+## Makes a transcript package from Human by using biomaRt and limited to a
+## small subset of the transcripts.
+transcript_ids &lt;- c(
+    "ENST00000400839",
+    "ENST00000400840",
+    "ENST00000478783",
+    "ENST00000435657",
+    "ENST00000268655",
+    "ENST00000313243",
+    "ENST00000341724")
+
+makeTxDbPackageFromBiomart(version="0.01",
+                           maintainer="Some One &lt;so@someplace.org&gt;",
+                           author="Some One &lt;so@someplace.com&gt;",
+                           transcript_ids=transcript_ids)
+
+
+## End(Not run)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

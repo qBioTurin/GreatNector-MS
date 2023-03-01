@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Coerce to file format structures</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for as-format-methods {GenomicFeatures}"><tr><td>as-format-methods {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Coerce to file format structures</h2>
+
+<h3>Description</h3>
+
+<p>These functions coerce a <code><a href="TxDb-class.html">TxDb</a></code> object to a
+<code><a href="../../GenomicRanges/html/GRanges-class.html">GRanges</a></code> object with
+metadata columns encoding transcript structures according to the
+model of a standard file format. Currently, BED and GFF models are
+supported. If a <code>TxDb</code> is passed to
+<code><a href="../../rtracklayer/html/export.html">export</a></code>, when targeting a BED or GFF file,
+this coercion occurs automatically.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'TxDb'
+asBED(x)
+## S4 method for signature 'TxDb'
+asGFF(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>A <code>TxDb</code> object to coerce to a <code>GRanges</code>,
+structured as BED or GFF.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>For <code>asBED</code>, a <code>GRanges</code>, with the columns <code>name</code>,
+<code>thickStart</code>, <code>thickEnd</code>, <code>blockStarts</code>,
+<code>blockSizes</code> added. The thick regions correspond to the CDS
+regions, and the blocks represent the exons. The transcript IDs are
+stored in the <code>name</code> column. The ranges are the transcript bounds.
+</p>
+<p>For <code>asGFF</code>, a <code>GRanges</code>, with columns <code>type</code>,
+<code>Name</code>, <code>ID</code>,, and <code>Parent</code>. The gene structures are
+expressed according to the conventions defined by the GFF3 spec. There
+are elements of each <code>type</code> of feature: &ldquo;gene&rdquo;,
+&ldquo;mRNA&rdquo; &ldquo;exon&rdquo; and &ldquo;cds&rdquo;. The <code>Name</code> column
+contains the <code>gene_id</code> for genes, <code>tx_name</code> for transcripts,
+and exons and cds regions are <code>NA</code>. The <code>ID</code> column uses
+<code>gene_id</code> and <code>tx_id</code>, with the prefixes &ldquo;GeneID&rdquo; and
+&ldquo;TxID&rdquo; to ensure uniqueness across types. The exons and cds
+regions have <code>NA</code> for <code>ID</code>. The <code>Parent</code> column
+contains the <code>ID</code>s of the parent features. A feature may have
+multiple parents (the column is a <code>CharacterList</code>). Each exon
+belongs to one or more mRNAs, and mRNAs belong to a gene.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Michael Lawrence
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  txdb_file &lt;- system.file("extdata", "hg19_knownGene_sample.sqlite",
+                           package="GenomicFeatures")
+  txdb &lt;- loadDb(txdb_file)
+
+  asBED(txdb)
+  asGFF(txdb)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

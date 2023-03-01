@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: The t-SNE method for dimensionality reduction</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for tsne {tsne}"><tr><td>tsne {tsne}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+The t-SNE method for dimensionality reduction
+</h2>
+
+<h3>Description</h3>
+
+<p>Provides a simple function interface for specifying t-SNE dimensionality reduction on R matrices or &quot;dist&quot; objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+tsne(X, initial_config = NULL, k = 2, initial_dims = 30, perplexity = 30,
+     max_iter = 1000, min_cost = 0, epoch_callback = NULL, whiten = TRUE,
+     epoch=100)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>X</code></td>
+<td>
+
+<p>The R matrix or &quot;dist&quot; object
+</p>
+</td></tr>
+<tr valign="top"><td><code>initial_config</code></td>
+<td>
+
+<p>an argument providing a matrix specifying the initial embedding for X.  See Details.
+</p>
+</td></tr>
+<tr valign="top"><td><code>k</code></td>
+<td>
+
+<p>the dimension of the resulting embedding.
+</p>
+</td></tr>
+<tr valign="top"><td><code>initial_dims</code></td>
+<td>
+
+<p>The number of dimensions to use in reduction method.
+</p>
+</td></tr>
+<tr valign="top"><td><code>perplexity</code></td>
+<td>
+
+<p>Perplexity parameter.  (optimal number of neighbors)
+</p>
+</td></tr>
+<tr valign="top"><td><code>max_iter</code></td>
+<td>
+
+<p>Maximum number of iterations to perform.
+</p>
+</td></tr>
+<tr valign="top"><td><code>min_cost</code></td>
+<td>
+
+<p>The minimum cost value (error) to halt iteration.
+</p>
+</td></tr>
+<tr valign="top"><td><code>epoch_callback</code></td>
+<td>
+
+<p>A callback function used after each epoch (an epoch here means a set number of iterations)
+</p>
+</td></tr>
+<tr valign="top"><td><code>whiten</code></td>
+<td>
+
+<p>A boolean value indicating whether the matrix data should be whitened.
+</p>
+</td></tr>
+<tr valign="top"><td><code>epoch</code></td>
+<td>
+
+<p>The number of iterations in between update messages.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>When the initial_config argument is specified, the algorithm will automatically enter the <em>final momentum</em> stage.  This stage has less large scale adjustment to the embedding, and is intended for small scale tweaking of positioning.  This can greatly speed up the generation of embeddings for various similar X datasets, while also preserving overall embedding orientation.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An R object containing a <em>ydata</em> embedding matrix, as well as a the matrix of probabilities <em>P</em>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Justin Donaldson (jdonaldson@gmail.com)
+</p>
+
+
+<h3>References</h3>
+
+<p>L.J.P. van der Maaten and G.E. Hinton. Visualizing High-Dimensional Data Using t-SNE. <em>Journal of Machine Learning Research</em> 9 (Nov) : 2579-2605, 2008.
+</p>
+<p>L.J.P. van der Maaten. Learning a Parametric Embedding by Preserving Local Structure. In <em>Proceedings of the Twelfth International Conference on Artificial Intelligence and Statistics</em> (AISTATS), JMLR W&amp;CP 5:384-391, 2009.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><a href="../../stats/html/dist.html">dist</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>## Not run: 
+colors = rainbow(length(unique(iris$Species)))
+names(colors) = unique(iris$Species)
+ecb = function(x,y){ plot(x,t='n'); text(x,labels=iris$Species, col=colors[iris$Species]) }
+tsne_iris = tsne(iris[,1:4], epoch_callback = ecb, perplexity=50)
+
+# compare to PCA
+dev.new()
+pca_iris = princomp(iris[,1:4])$scores[,1:2]
+plot(pca_iris, t='n')
+text(pca_iris, labels=iris$Species,col=colors[iris$Species])
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tsne</em> version 0.1-3.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

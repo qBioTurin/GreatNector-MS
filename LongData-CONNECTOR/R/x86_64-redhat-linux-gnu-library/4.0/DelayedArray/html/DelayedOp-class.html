@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DelayedOp objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for DelayedOp-class {DelayedArray}"><tr><td>DelayedOp-class {DelayedArray}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>DelayedOp objects</h2>
+
+<h3>Description</h3>
+
+<p>In a <a href="DelayedArray-class.html">DelayedArray</a> object, the delayed operations are stored as a
+tree of DelayedOp objects. Each node in this tree is a DelayedOp
+object that represents a delayed operation.
+</p>
+<p>DelayedOp objects are used inside <a href="DelayedArray-class.html">DelayedArray</a> objects and are not
+intended to be manipulated directly by the end user.
+</p>
+<p><code><a href="showtree.html">showtree</a></code> and <code><a href="simplify.html">simplify</a></code> can be used to visualize,
+inspect, and simplify this tree.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+is_noop(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>A DelayedSubset, DelayedAperm, or DelayedDimnames object.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>8 types of nodes are currently supported. Each type is a DelayedOp subclass:
+</p>
+<pre>  Node type                        Represented operation
+  ------------------------------------------------------------------
+  DelayedOp (VIRTUAL)
+  ------------------------------------------------------------------
+  * DelayedUnaryOp (VIRTUAL)
+    o DelayedSubset                Multi-dimensional single bracket
+                                   subsetting.
+    o DelayedAperm                 Extended aperm() (can drop and/or
+                                   add ineffective dimensions).
+    o DelayedUnaryIsoOp (VIRTUAL)  Unary op that preserves the
+                                   geometry.
+      - DelayedUnaryIsoOpStack     Simple ops stacked together.
+      - DelayedUnaryIsoOpWithArgs  One op with vector-like arguments
+                                   along the dimensions of the input.
+      - DelayedSubassign           Multi-dimensional single bracket
+                                   subassignment.
+      - DelayedDimnames            Set/replace the dimnames.
+  ------------------------------------------------------------------
+  * DelayedNaryOp (VIRTUAL)
+    o DelayedNaryIsoOp             N-ary op that preserves the
+                                   geometry.
+    o DelayedAbind                 abind()
+  ------------------------------------------------------------------
+  </pre>
+<p>All the nodes are array-like objects that must comply with the <em>seed
+contract</em> i.e. they must support <code>dim()</code>, <code>dimnames()</code>, and
+<code>extract_array()</code>. See <code>?<a href="extract_array.html">extract_array</a></code> for more
+information about the <em>seed contract</em>.
+</p>
+<p><code>is_noop()</code> can only be called on a DelayedSubset, DelayedAperm,
+or DelayedDimnames object at the moment, and will return <code>TRUE</code>
+if the object represents a no-op.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The DelayedOp virtual class and its 8 concrete subclasses are for
+internal use only and never exposed to the end user.
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><a href="DelayedArray-class.html">DelayedArray</a> objects.
+</p>
+</li>
+<li> <p><code><a href="showtree.html">showtree</a></code> to visualize and access the leaves of
+a tree of delayed operations carried by a <a href="DelayedArray-class.html">DelayedArray</a>
+object.
+</p>
+</li>
+<li> <p><code><a href="simplify.html">simplify</a></code> to simplify the tree of delayed operations
+carried by a <a href="DelayedArray-class.html">DelayedArray</a> object.
+</p>
+</li>
+<li> <p><code><a href="extract_array.html">extract_array</a></code>.
+</p>
+</li></ul>
+
+
+<hr /><div style="text-align: center;">[Package <em>DelayedArray</em> version 0.16.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

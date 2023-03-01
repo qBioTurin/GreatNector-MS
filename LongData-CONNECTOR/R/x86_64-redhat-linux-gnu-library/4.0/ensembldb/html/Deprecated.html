@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Deprecated functionality</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for Deprecated {ensembldb}"><tr><td>Deprecated {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Deprecated functionality</h2>
+
+<h3>Description</h3>
+
+<p>All functions, methods and classes listed on this page are
+deprecated and might be removed in future releases.
+</p>
+<p><code>GeneidFilter</code> creates a <code>GeneIdFilter</code>. Use
+<code>GeneIdFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>GenebiotypeFilter</code> creates a <code>GeneBiotypeFilter</code>. Use
+<code>GeneBiotypeFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>EntrezidFilter</code> creates a <code>EntrezFilter</code>. Use
+<code>EntrezFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>TxidFilter</code> creates a <code>TxIdFilter</code>. Use
+<code>TxIdFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>TxbiotypeFilter</code> creates a <code>TxBiotypeFilter</code>. Use
+<code>TxBiotypeFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>ExonidFilter</code> creates a <code>ExonIdFilter</code>. Use
+<code>ExonIdFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>ExonrankFilter</code> creates a <code>ExonRankFilter</code>. Use
+<code>ExonRankFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>SeqNameFilter</code> creates a <code>SeqNameFilter</code>. Use
+<code>SeqNameFilter</code> from the <code>AnnotationFilter</code> package instead.
+</p>
+<p><code>SeqstrandFilter</code> creates a <code>SeqStrandFilter</code>. Use
+<code>SeqStrandFilter</code> from the <code>AnnotationFilter</code> instead.
+</p>
+<p><code>SeqstartFilter</code> creates a <code>GeneStartFilter</code>, <code>TxStartFilter</code>
+or <code>ExonStartFilter</code> depending on the value of the parameter
+<code>feature</code>. Use <code>GeneStartFilter</code>, <code>TxStartFilter</code> and
+<code>ExonStartFilter</code> instead.
+</p>
+<p><code>SeqendFilter</code> creates a <code>GeneEndFilter</code>, <code>TxEndFilter</code>
+or <code>ExonEndFilter</code> depending on the value of the parameter
+<code>feature</code>. Use <code>GeneEndFilter</code>, <code>TxEndFilter</code> and
+<code>ExonEndFilter</code> instead.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+GeneidFilter(value, condition = "==")
+
+GenebiotypeFilter(value, condition = "==")
+
+EntrezidFilter(value, condition = "==")
+
+TxidFilter(value, condition = "==")
+
+TxbiotypeFilter(value, condition = "==")
+
+ExonidFilter(value, condition = "==")
+
+ExonrankFilter(value, condition = "==")
+
+SeqnameFilter(value, condition = "==")
+
+SeqstrandFilter(value, condition = "==")
+
+SeqstartFilter(value, condition = "&gt;", feature = "gene")
+
+SeqendFilter(value, condition = "&lt;", feature = "gene")
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>value</code></td>
+<td>
+<p>The value for the filter.</p>
+</td></tr>
+<tr valign="top"><td><code>condition</code></td>
+<td>
+<p>The condition for the filter.</p>
+</td></tr>
+<tr valign="top"><td><code>feature</code></td>
+<td>
+<p>For <code>SeqstartFilter</code> and <code>SeqendFilter</code>: on what type
+of feature should the filter be applied? Supported are <code>"gene"</code>,
+<code>"tx"</code> and <code>"exon"</code>.</p>
+</td></tr>
+</table>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

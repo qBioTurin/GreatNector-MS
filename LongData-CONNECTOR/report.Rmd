@@ -1,0 +1,158 @@
+---
+title: "Report MS"
+
+output:
+  html_document:
+    df_print: paged
+params:
+  Data:
+    value: x
+  p:
+    value: x
+  g:
+    value: x
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,results = 'asis',warning = F)
+library(connector)
+library(ggplot2)
+library(dplyr)
+library(readxl)
+Data = params$Data
+p = params$p
+g = params$g
+```
+
+```{r dataLoad}
+load("RData/")
+load( paste0("RData/temporal",Data,".RData") )
+
+## Counting relapses
+rel = grep(pattern = "RELAPSES", colnames(temporalCurve))
+temporalCurve$NumberRelapses = 0
+
+for( i in unique(temporalCurve$ID)){
+	temporalCurve[which(temporalCurve$ID == i),"NumberRelapses"] =
+		length(temporalCurve[which(temporalCurve$ID == i)[1],rel][!is.na(temporalCurve[which(temporalCurve$ID == i)[1],rel] )]
+												 )
+}
+
+temporalCurve = temporalCurve %>%
+	mutate(Relapses = ifelse(NumberRelapses ==0, "No rel","At least one"))
+temporalCurve$TypeRel = sapply(1:length(temporalCurve[,1]),
+															 function(x) gsub(pattern = "NA",replacement = "",paste(temporalCurve[x,rel],collapse = "")) )
+
+temporalCurve$NumberRelapses = as.factor(temporalCurve$NumberRelapses)
+#####
+
+patientsToNotConsider = c("CA0001","PR0002", "PR0004","ZG0005", "ZG0010", "ZG0017")
+
+do.call(rbind,
+        lapply(temporalCurve %>% 
+                 filter(Relapses!="No rel") %>% 
+                 select(ID) %>%
+                 distinct() %>% 
+                 unlist(),
+               function(i){
+                 TemporalCurve_sub = TemporalCurve %>% filter(ID == i)
+                 ftime = gsub(pattern = "M",
+                              replacement = "",
+                              x = TemporalCurve_sub[1,rel][!is.na(TemporalCurve_sub[1,rel] )]
+                 )
+                 ftime = unlist( strsplit(x = ftime,split = ",") )
+                 ftime = min(as.numeric(ftime))
+                 TemporalCurve_sub = TemporalCurve_sub %>% 
+                   dplyr::select(ID,Time, Exp) %>% 
+                   na.omit() %>%
+                   dplyr::group_by(Exp) %>%
+                   dplyr::mutate(dif = Time - ftime ) %>% 
+                   filter(dif > 0)  %>% 
+                   filter(dif == min(dif)) %>% 
+                   ungroup() %>%
+                   dplyr::select(-dif)
+                 TemporalCurve_sub$FirstRel = ftime
+                 return(TemporalCurve_sub)
+               })
+) -> firstRelapse
+
+temporalCurve = rbind(temporalCurve %>% 
+  filter(! ID %in% patientsToNotConsider),
+  firstRelapse) %>%
+  group_by(ID) %>%
+  na.omit() %>%
+  mutate(l = length(ID)) %>%
+  filter(l>2) %>%
+  select(-l) %>%
+  ungroup()
+
+# Feature = Feature %>% filter(! ID %in% patientsToNotConsider)
+
+temporalCurve$Observation = as.numeric(temporalCurve$Observation)
+
+CONNECTORList = DataFrameImport(TimeSeriesDataFrame = as.data.frame(temporalCurve),
+																AnnotationFrame = as.data.frame(Feature) )
+
+```
+
+```{r Visualization}
+### Visualization
+
+Datavisual<-DataVisualization(CONNECTORList,
+															feature="GENDER",
+															labels = c("Time",Data,Data))
+
+Datavisual
+```
+
+```{r LogLike}
+### Calculation of p
+CrossLogLike<-BasisDimension.Choice(CONNECTORList,2:8,Cores = 10)
+
+CrossLogLike$CrossLogLikePlot
+CrossLogLike$KnotsPlot
+
+```
+
+```{r Clustering}
+file = paste0("RData/Cluster",Data,"_p",p,".RData")
+if(file.exists(file)){
+	load(file)
+}else{
+	S.cl <-ClusterAnalysis(CONNECTORList,
+												 G=2:7,
+												 p=p,
+												 runs=200,
+												 Cores=20)
+	save(S.cl, file = file)
+}
+
+
+IndexesPlot.Extrapolation(S.cl,q = 0.0)-> indexes
+indexes$Plot
+indexes$Plot +
+    coord_cartesian(ylim=c(0, 4))
+ConsMatrix.Extrapolation(S.cl)-> ConsInfo
+
+```
+
+```{r Ginvesitgation}
+for(G in g){
+	cat( paste0("\n## G = ",G, "##") )
+	print(ConsInfo[[paste0("G",G)]]$ConsensusPlot)
+
+	MostProbableClustering.Extrapolation(S.cl,G,q = .0) ->MostProbableClustering
+
+	FCMplots<- ClusterWithMeanCurve(clusterdata = MostProbableClustering,
+																	feature="GENDER",
+																	labels = c("Time",Data))
+
+	### Disriminant Plot (goodness of the cluster)
+	DSpl = DiscriminantPlot(clusterdata = MostProbableClustering,
+													feature = "GENDER")
+
+	print(DSpl[[1]])
+}
+
+
+```

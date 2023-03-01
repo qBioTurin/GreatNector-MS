@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Connect to an EnsDb object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for EnsDb {ensembldb}"><tr><td>EnsDb {ensembldb}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Connect to an EnsDb object</h2>
+
+<h3>Description</h3>
+
+<p>The <code>EnsDb</code> constructor function connects to the database
+specified with argument <code>x</code> and returns a corresponding
+<code><a href="EnsDb-class.html">EnsDb</a></code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+EnsDb(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Either a character specifying the <em>SQLite</em> database file, or
+a <code>DBIConnection</code> to e.g. a MariaDB/MySQL database.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>By providing the connection to a MariaDB/MySQL database, it is possible
+to use MariaDB/MySQL as the database backend and queries will be performed on
+that database. Note however that this requires the package <code>RMariaDB</code>
+to be installed. In addition, the user needs to have access to a MySQL
+server providing already an EnsDb database, or must have write
+privileges on a MySQL server, in which case the <code><a href="useMySQL-EnsDb-method.html">useMySQL</a></code>
+method can be used to insert the annotations from an EnsDB package into
+a MySQL database.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <code><a href="EnsDb-class.html">EnsDb</a></code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Johannes Rainer
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## "Standard" way to create an EnsDb object:
+library(EnsDb.Hsapiens.v86)
+EnsDb.Hsapiens.v86
+
+## Alternatively, provide the full file name of a SQLite database file
+dbfile &lt;- system.file("extdata/EnsDb.Hsapiens.v86.sqlite", package = "EnsDb.Hsapiens.v86")
+edb &lt;- EnsDb(dbfile)
+edb
+
+## Third way: connect to a MySQL database
+## Not run: 
+library(RMariaDB)
+dbcon &lt;- dbConnect(MySQL(), user = my_user, pass = my_pass,
+    host = my_host, dbname = "ensdb_hsapiens_v86")
+edb &lt;- EnsDb(dbcon)
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>ensembldb</em> version 2.14.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

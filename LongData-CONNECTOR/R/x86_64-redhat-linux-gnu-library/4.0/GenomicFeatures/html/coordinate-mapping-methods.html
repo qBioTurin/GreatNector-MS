@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Map range coordinates between transcripts and genome space</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for mapToTranscripts {GenomicFeatures}"><tr><td>mapToTranscripts {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Map range coordinates between transcripts and genome space</h2>
+
+<h3>Description</h3>
+
+<p>Map range coordinates between features in the transcriptome and
+genome (reference) space.
+</p>
+<p>See <code>?<a href="../../GenomicAlignments/html/mapToAlignments.html">mapToAlignments</a></code> in the
+<span class="pkg">GenomicAlignments</span> package for mapping coordinates between
+reads (local) and genome (reference) space using a CIGAR alignment.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## mapping to transcripts
+## S4 method for signature 'GenomicRanges,GenomicRanges'
+mapToTranscripts(x, transcripts,
+          ignore.strand = FALSE)
+## S4 method for signature 'GenomicRanges,GRangesList'
+mapToTranscripts(x, transcripts,
+          ignore.strand = FALSE, intronJunctions=FALSE)
+## S4 method for signature 'ANY,TxDb'
+mapToTranscripts(x, transcripts, ignore.strand = FALSE,
+          extractor.fun = GenomicFeatures::transcripts, ...)
+## S4 method for signature 'GenomicRanges,GRangesList'
+pmapToTranscripts(x, transcripts,
+          ignore.strand = FALSE)
+
+## mapping from transcripts
+## S4 method for signature 'GenomicRanges,GRangesList'
+mapFromTranscripts(x, transcripts,
+          ignore.strand = FALSE)
+## S4 method for signature 'GenomicRanges,GRangesList'
+pmapFromTranscripts(x, transcripts,
+          ignore.strand = FALSE)
+## S4 method for signature 'IntegerRanges,GRangesList'
+pmapFromTranscripts(x, transcripts)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p><a href="../../GenomicRanges/html/GenomicRanges.html">GenomicRanges</a> object of positions to be mapped.
+The seqnames of <code>x</code> are used in <code>mapFromTranscripts</code>, i.e.,
+when mapping from transcripts to the genome. In the case of
+<code>pmapFromTranscripts</code>, <code>x</code> can be an
+<a href="../../IRanges/html/IntegerRanges.html">IntegerRanges</a> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>transcripts</code></td>
+<td>
+
+<p>A named <a href="../../GenomicRanges/html/GenomicRanges.html">GenomicRanges</a> or
+<a href="../../GenomicRanges/html/GRangesList.html">GRangesList</a> object used to map between <code>x</code>
+and the result. The ranges can be any feature in the transcriptome
+extracted from a <code>TxDb</code> (e.g., introns, exons, cds regions).
+See ?<code>transcripts</code> and ?<code>transcriptsBy</code> for a list of
+extractor functions.
+</p>
+<p>The <code>transcripts</code> object must have names. When mapping from
+transcripts to the genome, they are used to determine mapping pairs; in
+the reverse direction they become the seqlevels of the output object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>ignore.strand</code></td>
+<td>
+
+<p>When <code>ignore.strand</code> is TRUE, strand is ignored in overlaps operations
+(i.e., all strands are considered &quot;+&quot;) and the strand in the output is '*'.
+</p>
+<p>When <code>ignore.strand</code> is FALSE strand in the output is taken from the
+<code>transcripts</code> argument. When <code>transcripts</code> is a
+<code>GRangesList</code>, all inner list elements of a common list element must
+have the same strand or an error is thrown.
+</p>
+<p>Mapped position is computed by counting from the transcription start site
+(TSS) and is not affected by the value of <code>ignore.strand</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>intronJunctions</code></td>
+<td>
+
+<p>Logical to indicate if intronic ranges in <code>x</code> should be reported.
+</p>
+<p>This argument is only supported in <code>mapToTranscripts</code> when
+<code>transcripts</code> is a GRangesList.  When <code>transcripts</code> is a
+GRangesList, individual ranges can be thought of as exons and the spaces
+between the ranges as introns. 
+</p>
+<p>When <code>intronJunctions=TRUE</code>, ranges that fall completely &quot;within&quot; an
+intron are reported as a zero-width range (start and end are taken
+from the ranges they fall between). A metadata column called &quot;intronic&quot; is
+returned with the GRanges and marked as <code>TRUE</code> for these ranges. By
+default, <code>intronJunctions=FALSE</code> and these ranges are not mapped.
+</p>
+<p>Ranges that have either the start or end in an intron are considered &quot;non
+hits&quot; and are never mapped.  Ranges that span introns are always mapped.
+Neither of these range types are controlled by the <code>intronJunctions</code>
+argument.
+</p>
+</td></tr>
+<tr valign="top"><td><code>extractor.fun</code></td>
+<td>
+
+<p>Function to extract genomic features from a <code>TxDb</code> object.
+</p>
+<p>This argument is only applicable to <code>mapToTranscripts</code> when
+<code>transcripts</code> is a <code>TxDb</code> object. The <code>extractor</code> should
+be the name of a function (not a character()) described on the
+<code>?transcripts</code>, <code>?transcriptsBy</code>, or <code>?microRNAs</code> man page.
+</p>
+<p>Valid <code>extractor</code> functions:
+</p>
+
+<ul>
+<li><p>transcripts  ## default
+</p>
+</li>
+<li><p>exons
+</p>
+</li>
+<li><p>cds
+</p>
+</li>
+<li><p>genes
+</p>
+</li>
+<li><p>promoters
+</p>
+</li>
+<li><p>exonicParts
+</p>
+</li>
+<li><p>intronicParts
+</p>
+</li>
+<li><p>transcriptsBy
+</p>
+</li>
+<li><p>exonsBy
+</p>
+</li>
+<li><p>cdsBy
+</p>
+</li>
+<li><p>intronsByTranscript
+</p>
+</li>
+<li><p>fiveUTRsByTranscript
+</p>
+</li>
+<li><p>threeUTRsByTranscript
+</p>
+</li>
+<li><p>microRNAs
+</p>
+</li>
+<li><p>tRNAs
+</p>
+</li></ul>
+
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments passed to <code>extractor.fun</code> functions.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>In GenomicFeatures &gt;= 1.21.10, the default for <code>ignore.strand</code> was
+changed to <code>FALSE</code> for consistency with other methods in the
+<span class="pkg">GenomicRanges</span> and <span class="pkg">GenomicAlignments</span> packages. Additionally,
+the mapped position is computed from the TSS and does not depend on the
+<code>ignore.strand</code> argument.
+See the section on <code>ignore.strand</code> for details.
+</p>
+
+<ul>
+<li><p><code>mapToTranscripts</code>, <code>pmapToTranscripts</code>
+The genomic range in <code>x</code> is mapped to the local position in the
+<code>transcripts</code> ranges. A successful mapping occurs when <code>x</code>
+is completely within the <code>transcripts</code> range, equivalent to:
+</p>
+<pre>
+      findOverlaps(..., type="within")
+      </pre>
+<p>Transcriptome-based coordinates start counting at 1 at the beginning
+of the <code>transcripts</code> range and return positions where <code>x</code>
+was aligned. The seqlevels of the return object are taken from the
+<code>transcripts</code> object and should be transcript names. In this
+direction, mapping is attempted between all elements of <code>x</code> and
+all elements of <code>transcripts</code>.
+</p>
+<p><code>mapToTranscripts</code> uses <code>findOverlaps</code> to map ranges in
+<code>x</code> to ranges in <code>transcripts</code>. This method does not return
+unmapped ranges.
+</p>
+<p><code>pmapToTranscripts</code> maps the i-th range in <code>x</code> to the
+i-th range in <code>transcripts</code>. Recycling is supported for both
+<code>x</code> and <code>transcripts</code> when either is length == 1L; otherwise
+the lengths must match. Ranges in <code>x</code> that do not map (out of bounds
+or strand mismatch) are returned as zero-width ranges starting at 0.
+These ranges are given the seqname of &quot;UNMAPPED&quot;.
+
+</p>
+</li>
+<li><p><code>mapFromTranscripts</code>, <code>pmapFromTranscripts</code>
+The transcript-based position in <code>x</code> is mapped to genomic coordinates
+using the ranges in <code>transcripts</code>. A successful mapping occurs when
+the following is TRUE:
+</p>
+<pre>
+      width(transcripts) &gt;= start(x) + width(x)
+      </pre>
+<p><code>x</code> is aligned to <code>transcripts</code> by moving in <code>start(x)</code>
+positions in from the beginning of the <code>transcripts</code> range.  The
+seqlevels of the return object are chromosome names.
+</p>
+<p><code>mapFromTranscripts</code> uses the seqname of <code>x</code> and the names
+of <code>transcripts</code> to determine mapping pairs (vs attempting to match
+all possible pairs). Name matching is motivated by use cases such as
+differentially expressed regions where the expressed regions in <code>x</code>
+would only be related to a subset of regions in <code>transcripts</code>.
+This method does not return unmapped ranges.
+</p>
+<p><code>pmapFromTranscripts</code> maps the i-th range in <code>x</code> to the i-th
+range in <code>transcripts</code> and therefore does not use name matching.
+Recycling is supported in <code>pmapFromTranscripts</code> when either
+<code>x</code> or <code>transcripts</code> is length == 1L; otherwise the lengths
+must match. Ranges in <code>x</code> that do not map (out of bounds or strand
+mismatch) are returned as zero-width ranges starting at 0. These ranges
+are given the seqname of &quot;UNMAPPED&quot;.
+
+</p>
+</li></ul>
+
+
+
+<h3>Value</h3>
+
+<p><code>pmapToTranscripts</code> returns a <code>GRanges</code> the same length as
+<code>x</code>.
+</p>
+<p><code>pmapFromTranscripts</code> returns a <code>GRanges</code> when <code>transcripts</code>
+is a <code>GRanges</code> and a <code>GRangesList</code> when <code>transcripts</code>
+is a <code>GRangesList</code>. In both cases the return object is the same
+length as <code>x</code>. The rational for returning the <code>GRangesList</code> is
+to preserve exon structure; ranges in a list element that are not overlapped
+by <code>x</code> are returned as a zero-width range. The <code>GRangesList</code>
+return object will have no seqlevels called &quot;UNMAPPED&quot;; those will only
+occur when a <code>GRanges</code> is returned.
+</p>
+<p><code>mapToTranscripts</code> and <code>mapFromTranscripts</code> return <code>GRanges</code>
+objects that vary in length similar to a <code>Hits</code> object. The result
+contains mapped records only; strand mismatch and out of bound ranges are
+not returned. <code>xHits</code> and <code>transcriptsHits</code> metadata columns
+(similar to the <code>queryHits</code> and <code>subjectHits</code> of a <code>Hits</code>
+object) indicate elements of <code>x</code> and <code>transcripts</code> used in
+the mapping.
+</p>
+<p>When <code>intronJunctions</code> is TRUE, <code>mapToTranscripts</code> returns an
+extra metdata column named <code>intronic</code> to identify the intron ranges.
+</p>
+<p>When mapping to transcript coordinates, seqlevels of the output are the names
+on the <code>transcripts</code> object and most often these will be transcript
+names. When mapping to the genome, seqlevels of the output are the seqlevels
+of <code>transcripts</code> which are usually chromosome names.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>V. Obenchain, M. Lawrence and H. Pagès</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code>?<a href="../../GenomicAlignments/html/mapToAlignments.html">mapToAlignments</a></code> in the
+<span class="pkg">GenomicAlignments</span> package for methods mapping between
+reads and genome space using a CIGAR alignment.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## ---------------------------------------------------------------------
+## A. Basic Use: Conversion between CDS and Exon coordinates and the
+##    genome
+## ---------------------------------------------------------------------
+
+## Gene "Dgkb" has ENTREZID "217480":
+library(org.Mm.eg.db)
+Dgkb_geneid &lt;- get("Dgkb", org.Mm.egSYMBOL2EG)
+
+## The gene is on the positive strand, chromosome 12:
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+txdb &lt;- TxDb.Mmusculus.UCSC.mm10.knownGene
+tx_by_gene &lt;- transcriptsBy(txdb, by="gene")
+Dgkb_transcripts &lt;- tx_by_gene[[Dgkb_geneid]]
+Dgkb_transcripts  # all 7 Dgkb transcripts are on chr12, positive strand
+
+## To map coordinates from local CDS or exon space to genome 
+## space use mapFromTranscripts().
+
+## When mapping CDS coordinates to genome space the 'transcripts'
+## argument is the collection of CDS regions by transcript.
+coord &lt;- GRanges("chr12", IRanges(4, width=1))
+## Get the names of the transcripts in the gene:
+Dgkb_tx_names &lt;- mcols(Dgkb_transcripts)$tx_name
+Dgkb_tx_names
+## Use these names to isolate the region of interest:
+cds_by_tx &lt;- cdsBy(txdb, "tx", use.names=TRUE)
+Dgkb_cds_by_tx &lt;- cds_by_tx[intersect(Dgkb_tx_names, names(cds_by_tx))]
+## Dgkb CDS grouped by transcript (no-CDS transcripts omitted):
+Dgkb_cds_by_tx
+lengths(Dgkb_cds_by_tx)  # nb of CDS per transcript
+## A requirement for mapping from transcript space to genome space
+## is that seqnames in 'x' match the names in 'transcripts'.
+names(Dgkb_cds_by_tx) &lt;- rep(seqnames(coord), length(Dgkb_cds_by_tx))
+## There are 6 results, one for each transcript.
+mapFromTranscripts(coord, Dgkb_cds_by_tx)
+
+## To map exon coordinates to genome space the 'transcripts'
+## argument is the collection of exon regions by transcript.
+coord &lt;- GRanges("chr12", IRanges(100, width=1))
+ex_by_tx &lt;- exonsBy(txdb, "tx", use.names=TRUE)
+Dgkb_ex_by_tx &lt;- ex_by_tx[Dgkb_tx_names]
+names(Dgkb_ex_by_tx) &lt;- rep(seqnames(coord), length(Dgkb_ex_by_tx))
+## Again the output has 6 results, one for each transcript.
+mapFromTranscripts(coord, Dgkb_ex_by_tx)
+
+## To go the reverse direction and map from genome space to
+## local CDS or exon space, use mapToTranscripts().
+
+## Genomic position 37981944 maps to CDS position 4:
+coord &lt;- GRanges("chr12", IRanges(37981944, width=1))
+mapToTranscripts(coord, Dgkb_cds_by_tx)
+
+## Genomic position 37880273 maps to exon position 100:
+coord &lt;- GRanges("chr12", IRanges(37880273, width=1))
+mapToTranscripts(coord, Dgkb_ex_by_tx)
+
+
+## The following examples use more than 2GB of memory, which is more
+## than what 32-bit Windows can handle:
+is_32bit_windows &lt;- .Platform$OS.type == "windows" &amp;&amp;
+                    .Platform$r_arch == "i386"
+if (!is_32bit_windows) {
+## ---------------------------------------------------------------------
+## B. Map sequence locations in exons to the genome
+## ---------------------------------------------------------------------
+
+## NAGNAG alternative splicing plays an essential role in biological
+## processes and represents a highly adaptable system for
+## posttranslational regulation of gene function. The majority of
+## NAGNAG studies largely focus on messenger RNA. A study by Sun,
+## Lin, and Yan (http://www.hindawi.com/journals/bmri/2014/736798/)
+## demonstrated that NAGNAG splicing is also operative in large
+## intergenic noncoding RNA (lincRNA). One finding of interest was
+## that linc-POLR3G-10 exhibited two NAGNAG acceptors located in two
+## distinct transcripts: TCONS_00010012 and TCONS_00010010.
+
+## Extract the exon coordinates of TCONS_00010012 and TCONS_00010010:
+lincrna &lt;- c("TCONS_00010012", "TCONS_00010010")
+library(TxDb.Hsapiens.UCSC.hg19.lincRNAsTranscripts)
+txdb &lt;- TxDb.Hsapiens.UCSC.hg19.lincRNAsTranscripts
+exons &lt;- exonsBy(txdb, by="tx", use.names=TRUE)[lincrna]
+exons
+
+## The two NAGNAG acceptors were identified in the upstream region of
+## the fourth and fifth exons located in TCONS_00010012.
+## Extract the sequences for transcript TCONS_00010012:
+library(BSgenome.Hsapiens.UCSC.hg19)
+genome &lt;- BSgenome.Hsapiens.UCSC.hg19
+exons_seq &lt;- getSeq(genome, exons[[1]])
+
+## TCONS_00010012 has 4 exons:
+exons_seq
+
+## The most common triplet among the lincRNA sequences was CAG. Identify
+## the location of this pattern in all exons.
+cag_loc &lt;- vmatchPattern("CAG", exons_seq)
+
+## Convert the first occurance of CAG in each exon back to genome
+## coordinates.
+first_loc &lt;- do.call(c, sapply(cag_loc, "[", 1, simplify=TRUE))
+pmapFromTranscripts(first_loc, exons[[1]])
+
+## ---------------------------------------------------------------------
+## C. Map dbSNP variants to CDS or cDNA coordinates
+## ---------------------------------------------------------------------
+
+## The GIPR gene encodes a G-protein coupled receptor for gastric
+## inhibitory polypeptide (GIP). Originally GIP was identified to
+## inhibited gastric acid secretion and gastrin release but was later
+## demonstrated to stimulate insulin release in the presence of elevated
+## glucose.
+
+## In this example 5 SNPs located in the GIPR gene are mapped to cDNA
+## coordinates. A list of SNPs in GIPR can be downloaded from dbSNP or
+## NCBI.
+rsids &lt;- c("rs4803846", "rs139322374", "rs7250736", "rs7250754",
+           "rs9749185")
+
+## Extract genomic coordinates with a SNPlocs package.
+library(SNPlocs.Hsapiens.dbSNP144.GRCh38)
+snps &lt;- snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh38, rsids)
+
+## Gene regions of GIPR can be extracted from a TxDb package of
+## compatible build. The TxDb package uses Entrez gene identifiers
+## and GIPR is a gene symbol. Let's first lookup its Entrez gene ID.
+library(org.Hs.eg.db)
+GIPR_geneid &lt;- get("GIPR", org.Hs.egSYMBOL2EG)
+
+## The transcriptsBy() extractor returns a range for each transcript that
+## includes the UTR and exon regions (i.e., cDNA).
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb &lt;- TxDb.Hsapiens.UCSC.hg38.knownGene
+tx_by_gene &lt;- transcriptsBy(txdb, "gene")
+GIPR_transcripts &lt;- tx_by_gene[GIPR_geneid]
+GIPR_transcripts  # all 8 GIPR transcripts are on chr19, positive strand
+
+## Before mapping, the chromosome names (seqlevels) in the two
+## objects must be harmonized. The style is NCBI for 'snps' and
+## UCSC for 'GIPR_transcripts'.
+seqlevelsStyle(snps)
+seqlevelsStyle(GIPR_transcripts)
+
+## Modify the style (and genome) in 'snps' to match 'GIPR_transcripts'.
+seqlevelsStyle(snps) &lt;- seqlevelsStyle(GIPR_transcripts)
+
+## The 'GIPR_transcripts' object is a GRangesList of length 1. This single
+## list element contains the cDNA range for 8 different transcripts. To
+## map to each transcript individually 'GIPR_transcripts' must be unlisted
+## before mapping.
+
+## Map all 5 SNPS to all 8 transcripts:
+mapToTranscripts(snps, unlist(GIPR_transcripts))
+
+## Map the first SNP to transcript "ENST00000590918.5" and the second to
+## "ENST00000263281.7".
+pmapToTranscripts(snps[1:2], unlist(GIPR_transcripts)[1:2])
+
+## The cdsBy() extractor returns coding regions by gene or by transcript.
+## Extract the coding regions for transcript "ENST00000263281.7".
+cds &lt;- cdsBy(txdb, "tx", use.names=TRUE)["ENST00000263281.7"]
+cds
+
+## The 'cds' object is a GRangesList of length 1 containing all CDS ranges
+## for the single transcript "ENST00000263281.7".
+
+## To map to the concatenated group of ranges leave 'cds' as a GRangesList.
+mapToTranscripts(snps, cds)
+
+## Only the second SNP could be mapped. Unlisting the 'cds' object maps
+## the SNPs to the individual cds ranges (vs the concatenated range).
+mapToTranscripts(snps[2], unlist(cds))
+
+## The location is the same because the SNP hit the first CDS range. If
+## the transcript were on the "-" strand the difference in concatenated
+## vs non-concatenated position would be more obvious.
+
+## Change strand:
+strand(cds) &lt;- strand(snps) &lt;- "-"
+mapToTranscripts(snps[2], unlist(cds))
+}
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

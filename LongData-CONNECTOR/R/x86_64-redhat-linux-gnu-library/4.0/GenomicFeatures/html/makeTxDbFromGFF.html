@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Make a TxDb object from annotations available as a GFF3 or...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for makeTxDbFromGFF {GenomicFeatures}"><tr><td>makeTxDbFromGFF {GenomicFeatures}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Make a TxDb object from annotations available as a
+GFF3 or GTF file
+</h2>
+
+<h3>Description</h3>
+
+<p>The <code>makeTxDbFromGFF</code> function allows the user
+to make a <a href="TxDb-class.html">TxDb</a> object from transcript annotations
+available as a GFF3 or GTF file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+makeTxDbFromGFF(file,
+                format=c("auto", "gff3", "gtf"),
+                dataSource=NA,
+                organism=NA,
+                taxonomyId=NA,
+                circ_seqs=NULL,
+                chrominfo=NULL,
+                miRBaseBuild=NA,
+                metadata=NULL,
+                dbxrefTag)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>file</code></td>
+<td>
+
+<p>Input GFF3 or GTF file. Can be a path to a file, or an URL,
+or a connection object, or a <a href="../../rtracklayer/html/GFF3File.html">GFF3File</a>
+or <a href="../../rtracklayer/html/GTFFile.html">GTFFile</a> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>format</code></td>
+<td>
+
+<p>Format of the input file. Accepted values are: <code>"auto"</code> (the
+default) for auto-detection of the format, <code>"gff3"</code>, or <code>"gtf"</code>.
+Use <code>"gff3"</code> or <code>"gtf"</code> only if auto-detection failed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>dataSource</code></td>
+<td>
+
+<p>A single string describing the origin of the data file. Please be as
+specific as possible.
+</p>
+</td></tr>
+<tr valign="top"><td><code>organism</code></td>
+<td>
+
+<p>What is the Genus and species of this organism. Please use proper
+scientific nomenclature for example: &quot;Homo sapiens&quot; or &quot;Canis familiaris&quot;
+and not &quot;human&quot; or &quot;my fuzzy buddy&quot;. If properly written, this information
+may be used by the software to help you out later.
+</p>
+</td></tr>
+<tr valign="top"><td><code>taxonomyId</code></td>
+<td>
+
+<p>By default this value is NA and the organism provided will be used to
+look up the correct value for this. But you can use this argument to
+override that and supply your own taxonomy id here (which will be
+separately validated). Since providing a valid taxonomy id will not
+require us to look up one based on your organism: this is one way that
+you can loosen the restrictions about what is and isn't a valid value
+for the organism.
+</p>
+</td></tr>  
+<tr valign="top"><td><code>circ_seqs</code></td>
+<td>
+
+<p>A character vector to list out which chromosomes should be marked as
+circular.
+</p>
+</td></tr>
+<tr valign="top"><td><code>chrominfo</code></td>
+<td>
+
+<p>Data frame containing information about the chromosomes. Will be
+passed to the internal call to <code><a href="makeTxDb.html">makeTxDb</a></code>.
+See <code>?<a href="makeTxDb.html">makeTxDb</a></code> for more information.
+Alternatively, can be a <a href="../../GenomeInfoDb/html/Seqinfo.html">Seqinfo</a> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>miRBaseBuild</code></td>
+<td>
+
+<p>Specify the string for the appropriate build Information from mirbase.db
+to use for microRNAs. This can be learned by calling
+<code>supportedMiRBaseBuildValues</code>. By default, this value will be set to
+<code>NA</code>, which will inactivate the <code>microRNAs</code> accessor.
+</p>
+</td></tr>
+<tr valign="top"><td><code>metadata</code></td>
+<td>
+
+<p>A 2-column data frame containing meta information to be included in the
+<a href="TxDb-class.html">TxDb</a> object. See <code>?<a href="makeTxDb.html">makeTxDb</a></code> for more information about 
+the format of <code>metadata</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>dbxrefTag</code></td>
+<td>
+
+<p>If not missing, the values in the <code>Dbxref</code> attribute with the
+specified tag (like &ldquo;GeneID&rdquo;) are used for the feature names.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>makeTxDbFromGFF</code> is a convenience function that feeds
+data from the parsed file to the <code><a href="makeTxDbFromGRanges.html">makeTxDbFromGRanges</a></code>
+function.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A <a href="TxDb-class.html">TxDb</a> object.</p>
+
+
+<h3>Author(s)</h3>
+
+<p>M. Carlson and H. Pagès
+</p>
+
+
+<h3>See Also</h3>
+
+
+<ul>
+<li> <p><code><a href="makeTxDbFromGRanges.html">makeTxDbFromGRanges</a></code>, which <code>makeTxDbFromGFF</code>
+is based on, for making a <a href="TxDb-class.html">TxDb</a> object from a
+<a href="../../GenomicRanges/html/GRanges.html">GRanges</a> object.
+</p>
+</li>
+<li><p> The <code><a href="../../rtracklayer/html/import.html">import</a></code> function in the
+<span class="pkg">rtracklayer</span> package (also used by <code>makeTxDbFromGFF</code>
+internally).
+</p>
+</li>
+<li> <p><code><a href="makeTxDbFromUCSC.html">makeTxDbFromUCSC</a></code>, <code><a href="makeTxDbFromBiomart.html">makeTxDbFromBiomart</a></code>,
+and <code><a href="makeTxDbFromEnsembl.html">makeTxDbFromEnsembl</a></code>, for making a <a href="TxDb-class.html">TxDb</a>
+object from online resources.
+</p>
+</li>
+<li><p> The <code><a href="makeTxDbPackage.html">supportedMiRBaseBuildValues</a></code> function for
+listing all the possible values for the <code>miRBaseBuild</code>
+argument.
+</p>
+</li>
+<li><p> The <a href="TxDb-class.html">TxDb</a> class.
+</p>
+</li>
+<li> <p><code><a href="makeTxDb.html">makeTxDb</a></code> for the low-level function used by the
+<code>makeTxDbFrom*</code> functions to make the <a href="TxDb-class.html">TxDb</a> object
+returned to the user.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## TESTING GFF3
+gffFile &lt;- system.file("extdata","GFF3_files","a.gff3",package="GenomicFeatures")
+txdb &lt;- makeTxDbFromGFF(file=gffFile,
+            dataSource="partial gtf file for Tomatoes for testing",
+            organism="Solanum lycopersicum")
+
+## TESTING GTF, this time specifying the chrominfo
+gtfFile &lt;- system.file("extdata","GTF_files","Aedes_aegypti.partial.gtf",
+                       package="GenomicFeatures")
+chrominfo &lt;- data.frame(chrom = c('supercont1.1','supercont1.2'),
+                        length=c(5220442, 5300000),
+                        is_circular=c(FALSE, FALSE))
+metadata &lt;- data.frame(name="Resource URL",
+                       value=paste0("ftp://ftp.ensemblgenomes.org/pub/metazoa/",
+                                    "release-13/gtf/aedes_aegypti/"))
+txdb2 &lt;- makeTxDbFromGFF(file=gtfFile,
+             chrominfo=chrominfo,
+             dataSource="ensemblgenomes",
+             organism="Aedes aegypti",
+             metadata=metadata)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>GenomicFeatures</em> version 1.42.3 <a href="00Index.html">Index</a>]</div>
+</body></html>

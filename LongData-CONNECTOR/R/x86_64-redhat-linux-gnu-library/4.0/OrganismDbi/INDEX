@@ -1,0 +1,17 @@
+MultiDb-class           MultiDb and OrganismDb objects
+makeOrganismDbFromBiomart
+                        Make a OrganismDb object from annotations
+                        available on a BioMart database
+makeOrganismDbFromTxDb
+                        Make an OrganismDb object from an existing TxDb
+                        object.
+makeOrganismDbFromUCSC
+                        Make a OrganismDb object from annotations
+                        available at the UCSC Genome Browser
+makeOrganismPackage     Making OrganismDb packages from annotation
+                        packages.
+mapToTranscripts,ANY,MultiDb-method
+                        Map range coordinates between transcripts and
+                        genome space
+transcripts,MultiDb-method
+                        Extract genomic features from an object

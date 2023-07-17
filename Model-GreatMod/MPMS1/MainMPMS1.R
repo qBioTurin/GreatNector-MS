@@ -8,14 +8,14 @@ source("./RFunctions/Plot.R")
 
 run = function(init){
 
-    model.analysis(solver_fname = "Net/MS_Model.solver",
+    model.analysis(solver_fname = "MS_Model.solver",
                    f_time = 84*30, # days in 84 months
                    s_time = 1,
-                   parameters_fname = "Input/ParamsList.csv",
-                   functions_fname = "RFunctions/Functions.R",
+                   parameters_fname = "../Input/ParamsList.csv",
+                   functions_fname = "../RFunctions/Functions.R",
                    ini_v = init, # debug = T,
                    event_function = "EventFun",
-                   event_times = sort(c(180,540 ))
+                   event_times = sort(c(180,540))
     )
   
   
@@ -28,9 +28,8 @@ run = function(init){
 
 # 1) Generation of the model starting from its graphical representation
 
-model.generation(net_fname = "Net/MS_Model.PNPRO",
-								 transitions_fname = "Net/GenTransitions.cpp")
-system("mv MS_Model.* ./Net")
+model.generation(net_fname = "../Net/MS_Model.PNPRO",
+								 transitions_fname = "../Net/GenTransitions.cpp")
 
 # 2) Model Analysis
 
@@ -39,7 +38,7 @@ parmNamesMS = c("TeDup","TrDup2","TrDup","TeDup2",
                  "VentryTreg","VentryTeff_1", "VentryTeff_17",
                 "Consuption")
 
-saveRDS(parmNamesMS,file = "./Input/params_name.RDS")
+saveRDS(parmNamesMS,file = "../Input/params_name.RDS")
 init = rep(0,length(parmNamesMS))
 names(init) = parmNamesMS
 

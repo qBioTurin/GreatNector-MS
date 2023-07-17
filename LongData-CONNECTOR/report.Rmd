@@ -25,43 +25,57 @@ g = params$g
 ```
 
 ```{r dataLoad}
-load("RData/")
+
 load( paste0("RData/temporal",Data,".RData") )
+load("RData/Feature.RData")
 
 ## Counting relapses
-rel = grep(pattern = "RELAPSES", colnames(temporalCurve))
+rel = grep(pattern = "RELAPSES", colnames(Feature))
 temporalCurve$NumberRelapses = 0
 
 for( i in unique(temporalCurve$ID)){
-	temporalCurve[which(temporalCurve$ID == i),"NumberRelapses"] =
-		length(temporalCurve[which(temporalCurve$ID == i)[1],rel][!is.na(temporalCurve[which(temporalCurve$ID == i)[1],rel] )]
-												 )
+  temporalCurve[which(temporalCurve$ID == i),"NumberRelapses"] =
+    length(
+      Feature[which(Feature$ID == i)[1],rel][!is.na(Feature[which(Feature$ID == i)[1],rel] )]
+    )
 }
 
 temporalCurve = temporalCurve %>%
-	mutate(Relapses = ifelse(NumberRelapses ==0, "No rel","At least one"))
+  mutate(Relapses = ifelse(NumberRelapses ==0, "No rel","At least one"))
 temporalCurve$TypeRel = sapply(1:length(temporalCurve[,1]),
-															 function(x) gsub(pattern = "NA",replacement = "",paste(temporalCurve[x,rel],collapse = "")) )
+                               function(x) gsub(pattern = "NA",replacement = "",paste(Feature[x,rel],collapse = "")) )
 
 temporalCurve$NumberRelapses = as.factor(temporalCurve$NumberRelapses)
 #####
 
-patientsToNotConsider = c("CA0001","PR0002", "PR0004","ZG0005", "ZG0010", "ZG0017")
+#patientsToNotConsider = c("CA0001","PR0002", "PR0004","ZG0005", "ZG0010", "ZG0017")
+
+patientsToNotConsider = c("PR0002", "PR0004","ZG0005", "ZG0010", "ZG0017")
+
+TemporalCurve = merge(temporalCurve,
+                      Feature, by = "ID")
+
+TemporalCurve$Exp = Data
+
+rel = grep(pattern = "RELAPSES", colnames(TemporalCurve))
 
 do.call(rbind,
         lapply(temporalCurve %>% 
                  filter(Relapses!="No rel") %>% 
-                 select(ID) %>%
+                 dplyr::select(ID) %>%
                  distinct() %>% 
                  unlist(),
                function(i){
-                 TemporalCurve_sub = TemporalCurve %>% filter(ID == i)
+                 TemporalCurve_sub = TemporalCurve %>%
+                   filter(ID == i)
+
                  ftime = gsub(pattern = "M",
                               replacement = "",
                               x = TemporalCurve_sub[1,rel][!is.na(TemporalCurve_sub[1,rel] )]
                  )
                  ftime = unlist( strsplit(x = ftime,split = ",") )
                  ftime = min(as.numeric(ftime))
+                
                  TemporalCurve_sub = TemporalCurve_sub %>% 
                    dplyr::select(ID,Time, Exp) %>% 
                    na.omit() %>%
@@ -70,15 +84,23 @@ do.call(rbind,
                    filter(dif > 0)  %>% 
                    filter(dif == min(dif)) %>% 
                    ungroup() %>%
-                   dplyr::select(-dif)
+                   dplyr::select(-dif) %>%
+                   rename(TimeAfterFirstRel = Time)
+                 
                  TemporalCurve_sub$FirstRel = ftime
                  return(TemporalCurve_sub)
                })
 ) -> firstRelapse
 
-temporalCurve = rbind(temporalCurve %>% 
-  filter(! ID %in% patientsToNotConsider),
-  firstRelapse) %>%
+Feature = merge(Feature,
+                firstRelapse,all.x = T)
+
+Feature$Exp = Data
+
+temporalCurve = 
+  temporalCurve %>% 
+  dplyr::select(ID,Time, Observation) %>% 
+  filter(! ID %in% patientsToNotConsider) %>%
   group_by(ID) %>%
   na.omit() %>%
   mutate(l = length(ID)) %>%
@@ -86,12 +108,16 @@ temporalCurve = rbind(temporalCurve %>%
   select(-l) %>%
   ungroup()
 
-# Feature = Feature %>% filter(! ID %in% patientsToNotConsider)
+Feature = Feature %>% filter(! ID %in% patientsToNotConsider)
 
 temporalCurve$Observation = as.numeric(temporalCurve$Observation)
 
-CONNECTORList = DataFrameImport(TimeSeriesDataFrame = as.data.frame(temporalCurve),
-																AnnotationFrame = as.data.frame(Feature) )
+# remove time after third injection
+temporalCurve = temporalCurve %>% filter( !(ID == "CA0001" & Time == 72) )
+
+CONNECTORList = DataFrameImport(TimeSeriesDataFrame = as.data.frame(temporalCurve) %>%
+                                  dplyr::select(ID,Observation,Time),
+                                AnnotationFrame = as.data.frame(Feature) )
 
 ```
 
@@ -99,8 +125,8 @@ CONNECTORList = DataFrameImport(TimeSeriesDataFrame = as.data.frame(temporalCurv
 ### Visualization
 
 Datavisual<-DataVisualization(CONNECTORList,
-															feature="GENDER",
-															labels = c("Time",Data,Data))
+                              feature="GENDER",
+                              labels = c("Time",Data,Data))
 
 Datavisual
 ```
@@ -117,41 +143,41 @@ CrossLogLike$KnotsPlot
 ```{r Clustering}
 file = paste0("RData/Cluster",Data,"_p",p,".RData")
 if(file.exists(file)){
-	load(file)
+  load(file)
 }else{
-	S.cl <-ClusterAnalysis(CONNECTORList,
-												 G=2:7,
-												 p=p,
-												 runs=200,
-												 Cores=20)
-	save(S.cl, file = file)
+  S.cl <-ClusterAnalysis(CONNECTORList,
+                         G=2:7,
+                         p=p,
+                         runs=200,
+                         Cores=20)
+  save(S.cl, file = file)
 }
 
 
 IndexesPlot.Extrapolation(S.cl,q = 0.0)-> indexes
 indexes$Plot
 indexes$Plot +
-    coord_cartesian(ylim=c(0, 4))
+  coord_cartesian(ylim=c(0, 4))
 ConsMatrix.Extrapolation(S.cl)-> ConsInfo
 
 ```
 
 ```{r Ginvesitgation}
 for(G in g){
-	cat( paste0("\n## G = ",G, "##") )
-	print(ConsInfo[[paste0("G",G)]]$ConsensusPlot)
-
-	MostProbableClustering.Extrapolation(S.cl,G,q = .0) ->MostProbableClustering
-
-	FCMplots<- ClusterWithMeanCurve(clusterdata = MostProbableClustering,
-																	feature="GENDER",
-																	labels = c("Time",Data))
-
-	### Disriminant Plot (goodness of the cluster)
-	DSpl = DiscriminantPlot(clusterdata = MostProbableClustering,
-													feature = "GENDER")
-
-	print(DSpl[[1]])
+  cat( paste0("\n## G = ",G, "##") )
+  print(ConsInfo[[paste0("G",G)]]$ConsensusPlot)
+  
+  MostProbableClustering.Extrapolation(S.cl,G,q = .0) ->MostProbableClustering
+  
+  FCMplots<- ClusterWithMeanCurve(clusterdata = MostProbableClustering,
+                                  feature="GENDER",
+                                  labels = c("Time",Data))
+  
+  ### Disriminant Plot (goodness of the cluster)
+  DSpl = DiscriminantPlot(clusterdata = MostProbableClustering,
+                          feature = "GENDER")
+  
+  print(DSpl[[1]])
 }
 
 

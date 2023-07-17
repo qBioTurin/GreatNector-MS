@@ -1,6 +1,8 @@
 ---
 title: "Data Investigation"
-output: pdf_document
+output: 
+    pdf_document: 
+    keep_tex:  true
 ---
 
 ```{r setup, include=FALSE}
@@ -11,13 +13,14 @@ library(tidyr)
 ```
 
 
-# Connector Clustering
+# CONNECTOR Clustering
+
 I primi plot rappresentano la divisione in cluster ottenuti usando CONNECTOR (le colonne) per ogni esperimento (le righe). I colori dipendono dai pazienti, il numero di relapse (in ordine).
 
 ```{r dataPlot, warning=F,echo=F,fig.width = 10, fig.height = 8}
 
-TemporalCurve = readRDS(file = "RData/DataWithoutCurves/Summary.Rds")
-MeanCurves = readRDS(file = "RData/DataWithoutCurves/MeanCurves.Rds")
+TemporalCurve = readRDS(file = "RData/Summary.Rds")
+MeanCurves = readRDS(file = "RData/MeanCurves.Rds")
 
 steps = c("BASELINE"," M6"," M12"," M18"," M24"," M36"," M48","M60"," M72" )
 names(steps) = c(0,6 ,12, 18, 24, 36, 48, 60, 72)
@@ -72,8 +75,10 @@ do.call(rbind,
                    filter(dif == min(dif)) %>% 
                    ungroup() %>%
                    dplyr::select(-dif,-Observation)
-                 if(dim(TemporalCurve_sub)[1] == 0 )
-                   TemporalCurve_sub = data.frame(ID =NA, Time =NA, Exp = c("CD4","Th17","Treg","Th1") )
+                 if(dim(TemporalCurve_sub)[1] == 0 ) {
+                   # the GA0001 id does not have any obsevations after the relapse
+                   TemporalCurve_sub = data.frame(ID =i, Time =NA, Exp = c("CD4","Th17","Treg","Th1") )
+                   }
                  TemporalCurve_sub$FirstRel = ftime
                  
                  return(TemporalCurve_sub)
@@ -100,9 +105,19 @@ for(f in featCol){
       theme(legend.position = "bottom")+
       labs(x="",y="",col = f)
   )
+  
+if(f != "ID"){
+    for(ee in unique(tmp$Exp)){
+      print(ee)
+    tmp_sub_e = tmp[,c("Exp",f,"Cluster","ID")] %>%
+      filter(Exp == ee) %>%
+      distinct()
+    
+    print( knitr::kable(table(tmp_sub_e[,c(f,"Cluster")]) ) )
+    
+  }
 }
-
-
+}
 ```
 
 ```{r clusterUnion, warning=F,echo=F,fig.width = 10, fig.height = 8}
@@ -194,6 +209,7 @@ cluster <- kmeans(TemporalCurveSub_num[,-1],
 
 #don't use the record ID as a clustering variable!
 
+saveRDS(cluster,file = "RData/KmeansCluster.RDs")
 a = data.frame(TemporalCurveSub,ClusterKmeans = cluster$cluster)
 
 knitr::kable(a)
@@ -332,30 +348,6 @@ cluster <- kmeans(data[,-1],
 
 a = data.frame(data,ClusterKmeansZero = cluster$cluster)
 
-# set.seed(43)
-# tsne_out <-Rtsne::Rtsne(X = data[,-1],perplexity = 8)
-# a$x = tsne_out$Y[,1]
-# a$y = tsne_out$Y[,2]
-# 
-# ggplot(a) + 
-#   geom_point(aes(x = x, y = y, col = as.factor(ClusterKmeansZero)) ) +
-#   theme_bw()
-# 
-# TemporalCurveCl = merge(TemporalCurveCl,a[,c("ID","ClusterKmeansZero")])
-# firstRelapse2 = merge(firstRelapse,TemporalCurveCl[,c("ID","ClusterKmeans","ClusterKmeansZero")])
-# 
-# ggplot(TemporalCurveCl%>%
-#          arrange(Time) %>% drop_na(Observation) ) +
-#   geom_point(data = firstRelapse2,
-#              aes(x = Step, y = Observation, group = ID, col = as.factor(ClusterKmeansZero)),size = 2 )+
-#   scale_shape_manual(values=1:nlevels(TemporalCurve$ID)) +
-#   geom_line(aes(x = Step, y = Observation,group = ID, col = as.factor(ClusterKmeansZero)) )+
-#   facet_grid(Exp~ ClusterKmeans,scales = "free_y") +
-#   theme_bw()+
-#   theme(legend.position = "bottom")+
-#   scale_x_discrete(breaks = steps,limit = steps)+
-#   labs(title = "Colored with respect to kmeans clustering at time 0",x = "", y="")
-
 ```
 
 
@@ -419,126 +411,3 @@ for(f in featCol[-which(featCol%in% c("ID","EDSS"))]){
   }
 }
 ```
-
-<!-- # Kmeans Clustering adding the Th17/Treg intial condition -->
-
-<!-- ```{r NumClusterinf2, warning=F,echo=F,fig.width = 10, fig.height = 8} -->
-
-<!-- seed = 144 -->
-
-<!-- #install.packages("klaR") -->
-<!-- library(klaR) -->
-
-<!-- v = 1:3 -->
-<!-- names(v) = LETTERS[1:3] -->
-<!-- TemporalCurveSub->TemporalCurveSub_num -->
-<!-- for(i in 2:length(TemporalCurveSub_num)) -->
-<!--   TemporalCurveSub_num[,i] = v[TemporalCurveSub[,i]] -->
-
-<!-- data_sub = data %>%  -->
-<!--   mutate( Th17_Treg = Th17_prod/Treg_prod) %>%  -->
-<!--   dplyr::select(ID,Th17_Treg) -->
-<!-- TemporalCurveSub_num = merge(data_sub,TemporalCurveSub_num,by = "ID") -->
-
-<!-- cl = t(sapply(2:7, function(k){ -->
-<!--   set.seed(seed) -->
-<!--   cluster <- kmeans(TemporalCurveSub_num[,-1], -->
-<!--                     k, -->
-<!--                     iter.max = 1000)  -->
-<!--   return(data.frame(With=sum(cluster$withinss),K=k)) -->
-<!-- })) -->
-
-<!-- cl = data.frame(K = unlist(cl[,2]), With = unlist(cl[,1])) -->
-<!-- kopt = cl$K[which.min( c(cl$With[1],abs(diff(cl$With))) )]-1 -->
-<!-- kopt=3 -->
-<!-- ggplot(cl,aes(x= K,y=With)) + -->
-<!--   geom_line() + -->
-<!--   geom_point() + -->
-<!--   geom_vline(xintercept = kopt) -->
-
-<!-- set.seed(seed) -->
-<!-- cluster <- kmeans(TemporalCurveSub_num[,-1], -->
-<!--                   kopt, -->
-<!--                   iter.max = 1000 )  -->
-
-<!-- #don't use the record ID as a clustering variable! -->
-
-<!-- a = data.frame(TemporalCurveSub_num,ClusterKmeans = cluster$cluster) -->
-
-<!-- knitr::kable(a) -->
-
-<!-- ``` -->
-
-<!-- ```{r dataplotClusterKmeans2, warning=F,echo=F,fig.width = 10, fig.height = 8} -->
-
-<!-- TemporalCurveCl = merge(TemporalCurve,a[,c("ID","ClusterKmeans")]) -->
-<!-- infoCl = TemporalCurveCl %>% dplyr::select(-Observation,-Time,-Step) %>% distinct() -->
-
-<!-- firstRelapse = merge(firstRelapse,a[,c("ID","ClusterKmeans")]) -->
-
-<!-- ggplot(TemporalCurveCl%>% -->
-<!--          arrange(Time) %>% drop_na(Observation) ) + -->
-<!--   geom_point(data = firstRelapse, -->
-<!--              aes(x = Step, y = Observation, group = ID, col =ID),size = 2 )+        scale_x_discrete(breaks = steps,limit = steps)+ -->
-<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = ID))+ -->
-<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
-<!--   theme_bw()+ -->
-<!--   theme(legend.position = "bottom")+ -->
-<!--   labs(title = "Colored with respect to IDs",x = "", y="") -->
-
-<!-- ggplot(TemporalCurveCl%>% -->
-<!--          arrange(Time) %>% drop_na(Observation) ) + -->
-<!--   geom_point(data = firstRelapse, -->
-<!--              aes(x = Step, y = Observation, group = ID, col = Relapses),size = 2 )+ -->
-<!--   scale_x_discrete(breaks = steps,limit = steps)+ -->
-<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = Relapses))+ -->
-<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
-<!--   theme_bw()+ -->
-<!--   theme(legend.position = "bottom")+ -->
-<!--   labs(title = "Colored with respect to number of relapses",x = "", y="") -->
-<!-- knitr::kable(infoCl %>%  -->
-<!--                dplyr::select(-Exp) %>%  -->
-<!--                distinct() %>% -->
-<!--                group_by(ClusterKmeans) %>%  -->
-<!--                dplyr::count(Relapses)) -->
-
-<!-- ggplot(TemporalCurveCl%>% -->
-<!--          arrange(Time) %>% drop_na(Observation) ) + -->
-<!--   geom_point(data = firstRelapse, -->
-<!--              aes(x = Step, y = Observation, group = ID, col = Cluster),size = 2 )+ -->
-<!--   scale_x_discrete(breaks = steps,limit = steps)+ -->
-<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = Cluster))+ -->
-<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
-<!--   theme_bw()+ -->
-<!--   theme(legend.position = "bottom")+ -->
-<!--   labs(title = "Colored with respect to the connector's clusters obtained for each experiment", -->
-<!--        x = "", y="") -->
-<!-- knitr::kable(infoCl %>% group_by(Exp,ClusterKmeans) %>% dplyr::count(Cluster)) -->
-
-<!-- ggplot(TemporalCurveCl%>% -->
-<!--          arrange(Time) %>% drop_na(Observation) ) + -->
-<!--   geom_point(data = firstRelapse, -->
-<!--              aes(x = Step, y = Observation, group = ID, col = EDSS),size = 2 )+ -->
-<!--   scale_x_discrete(breaks = steps,limit = steps)+ -->
-<!--   geom_line(aes(x = Step, y = Observation,group = ID, col = EDSS))+ -->
-<!--   facet_grid(Exp~ ClusterKmeans,scales = "free_y") + -->
-<!--   theme_bw()+ -->
-<!--   theme(legend.position = "bottom")+ -->
-<!--   labs(title = "Colored with respect to EDSS connector clustering", -->
-<!--        x = "", y="") -->
-<!-- knitr::kable(infoCl %>%  -->
-<!--                dplyr::select(-Exp) %>%  -->
-<!--                distinct() %>% -->
-<!--                group_by(ClusterKmeans) %>% dplyr::count(EDSS)) -->
-
-<!-- gr = TemporalCurveCl %>% -->
-<!--   #group_by(Time,Exp,ClusterKmodes) %>% -->
-<!--   #dplyr::summarise(Mean = mean(Observation,na.rm = T)) %>%  -->
-<!--   dplyr::select(Time, Observation, ClusterKmeans, Exp,ID) %>% -->
-<!--   dplyr::mutate(Month = ifelse(Time < 5, Time*6, (Time-1)*12 ) ) -->
-
-<!-- # write.table(x = gr, file = "Model/Input/reference.csv", -->
-<!-- #             row.names = F, -->
-<!-- #             col.names = T, -->
-<!-- #             quote = F )  -->
-<!-- ``` -->

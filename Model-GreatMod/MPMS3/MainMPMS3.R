@@ -1,27 +1,27 @@
 # library(devtools)
-# install_github("https://github.com/qBioTurin/epimod", ref="variabilityFBA")
-# downloadContainers(tag = "2.0.0")
+# install_github("https://github.com/qBioTurin/epimod")
+# downloadContainers(tag = "latest")
 
 library(epimod)
-setwd("/MPMS3/")
-source("./RFunctions/Plot.R")
+setwd("~/GreatNector-MS/Model-GreatMod/MPMS3/")
+source("../RFunctions/Plot.R")
 
 run = function(init){
-    model.analysis(solver_fname = "Net/MS_Model.solver",
+    model.analysis(solver_fname = "../Net/MS_Model.solver",
                    f_time = 84*30, # days in 84 months
                    s_time = 15,
                    solver_type = "TAUG",
                    n_run = 60, taueps = 0.1,
                    parallel_processors = 20,
-                   parameters_fname = "Input/ParamsList.csv",
-                   functions_fname = "RFunctions/Functions.R",
+                   parameters_fname = "../Input/ParamsList.csv",
+                   functions_fname = "../RFunctions/Functions.R",
                    ini_v = init, # debug = T,
                    event_function = "EventFun",
                    event_times = sort(c(180,540 ))
     )
   
   pl = plot.generation(folder = "MS_Model_analysis",
-                       reference = "Input/referenceGroup3.csv",
+                       reference = "../Input/referenceGroup3.csv",
                        event_ATZ = c(0,360), # Idose = after 6M and the IIdose after 12M w.r.t. the Idose
                        event_Antig = 0 )
   return(pl$pl)
@@ -29,9 +29,8 @@ run = function(init){
 
 # 1) Generation of the model starting from its graphical representation
 
-model.generation(net_fname = "Net/MS_Model.PNPRO",
-								 transitions_fname = "Net/GenTransitions.cpp")
-system("mv MS_Model.* ./Net")
+model.generation(net_fname = "../Net/MS_Model.PNPRO",
+								 transitions_fname = "../Net/GenTransitions.cpp")
 
 # 2) Model Analysis
 
@@ -40,7 +39,7 @@ parmNamesMS = c("TeDup","TrDup2","TrDup","TeDup2",
                  "VentryTreg","VentryTeff_1", "VentryTeff_17",
                 "Consuption")
 
-saveRDS(parmNamesMS,file = "./Input/params_name.RDS")
+saveRDS(parmNamesMS,file = "../Input/params_name.RDS")
 init = rep(0,length(parmNamesMS))
 names(init) = parmNamesMS
 

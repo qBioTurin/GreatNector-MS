@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This project file has been saved by the New GreatSPN Editor, v.100 --><project name="Rete_SM_new" version="121">
+  <gspn name="Simpleprova" view-rates="false" zoom="75">
+    <nodes>
+      <place label-x="-2.0" label-y="-1.0" name="Teff_in" x="68.0" y="78.0"/>
+      <place label-x="-2.5" label-y="1.0" magnets="NSEW_SQUARE_POINTS" name="Treg_in" x="41.0" y="78.0"/>
+      <text-box bold="true" border-color="#000000" fill-color="none" height="26.24375" locked="true" name="__textBox0" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" width="26.5" x="122.75" y="32.878125">Rates definition:</text-box>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="TrD" shown-as="\mathrm{TregDeath}" value="0.0416667" x="123.5625" y="50.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="TeD" shown-as="\mathrm{TeffDeath}" value="0.0416667" x="123.8125" y="51.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="rec" shown-as="\mathrm{ODCRecovery}" value="0.10" x="137.125" y="49.0"/>
+      <text-box bold="true" border-color="#000000" fill-color="none" height="8.375" name="__textBox1" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" width="43.375" x="122.3125" y="10.8125">Color definition:</text-box>
+      <color-class definition="circular le{1..1} is Lmin + le{2..2} is L2 + le{3..3} is L3+ le{4..4} is L4 + le{5..5} is Lmax" name="Mie" x="123.5625" y="13.0"/>
+      <color-var domain="Mie" name="l" x="123.4375" y="15.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="NKD" shown-as="\mathrm{NKDeath}" value="0.0416667" x="123.9375" y="49.0"/>
+      <transition delay="TimoReg" guard-x="-5.5" guard-y="0.5" label-y="-1.0" name="FromTimoREG" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="41.55" y="41.0"/>
+      <transition delay="TimoEff" guard-x="-5.5" guard-y="0.5" label-y="-1.0" name="FromTimoEFF" nservers-x="0.5" rotation="3.141592653589793" type="EXP" x="75.55" y="42.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="ATZD" shown-as="\mathrm{ATZDeath}" value="0" x="123.375" y="52.0"/>
+      <transition delay="Pass_BBB_Treg" guard="teff in Th17" label-x="-3.5" label-y="-1.0" name="Treg_pass_BBB" nservers-x="0.5" rotation="4.71238898038469" type="EXP" x="41.55" y="65.0"/>
+      <place label-x="3.5" label-y="1.0" name="Treg_out" x="41.0" y="46.0"/>
+      <place domain="TeffType" label-x="-4.0" label-y="1.0" name="Teff_out" x="68.0" y="46.0"/>
+      <transition delay="Pass_BBB_Teff" guard="teff1 in Th17" label-x="4.0" label-y="-1.0" magnets="NSEW_SQUARE_POINTS" name="Teff_pass_BBB" nservers-x="0.5" rotation="4.71238898038469" type="EXP" x="68.55" y="65.0"/>
+      <place label-x="-2.5" label-y="-1.0" name="Antigen" x="59.0" y="19.0"/>
+      <transition delay="Call[&quot;Killing&quot;]" label-x="3.5" label-y="0.5" name="TeffkillsA" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="64.55" y="19.0"/>
+      <transition delay="Call[&quot;TeffDup&quot;]" guard-y="3.0" label-y="-1.0" name="TeffDup_out" nservers-x="0.5" rotation="4.71238898038469" type="EXP" x="70.55" y="36.0"/>
+      <transition delay="Call[&quot;TregDup&quot;]" delay-x="1.0" guard-y="3.0" label-x="-2.5" label-y="1.0" name="TregDup_out" nservers-x="0.5" rotation="4.71238898038469" type="EXP" x="38.55" y="51.0"/>
+      <transition delay="TrD" magnets="NSEW_POINTS" name="Treg_death" nservers-x="0.5" type="EXP" x="32.55" y="46.0"/>
+      <transition delay="TeD" label-y="1.5" magnets="NSEW_SQUARE_POINTS" name="Teff_death" nservers-x="0.5" rotation="6.283185307179586" type="EXP" x="75.55" y="46.0"/>
+      <transition delay="Call[&quot;Killing&quot;]" label-y="1.5" name="TregKillsTeff_out" nservers-x="0.5" type="EXP" x="55.55" y="46.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="INFproduction" shown-as="\mathrm{INFproduction}" value="0.10" x="124.125" y="37.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="INFproductionNK" shown-as="\mathrm{INFproductionNK}" value="0.10" x="123.875" y="38.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="IL10production" shown-as="\mathrm{IL10production}" value="0.10" x="125.125" y="39.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="IL10productionNK" shown-as="\mathrm{IL10productionNK}" value="0.10" x="124.875" y="40.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="IL17production" shown-as="\mathrm{IL17production}" value="0.10" x="123.625" y="36.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="TimoReg" shown-as="\mathrm{TimoReg}" value="0.3174603" x="139.75" y="37.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="TimoEff" shown-as="\mathrm{TimoEff}" value="0.2963841" x="139.5" y="36.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="NKBorn" shown-as="\mathrm{NKBorn}" value=" 0.1666667" x="139.375" y="38.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="IL10onBBB" shown-as="\mathrm{IL10onBBB}" value="0.10" x="136.25" y="43.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="IL17onBBB" shown-as="\mathrm{IL17onBBB}" value="0.10" x="136.25" y="42.0"/>
+      <constant alt-name-fn="LATEX_TEXT" consttype="REAL" name="NK2" shown-as="\mathrm{NKdup}" value="0.0416667" x="123.875" y="44.0"/>
+      <place label-y="-1.5" name="ATZ" x="55.0" y="53.0"/>
+      <transition delay="ATZD" label-x="3.0" label-y="1.5" name="ATZDegradation" nservers-x="0.5" rotation="3.665191429188092" type="EXP" x="60.55" y="56.0"/>
+      <transition delay="Call[&quot;ATZKill&quot;]" label-x="0.5" name="ATZkillTreg" nservers-x="0.5" type="EXP" x="47.55" y="53.0"/>
+      <transition delay="Call[&quot;ATZKill&quot;]" label-x="0.5" name="ATZkillTeff" nservers-x="0.5" type="EXP" x="61.55" y="53.0"/>
+      <text-box bold="true" border-color="#3f0018" fill-color="#fff3f8" height="10.5" horiz-pos="2" name="__textBox2" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="102.0" x="19.0" y="59.5">Barrier</text-box>
+      <text-box bold="true" border-color="#3f2f00" fill-color="#fffcf3" height="7.5" horiz-pos="2" name="__textBox3" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="29.0" x="42.0" y="52.0">ATZ</text-box>
+      <text-box bold="true" border-color="#203f00" fill-color="#f4fff3" height="26.5" horiz-pos="2" name="__textBox4" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="21.5" x="24.0" y="27.0">Treg</text-box>
+      <text-box bold="true" border-color="#00273f" fill-color="#f3ffff" height="24.5" horiz-pos="2" name="__textBox5" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="41.5" x="46.25" y="26.75">Teff</text-box>
+      <text-box bold="true" border-color="#3f0000" fill-color="#fff3f3" height="12.0" horiz-pos="2" name="__textBox7" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="29.0" x="46.0" y="14.0">Antigen</text-box>
+      <text-box bold="true" border-color="#203f00" fill-color="#f4fff3" height="26.5" horiz-pos="2" locked="true" name="copy___textBox4" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="21.5" x="30.25" y="70.75">Treg</text-box>
+      <text-box bold="true" border-color="#00273f" fill-color="#f3ffff" height="26.25" horiz-pos="2" locked="true" name="copy___textBox5" shadow="true" shape="ROUND_RECTANGLE" text-color="#000000" text-size="HEADER1" vert-pos="3" width="22.5" x="52.75" y="71.0">Teff</text-box>
+      <constant consttype="REAL" name="Pass_BBB_Treg" value="0" x="137.375" y="53.0"/>
+      <constant consttype="REAL" name="Pass_BBB_Teff" value="0" x="137.25" y="54.0"/>
+      <constant consttype="REAL" name="TregDup" value="0.0416667" x="124.875" y="45.0"/>
+      <constant consttype="REAL" name="TregActivation" value=" 0" x="137.8125" y="48.0"/>
+      <color-class definition="t{17..17} is Th17 + t{1..1} is Th1" name="TeffType" x="123.6875" y="21.0"/>
+      <color-var domain="TeffType" name="teff" x="124.125" y="23.0"/>
+      <transition delay="Call[&quot;AntigEntry&quot;]" label-y="-1.0" name="Entry" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="59.55" y="15.0"/>
+      <transition name="Consuption" nservers-x="0.5" type="EXP" x="51.55" y="57.0"/>
+      <color-var domain="TeffType" name="teff2" x="126.125" y="25.0"/>
+      <color-var domain="TeffType" name="teff1" x="135.0625" y="23.0"/>
+    </nodes>
+    <edges>
+      <arc head="Treg_pass_BBB" kind="INPUT" tail="Treg_out"/>
+      <arc head="Teff_pass_BBB" kind="INPUT" mult="&lt;teff1&gt;+&lt;teff2&gt;" mult-k="0.8420898437500001" mult-x="-2.5" mult-y="1.0002929687499957" tail="Teff_out"/>
+      <arc head="TeffkillsA" kind="INPUT" mult-k="0.90009765625" mult-x="-1.5" mult-y="-0.3016601562500014" tail="Antigen"/>
+      <arc head="TeffkillsA" head-magnet="1" kind="INPUT" mult="&lt;teff&gt;" mult-k="0.6346679687500001" mult-x="0.685312954917336" mult-y="0.45615768147983715" tail="Teff_out" tail-magnet="6">
+        <point x="65.0" y="39.0"/>
+      </arc>
+      <arc head="TeffDup_out" kind="INPUT" mult="&lt;teff&gt;" mult-k="1.9999023437499996" tail="Teff_out" tail-magnet="1">
+        <point x="71.0" y="41.5"/>
+      </arc>
+      <arc head="Teff_out" head-magnet="1" kind="OUTPUT" mult="2&lt;teff&gt;" mult-k="0.0" mult-x="-1.718780517578125" mult-y="0.550048828125" tail="TeffDup_out">
+        <point x="68.5" y="41.0"/>
+      </arc>
+      <arc head="Treg_out" head-magnet="3" kind="OUTPUT" mult="2" mult-k="1.50283203125" mult-x="-0.729509042160565" mult-y="0.4316968072018952" tail="TregDup_out" tail-magnet="1">
+        <point x="40.5" y="52.0"/>
+      </arc>
+      <arc head="TregDup_out" head-magnet="1" kind="INPUT" mult-k="1.7616210937499996" tail="Treg_out" tail-magnet="3">
+        <point x="39.0" y="49.0"/>
+      </arc>
+      <arc head="Treg_death" head-magnet="1" kind="INPUT" tail="Treg_out"/>
+      <arc head="Teff_death" head-magnet="3" kind="INPUT" mult="&lt;teff&gt;" mult-k="0.21240234375000003" tail="Teff_out" tail-magnet="0"/>
+      <arc head="TregKillsTeff_out" kind="INPUT" mult-k="1.38271484375" tail="Treg_out" tail-magnet="0">
+        <point x="50.0" y="47.0"/>
+      </arc>
+      <arc head="Treg_out" kind="OUTPUT" mult-k="0.27509765625000004" tail="TregKillsTeff_out"/>
+      <arc head="TregKillsTeff_out" kind="INPUT" mult="&lt;teff&gt;" mult-k="0.5241210937499999" tail="Teff_out" tail-magnet="4"/>
+      <arc head="ATZDegradation" kind="INPUT" tail="ATZ"/>
+      <arc head="ATZkillTeff" kind="INPUT" tail="ATZ" tail-magnet="1"/>
+      <arc head="ATZkillTreg" kind="INPUT" tail="ATZ" tail-magnet="4"/>
+      <arc head="ATZkillTreg" kind="INPUT" mult-k="0.5895507812500002" mult-x="-0.05722656249999858" mult-y="0.4427734375000014" tail="Treg_out">
+        <point x="44.0" y="54.0"/>
+      </arc>
+      <arc head="ATZkillTeff" kind="INPUT" mult="&lt;teff&gt;" tail="Teff_out">
+        <point x="67.0" y="54.0"/>
+      </arc>
+      <arc head="Antigen" kind="OUTPUT" tail="Entry"/>
+      <arc head="Teff_out" kind="OUTPUT" mult="&lt;teff&gt;" mult-y="0.0" tail="FromTimoEFF"/>
+      <arc head="Teff_in" kind="OUTPUT" mult-x="-1.5" mult-y="0.5" tail="Teff_pass_BBB"/>
+      <arc head="Treg_in" kind="OUTPUT" tail="Treg_pass_BBB"/>
+      <arc head="Treg_out" kind="OUTPUT" mult-k="1.38779296875" tail="FromTimoREG">
+        <point x="42.0" y="43.25048828125"/>
+      </arc>
+      <arc broken="true" head="TregDup_out" kind="INPUT" mult="&lt;teff&gt;" mult-k="2.68345947265625" tail="Teff_out">
+        <point x="52.0" y="56.5"/>
+        <point x="38.0" y="56.5"/>
+      </arc>
+      <arc broken="true" head="Teff_out" kind="OUTPUT" mult="&lt;teff&gt;" tail="TregDup_out">
+        <point x="38.0" y="56.5"/>
+        <point x="52.0" y="56.5"/>
+      </arc>
+      <arc head="ATZ" kind="OUTPUT" tail="ATZkillTeff"/>
+      <arc head="ATZ" kind="OUTPUT" tail="ATZkillTreg"/>
+      <arc head="Consuption" kind="INPUT" tail="ATZ"/>
+      <arc head="Treg_pass_BBB" kind="INPUT" mult="&lt;teff&gt;" mult-k="1.40087890625" tail="Teff_out">
+        <point x="63.5" y="65.0"/>
+      </arc>
+      <arc head="Teff_out" kind="OUTPUT" mult="&lt;teff1&gt;" tail="Teff_pass_BBB" tail-magnet="3">
+        <point x="72.5" y="54.5"/>
+      </arc>
+      <arc head="Teff_out" kind="OUTPUT" mult="&lt;teff&gt;" tail="Treg_pass_BBB">
+        <point x="61.5" y="63.0"/>
+      </arc>
+    </edges>
+  </gspn>
+  <measures gspn-name="PetriNetold" name="Measures" simplified-UI="false">
+    <assignments/>
+    <greatspn/>
+    <formulas>
+      <formula comment="Basic statistics of the toolchain execution." language="STAT"/>
+      <formula comment="All the basic Petri net measures" language="ALL"/>
+    </formulas>
+  </measures>
+</project>
